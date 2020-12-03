@@ -23,6 +23,7 @@ export default async function () {
           let team = await db.getOneTeam(req.query.teamKey)
           if (!team.researchersKeys.includes(req.user._key)) return res.sendStatus(403)
           else {
+            // TODO: only answers related to the studies managed by the team should be returned
             let answers = await db.getAnswers()
             res.send(answers)
           }

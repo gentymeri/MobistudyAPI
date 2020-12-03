@@ -85,8 +85,8 @@ export default async function (db) {
       }
     },
 
-    // deletes all data based on participant
-    async deleteAnswersByParticipant (userKey) {
+    // deletes all data based on user key
+    async deleteAnswersByUser (userKey) {
       let answers = await this.getAnswersDataByUser(userKey)
       for (let i = 0; i < answers.length; i++) {
         await this.deleteAnswer(answers[i]._key)

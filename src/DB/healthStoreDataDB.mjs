@@ -63,15 +63,15 @@ export default async function (db) {
     // deletes all data based on study
     async deleteHealthStoreByStudy (studyKey) {
       let healthStoreData = await this.getHealthStoreDataByStudy(studyKey)
-      for(let i = 0; i < healthStoreData.length; i++) {
+      for (let i = 0; i < healthStoreData.length; i++) {
         await this.deleteHealthStoreData(healthStoreData[i]._key)
       }
     },
 
-    // deletes all data based on participant
-    async deleteHealthStoreDataByParticipant (userKey) {
+    // deletes all data based on user key
+    async deleteHealthStoreDataByUser (userKey) {
       let healthStoreData = await this.getHealthStoreDataByUser(userKey)
-      for(let i = 0; i < healthStoreData.length; i++) {
+      for (let i = 0; i < healthStoreData.length; i++) {
         await this.deleteHealthStoreData(healthStoreData[i]._key)
       }
     }

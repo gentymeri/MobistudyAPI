@@ -60,18 +60,18 @@ export default async function (db, logger) {
       return true
     },
 
-       // deletes all data based on study
+    // deletes all data based on study
     async deleteSMWTDataByStudy (studyKey) {
       let SMWTData = await this.getSMWTDataByStudy(studyKey)
-      for(let i = 0; i < SMWTData.length; i++) {
+      for (let i = 0; i < SMWTData.length; i++) {
         await this.deleteSMWTData(SMWTData[i]._key)
       }
     },
 
     // deletes all data based on participant
-    async deleteSMWTDataByParticipant (userKey) {
+    async deleteSMWTDataByUser (userKey) {
       let SMWTData = await this.getSMWTDataByUser(userKey)
-      for(let i = 0; i < SMWTData.length; i++) {
+      for (let i = 0; i < SMWTData.length; i++) {
         await this.deleteSMWTData(SMWTData[i]._key)
       }
     }

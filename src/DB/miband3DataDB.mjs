@@ -63,15 +63,15 @@ export default async function (db) {
     // deletes all data based on study
     async deleteMiband3DataByStudy (studyKey) {
       let miband3Data = await this.getMiband3DataByStudy(studyKey)
-      for(let i = 0; i < miband3Data.length; i++) {
+      for (let i = 0; i < miband3Data.length; i++) {
         await this.deleteMiband3Data(miband3Data[i]._key)
       }
     },
 
-    // deletes all data based on participant
-    async deleteMiband3DataByParticipant (userKey) {
+    // deletes all data based on user
+    async deleteMiband3DataByUser (userKey) {
       let miband3Data = await this.getMiband3DataByUser(userKey)
-      for(let i = 0; i < miband3Data.length; i++) {
+      for (let i = 0; i < miband3Data.length; i++) {
         await this.deleteMiband3Data(miband3Data[i]._key)
       }
     }
