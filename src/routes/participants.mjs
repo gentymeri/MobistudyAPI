@@ -106,10 +106,10 @@ export default async function () {
       let userKey = participant.userKey
       if (req.user.role === 'admin' || req.user.role === 'participant') {
         if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
-        
+
         // Remove Answers
         await db.deleteAnswersByParticipant(userKey)
-        
+
         // Remove Health Store Data
         await db.deletHealthStoreDataByParticipant(userKey)
 
@@ -190,7 +190,7 @@ export default async function () {
       let participant = await db.getParticipantByUserKey(userKey)
       if (!participant) return res.status(404)
       // Remove Answers
-      let answers = await db.getAllAnswersByUser(userKey)
+      let answers = await db.getAnswersByUser(userKey)
       for (let i = 0; i < answers.length; i++) {
         let answerKey = answers[i]._key
         await db.deleteAnswer(answerKey)

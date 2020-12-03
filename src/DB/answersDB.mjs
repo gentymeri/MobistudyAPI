@@ -11,7 +11,7 @@ export default async function (db) {
   let collection = await utils.getCollection(db, 'answers')
 
   return {
-    async getAllAnswers () {
+    async getAnswers () {
       var filter = ''
 
       // TODO: use LIMIT @offset, @count in the query for pagination
@@ -80,7 +80,7 @@ export default async function (db) {
     // deletes all data based on study
     async deleteAnswersByStudy (studyKey) {
       let answers = await this.getMiband3DataByStudy(studyKey)
-      for(let i = 0; i < answers.length; i++) {
+      for (let i = 0; i < answers.length; i++) {
         await this.deleteAnswer(answers[i]._key)
       }
     },
@@ -88,7 +88,7 @@ export default async function (db) {
     // deletes all data based on participant
     async deleteAnswersByParticipant (userKey) {
       let answers = await this.getAnswersDataByUser(userKey)
-      for(let i = 0; i < answers.length; i++) {
+      for (let i = 0; i < answers.length; i++) {
         await this.deleteAnswer(answers[i]._key)
       }
     }

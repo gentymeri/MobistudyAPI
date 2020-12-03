@@ -23,7 +23,7 @@ export default async function () {
           let team = await db.getOneTeam(req.query.teamKey)
           if (!team.researchersKeys.includes(req.user._key)) return res.sendStatus(403)
           else {
-            let answers = await db.getAllAnswers()
+            let answers = await db.getAnswers()
             res.send(answers)
           }
         }
