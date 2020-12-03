@@ -54,10 +54,26 @@ export default async function (db) {
       return miband3Data
     },
 
-    // deletes healthStoreData
+    // deletes miband3Data
     async deleteMiband3Data (_key) {
       await collection.remove(_key)
       return true
+    },
+
+    // deletes all data based on study
+    async deleteMiband3DataByStudy (studyKey) {
+      let miband3Data = await this.getMiband3DataByStudy(studyKey)
+      for(let i = 0; i < miband3Data.length; i++) {
+        await this.deleteMiband3Data(miband3Data[i]._key)
+      }
+    },
+
+    // deletes all data based on participant
+    async deleteMiband3DataByParticipant (userKey) {
+      let miband3Data = await this.getMiband3DataByUser(userKey)
+      for(let i = 0; i < miband3Data.length; i++) {
+        await this.deleteMiband3Data(miband3Data[i]._key)
+      }
     }
   }
 }

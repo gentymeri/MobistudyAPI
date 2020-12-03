@@ -149,7 +149,16 @@ export default async function () {
             await db.replaceParticipant(partKey, participant)
           }
         }
+        // Data needs to be deleted before the study TODO: Should do this for the other type of data as well
+        await db.deleteAnswersByStudy(studyKey)
+        await db.deleteHealthStoreByStudy(studykey)
+        await db.deleteQCSTDataByStudy(studyKey)
+        await db.deleteSMWTDataByStudy(studyKey)
+        await db.deleteMiband3DataByStudy(studyKey)
+
+        // Deleting the study
         await db.deleteStudy(studykey)
+        
         res.sendStatus(200)
         applogger.info({ studyKey: studykey }, 'Study deleted')
         auditLogger.log('studyDescriptionDeleted', req.user._key, studykey, undefined, 'Study description with key ' + studykey + ' deleted', 'studies', studykey, undefined)

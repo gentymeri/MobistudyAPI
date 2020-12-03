@@ -58,6 +58,22 @@ export default async function (db, logger) {
     async deleteQCSTData (_key) {
       await collection.remove(_key)
       return true
+    },
+
+       // deletes all data based on study
+    async deleteQCSTDataByStudy (studyKey) {
+      let QCSTData = await this.getQCSTDataByStudy(studyKey)
+      for(let i = 0; i < QCSTData.length; i++) {
+        await this.deleteQCSTData(QCSTData[i]._key)
+      }
+    },
+
+    // deletes all data based on participant
+    async deleteQCSTDataByParticipant (userKey) {
+      let QCSTData = await this.getQCSTDataByUser(userKey)
+      for(let i = 0; i < QCSTData.length; i++) {
+        await this.deleteQCSTData(QCSTData[i]._key)
+      }
     }
   }
 }

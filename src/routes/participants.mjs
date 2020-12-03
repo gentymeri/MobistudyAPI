@@ -106,18 +106,22 @@ export default async function () {
       let userKey = participant.userKey
       if (req.user.role === 'admin' || req.user.role === 'participant') {
         if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
+        
         // Remove Answers
-        let answers = await db.getAllAnswersByUser(userKey)
-        for (let i = 0; i < answers.length; i++) {
-          let answerKey = answers[i]._key
-          await db.deleteAnswer(answerKey)
-        }
+        await db.deleteAnswersByParticipant(userKey)
+        
         // Remove Health Store Data
-        let healthData = await db.getHealthStoreDataByUser(userKey)
-        for (let j = 0; j < healthData.length; j++) {
-          let healthDataKey = healthData[j]._key
-          await db.deleteHealthStoreData(healthDataKey)
-        }
+        await db.deletHealthStoreDataByParticipant(userKey)
+
+        // Remove Miband3 Data TODO: Refactor the above, answers and healthData as well
+        await db.deleteMiband3DataByParticipant(userKey)
+
+        // Remove QCST Data
+        await db.deleteQCSTDataByParticipant(userKey)
+
+        // Remove SMWT Data
+        await db.deleteSMWTDataByParticipant(userKey)
+
         // Remove Audit logs
         let auditLogs = await db.getLogsByUser(userKey)
         for (let k = 0; k < auditLogs.length; k++) {
