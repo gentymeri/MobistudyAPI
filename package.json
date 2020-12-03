@@ -5,8 +5,8 @@
   "description": "The REST API of Mobistudy",
   "main": "./src/www.mjs",
   "scripts": {
-    "start": "node --experimental-modules ./src/www.mjs",
-    "devstart": "nodemon --experimental-modules",
+    "start": "node ./src/www.mjs",
+    "devstart": "nodemon ",
     "test:unit": "jest --updateSnapshot",
     "test:unit:watch": "jest --watch",
     "test:unit:watchAll": "jest --watchAll",
