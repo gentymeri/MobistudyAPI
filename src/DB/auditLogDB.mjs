@@ -26,7 +26,7 @@ export default async function (db) {
       if (countOnly) {
         queryString = 'RETURN COUNT ( '
       }
-      let bindings = { }
+      let bindings = {}
       queryString += `FOR log IN auditlogs `
       if (!countOnly || userEmail) {
         queryString += ` FOR user IN users
@@ -96,6 +96,7 @@ export default async function (db) {
         else return undefined
       } else return cursor.all()
     },
+
     async getLogsByUser (userKey) {
       let bindings = { 'userKey': userKey }
       let query = 'FOR log IN auditlogs FILTER log.userKey == @userKey RETURN log'
@@ -103,10 +104,18 @@ export default async function (db) {
       let cursor = await db.query(query, bindings)
       return cursor.all()
     },
+
     // deletes a log
     async deleteLog (_key) {
       await collection.remove(_key)
       return true
+    },
+
+    async deleteLogsByUser (userKey) {
+      let bindings = { 'userKey': userKey }
+      let query = 'FOR log IN auditlogs FILTER log.userKey == @userKey REMOVE log IN auditlogs'
+      applogger.trace('Querying "' + query + '"')
+      return db.query(query, bindings)
     }
   }
 }

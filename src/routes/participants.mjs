@@ -119,6 +119,9 @@ export default async function () {
       // Remove SMWT Data
       await db.deleteSMWTDataByUser(userKey)
 
+      // Remove Audit logs
+      await db.deleteLogsByUser(userKey)
+
       await db.removeParticipant(participant._key)
       await db.removeUser(req.params.userKey)
       res.sendStatus(200)
@@ -140,36 +143,32 @@ export default async function () {
       if (participant === null) return res.sendStatus(404)
       // Participant can remove only himself from Participant and Users DB
       let userKey = participant.userKey
-      if (req.user.role === 'admin' || req.user.role === 'participant') {
-        if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
+      if (req.user.role === 'researcher') return res.sendStatus(403)
+      if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
 
-        // Remove Answers
-        await db.deleteAnswersByParticipant(userKey)
+      // Remove Answers
+      await db.deleteAnswersByParticipant(userKey)
 
-        // Remove Health Store Data
-        await db.deletHealthStoreDataByParticipant(userKey)
+      // Remove Health Store Data
+      await db.deletHealthStoreDataByParticipant(userKey)
 
-        // Remove Miband3 Data TODO: Refactor the above, answers and healthData as well
-        await db.deleteMiband3DataByParticipant(userKey)
+      // Remove Miband3 Data TODO: Refactor the above, answers and healthData as well
+      await db.deleteMiband3DataByParticipant(userKey)
 
-        // Remove QCST Data
-        await db.deleteQCSTDataByParticipant(userKey)
+      // Remove QCST Data
+      await db.deleteQCSTDataByParticipant(userKey)
 
-        // Remove SMWT Data
-        await db.deleteSMWTDataByParticipant(userKey)
+      // Remove SMWT Data
+      await db.deleteSMWTDataByParticipant(userKey)
 
-        // Remove Audit logs
-        let auditLogs = await db.getLogsByUser(userKey)
-        for (let k = 0; k < auditLogs.length; k++) {
-          let auditLogKey = auditLogs[k]._key
-          await db.deleteLog(auditLogKey)
-        }
-        await db.removeParticipant(partKey)
-        await db.removeUser(userKey)
-        res.sendStatus(200)
-        applogger.info({ participantKey: partKey }, 'Participant profile deleted')
-        auditLogger.log('participantDeleted', req.user._key, undefined, undefined, 'Participant deleted', 'participants', partKey, undefined)
-      }
+      // Remove Audit logs
+      await db.deleteLogsByUser(userKey)
+
+      await db.removeParticipant(partKey)
+      await db.removeUser(userKey)
+      res.sendStatus(200)
+      applogger.info({ participantKey: partKey }, 'Participant profile deleted')
+      auditLogger.log('participantDeleted', req.user._key, undefined, undefined, 'Participant deleted', 'participants', partKey, undefined)
     } catch (err) {
       // respond to request with error
       applogger.error({ error: err }, 'Cannot delete participant')
