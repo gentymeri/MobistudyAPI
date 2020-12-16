@@ -37,7 +37,7 @@ export default async function () {
   // userEmail
   // sortDirection: ASC or DESC
   // offset: for pagination
-  // count: for pagination
+  // rowsPerPage: for pagination
   router.get('/auditlog', passport.authenticate('jwt', { session: false }), async function (req, res) {
     if (req.user.role !== 'admin' && req.user.role !== 'researcher') {
       console.log(`not a researcher`)
@@ -46,7 +46,7 @@ export default async function () {
       try {
         // Researcher: a study must be specified and the researcher has to be allowed to see that study
         if (req.user.role === 'researcher') {
-          if (! req.query.studyKey) return res.sendStatus(400)
+          if (!req.query.studyKey) return res.sendStatus(400)
           let teams = await db.getAllTeams(req.user._key, req.query.studyKey)
           if (teams.length === 0) return res.sendStatus(403)
         }
@@ -59,7 +59,7 @@ export default async function () {
           req.query.userEmail,
           req.query.sortDirection,
           req.query.offset,
-          req.query.count
+          req.query.rowsPerPage
         )
         res.send(result)
       } catch (err) {
@@ -83,7 +83,7 @@ export default async function () {
           req.query.userEmail,
           req.query.sortDirection,
           req.query.offset,
-          req.query.count
+          req.query.rowsPerPage
         )
         res.send(result)
       } catch (err) {

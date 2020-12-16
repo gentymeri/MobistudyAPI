@@ -21,7 +21,7 @@ export default async function (db) {
       let cursor = await db.query(query)
       return cursor.all()
     },
-    async getAuditLogs (countOnly, after, before, eventType, studyKey, taskId, userEmail, sortDirection, offset, count) {
+    async getAuditLogs (countOnly, after, before, eventType, studyKey, taskId, userEmail, sortDirection, offset, rowsPerPage) {
       let queryString = ''
       if (countOnly) {
         queryString = 'RETURN COUNT ( '
@@ -67,10 +67,10 @@ export default async function (db) {
         }
         queryString += `SORT log.timestamp @sortDirection `
         bindings.sortDirection = sortDirection
-        if (!!offset && !!count) {
-          queryString += `LIMIT @offset, @count `
+        if (!!offset && !!rowsPerPage) {
+          queryString += `LIMIT @offset, @rowsPerPage `
           bindings.offset = parseInt(offset)
-          bindings.count = parseInt(count)
+          bindings.rowsPerPage = parseInt(rowsPerPage)
         }
       }
 
