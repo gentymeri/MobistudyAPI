@@ -25,11 +25,8 @@
     "adminEmail": "admin@mobistudy.org",
     "adminPassword": "password"
   },
-  "gmail": {
-    "email": "xxx@gmail.com",
-    "client_id":"LONG STRING",
-    "project_id":"project ID",
-    "client_secret":"LONG STRING",
-    "refresh_token": "LONG STRING"
+   "outlook": {
+    "email": "undefined",
+    "password": "undefined"
   }
 }

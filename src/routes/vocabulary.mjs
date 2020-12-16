@@ -17,8 +17,7 @@ export default async function () {
   router.get('/vocabulary/:lang/:type/search', async function (req, res) {
     try {
       let lang = req.params.lang
-
-      if (lang !== 'en' && lang !== 'sv') {
+      if (lang !== 'en' && lang !== 'sv') { // TODO: se or sv?
         res.sendStatus(400)
         return
       }
@@ -34,6 +33,7 @@ export default async function () {
         res.sendStatus(400)
         return
       }
+
       let limit = req.query.limit
       if (!limit) limit = 10 // default limit
       
