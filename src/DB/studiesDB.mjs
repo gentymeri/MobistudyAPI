@@ -10,6 +10,71 @@ export default async function (db) {
   let collection = await utils.getCollection(db, 'studies')
 
   return {
+    // NEW GET STUDIES FUNCTION
+    async getStudies (countOnly, after, before, studyTitle, sortDirection, offset, rowsPerPage) {
+      let queryString = ''
+
+      if (countOnly) {
+        queryString = `RETURN COUNT ( `
+      }
+      let bindings = {}
+      queryString += `FOR study IN studies `
+      if (!countOnly || studyTitle) {
+        queryString += ` FOR team IN teams
+        FILTER team._key == study.teamKey `
+      }
+      if (after && before) {
+        queryString += `FILTER DATE_DIFF(study.createdTS, @after, 's') <=0 AND DATE_DIFF(study.createdTS, @before, 's') >=0 `
+        bindings.after = after
+        bindings.before = before
+      }
+      if (after && !before) {
+        queryString += `FILTER DATE_DIFF(study.createdTS, @after, 's') <=0 `
+        bindings.after = after
+      }
+      if (!after && before) {
+        queryString += `FILTER DATE_DIFF(study.createdTS, @before, 's') >=0 `
+        bindings.before = before
+      }
+      if (studyTitle) {
+        queryString += `FILTER LIKE(study.generalities.title, CONCAT('%', @studyTitle, '%'), true) `
+        bindings.studyTitle = studyTitle
+      }
+      if (!countOnly) {
+        if (!sortDirection) {
+          sortDirection = 'DESC'
+        }
+        queryString += `SORT study.generalities.title @sortDirection `
+        bindings.sortDirection = sortDirection
+        if (!!offset && !!rowsPerPage) {
+          queryString += `LIMIT @offset, @rowsPerPage `
+          bindings.offset = parseInt(offset)
+          bindings.rowsPerPage = parseInt(rowsPerPage)
+        }
+      }
+
+      if (countOnly) {
+        queryString += ` RETURN 1 )`
+      } else {
+        queryString += ` RETURN {
+          studykey: study._key,
+          studytitle: study.generalities.title,
+          createdTS: study.createdTS,
+          publishedTS: study.publishedTS,
+          teamkey: study.teamKey,
+          teamname: team.name,
+          startDate: study.generalities.startDate,
+          endDate: study.generalities.endDate
+        }`
+      }
+      applogger.trace(bindings, 'Querying "' + queryString + '"')
+      let cursor = await db.query(queryString, bindings)
+      if (countOnly) {
+        let counts = await cursor.all()
+        if (counts.length) return '' + counts[0]
+        else return undefined
+      } else return cursor.all()
+    },
     async getAllStudies () {
       // TODO: use LIMIT @offset, @count in the query for pagination
 

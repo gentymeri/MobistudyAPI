@@ -14,6 +14,52 @@ const router = express.Router()
 
 export default async function () {
   var db = await getDB()
+  // NEW GET STUDIES FUNCTION FOR TableStudies.vue
+  router.get('/getStudies', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    if (req.user.role !== 'admin') {
+      console.log(`not an admin`)
+      res.sendStatus(403)
+    } else {
+      try {
+        let result = await db.getStudies(false,
+          req.query.after,
+          req.query.before,
+          req.query.studyTitle,
+          req.query.sortDirection,
+          req.query.offset,
+          req.query.rowsPerPage
+        )
+        console.log('routes/studies.mjs RESULT:', result)
+        res.send(result)
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot retrieve studies')
+        res.sendStatus(500)
+      }
+    }
+  })
+
+  // NEW GET STUDIES COUNT FUNCTION
+  router.get('/getStudies/count', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    if (req.user.role !== 'admin') {
+      console.log(`not an admin`)
+      res.sendStatus(403)
+    } else {
+      try {
+        let result = await db.getStudies(true,
+          req.query.after,
+          req.query.before,
+          req.query.studyTitle,
+          req.query.sortDirection,
+          req.query.offset,
+          req.query.rowsPerPage
+        )
+        res.send(result)
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot retrieve studies count')
+        res.sendStatus(500)
+      }
+    }
+  })
 
   // query parameters:
   // teamKey (optional)
