@@ -22,7 +22,7 @@ export default async function (db) {
       return cursor.all()
     },
 
-    async getAllAnswersByUser (userKey) {
+    async getAnswersByUser (userKey) {
       var filter = 'FILTER answer.userKey == @userKey'
       var query = 'FOR answer IN answers ' + filter + ' RETURN answer'
       let bindings = { userKey: userKey }
@@ -31,7 +31,7 @@ export default async function (db) {
       return cursor.all()
     },
 
-    async getAnswerByUserAndStudy (userKey, studyKey) {
+    async getAnswersByUserAndStudy (userKey, studyKey) {
       var query = 'FOR answer IN answers FILTER answer.userKey == @userKey AND answer.studyKey == @studyKey RETURN answer'
       let bindings = { userKey: userKey, studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
@@ -39,7 +39,7 @@ export default async function (db) {
       return cursor.all()
     },
 
-    async getAnswerByStudy (studyKey) {
+    async getAnswersByStudy (studyKey) {
       var query = 'FOR answer IN answers FILTER answer.studyKey == @studyKey RETURN answer'
       let bindings = { studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
@@ -75,6 +75,22 @@ export default async function (db) {
     async deleteAnswer (_key) {
       await collection.remove(_key)
       return true
+    },
+
+    // deletes all data based on study
+    async deleteAnswersByStudy (studyKey) {
+      let answers = await this.getMiband3DataByStudy(studyKey)
+      for (let i = 0; i < answers.length; i++) {
+        await this.deleteAnswer(answers[i]._key)
+      }
+    },
+
+    // deletes all data based on user key
+    async deleteAnswersByUser (userKey) {
+      let answers = await this.getAnswersDataByUser(userKey)
+      for (let i = 0; i < answers.length; i++) {
+        await this.deleteAnswer(answers[i]._key)
+      }
     }
   }
 }
