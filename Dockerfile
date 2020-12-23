@@ -1,4 +1,4 @@
-FROM node:11.12-alpine  as build
+FROM node:14.15.2-alpine  as build
 
 RUN apk --no-cache add --virtual native-deps \
   g++ gcc libgcc libstdc++ linux-headers autoconf automake make nasm python git && \
@@ -13,7 +13,7 @@ RUN npm install --production
 
 COPY . /usr/src/app
 
-FROM node:11.12-alpine
+FROM node:14.15.2-alpine
 
 COPY --from=build /usr/src/app /usr/src/app
 
