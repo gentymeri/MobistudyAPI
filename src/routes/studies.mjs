@@ -183,12 +183,25 @@ export default async function () {
 
   router.get('/newInvitationCode', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
-      if (req.user.role !== 'participant') return res.sendStatus(403)
+      if (req.user.role !== 'researcher') return res.sendStatus(403)
       let studyCode = await db.getNewInvitationCode()
+      if(!studyCode) throw new Error('Cannot retrieve study code', studyCode)
       res.send(studyCode)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve study code')
       res.sendStatus(500)
+    }
+  })
+
+    router.get('/invitationalStudy/:invitationalCode', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    try {
+      let invitationalCode = req.params.invitationalCode
+      let study = await db.getInvitationalStudy(invitationalCode)
+      if(!study) throw new Error('Cannot find study based on code.')
+      res.send(study)
+    } catch (err) {
+      applogger.error({ error: err }, err.message)
+      res.sendStatus(404) // TODO: Why can i not send a custom error message if no study exists?
     }
   })
 
