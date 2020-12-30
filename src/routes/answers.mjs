@@ -24,7 +24,7 @@ export default async function () {
           if (!team.researchersKeys.includes(req.user._key)) return res.sendStatus(403)
           else {
             // TODO: only answers related to the studies managed by the team should be returned
-            let answers = await db.getAnswers()
+            let answers = await db.getAllAnswers()
             res.send(answers)
           }
         }

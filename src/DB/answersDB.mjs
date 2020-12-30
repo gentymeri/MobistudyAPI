@@ -11,7 +11,7 @@ export default async function (db) {
   let collection = await utils.getCollection(db, 'answers')
 
   return {
-    async getAnswers () {
+    async getAllAnswers () {
       var filter = ''
 
       // TODO: use LIMIT @offset, @count in the query for pagination
