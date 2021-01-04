@@ -157,9 +157,9 @@ export default async function (db) {
       return random
     },
     // Gets the one study that matches the invitation code
-    async getInvitationalStudy(invitationCode) {
+    async getInvitationalStudy (invitationCode) {
       const query = `FOR study IN studies FILTER study.invitationCode == @invitationCode RETURN study`
-      let bindings = {invitationCode: invitationCode}
+      let bindings = { invitationCode: invitationCode }
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
       let study = await cursor.next()
@@ -191,7 +191,7 @@ export default async function (db) {
       AND participant.studiesSuggestions == TRUE
       AND study.inclusionCriteria.diseases[*].conceptId ALL IN participant.diseases[*].conceptId
       AND study.inclusionCriteria.medications[*].conceptId ALL IN participant.medications[*].conceptId
-      AND study.generalities.invitational == FALSE
+      AND !study.generalities.invitational
       RETURN study._key`
 
       let bindings = { userKey: userKey }
