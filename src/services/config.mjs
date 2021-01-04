@@ -12,15 +12,15 @@ var config
 /**
 * Retrieves Docker secrets from /run/secrets
 */
-function getSwarmSecret(secret){
-  try{
+function getSwarmSecret (secret) {
+  try {
     // Swarm secret are accessible within tmpfs /run/secrets dir
     return fs.readFileSync(util.format('/run/secrets/%s', secret), 'utf8').trim()
-   }
-   catch(e){
-     return false
-   }
- }
+  }
+  catch (e) {
+    return false
+  }
+}
 
 export default function () {
   if (!config) {
@@ -55,8 +55,8 @@ export default function () {
     if (config.password === undefined) config.password = (getSwarmSecret('DB_PASSWORD') || process.env.DB_PASSWORD)
 
     if (config.outlook === undefined) config.outlook = {}
-    if (config.email === undefined) config.outlook.email = process.env.OUTLOOK_EMAIL // TODO: Need to dockerize
-    if (config.password === undefined) config.outlook.pass = process.env.OUTLOOK_PASSWORD
+    if (config.outlook.email === undefined) config.outlook.email = process.env.OUTLOOK_EMAIL
+    if (config.outlook.password === undefined) config.outlook.password = (getSwarmSecret('OUTLOOK_PASSWORD') || process.env.OUTLOOK_PASSWORD)
   }
   return config
 }
