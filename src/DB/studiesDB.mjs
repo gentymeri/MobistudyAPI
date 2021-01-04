@@ -154,7 +154,7 @@ export default async function (db) {
         if (study.length) repeat = true
         else repeat = false
       } while (repeat)
-      return random
+      return random + ''
     },
     // Gets the one study that matches the invitation code
     async getInvitationalStudy (invitationCode) {
