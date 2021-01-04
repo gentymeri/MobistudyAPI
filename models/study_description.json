@@ -5,7 +5,7 @@
   "publishedTS": "2019-02-27T12:46:07.294Z",
   "teamKey": "123456",
   "generalities": {
-    "inviteOnly": true,
+    "invitational": true,
     "invitationCode": 123456,
     "languages": [
       "en",
