@@ -42,6 +42,14 @@ export default async function () {
   app.use(bodyParser.json({ limit: '20mb' }))
   app.use(bodyParser.text({ limit: '20mb' }))
 
+
+  // this needs to be called by apps, allow CORS for everybody
+  app.use(function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*')
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+    next()
+  })
+
   app.use(passport.initialize())
 
   const api_prefix = '/api'
