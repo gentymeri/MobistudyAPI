@@ -231,8 +231,9 @@ export default async function () {
     try {
       if (req.user.role !== 'researcher') return res.sendStatus(403)
       let studyCode = await db.getNewInvitationCode()
+      applogger.info({ studyCode: studyCode }, 'Study code sending back from server')
       if(!studyCode) throw new Error('Cannot retrieve study code', studyCode)
-      res.send(studyCode)
+      res.json(studyCode)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve study code')
       res.sendStatus(500)
@@ -243,6 +244,7 @@ export default async function () {
     try {
       let invitationalCode = req.params.invitationalCode
       let study = await db.getInvitationalStudy(invitationalCode)
+      applogger.info({study: study}, 'Study:')
       if(!study) throw new Error('Cannot find study based on code.')
       res.send(study)
     } catch (err) {
