@@ -185,7 +185,7 @@ export default async function () {
     }
     try {
       let participant = await db.getParticipantByUserKey(req.params.userKey)
-      if (!participant) return res.status(404)
+      if (!participant) return res.sendStatus(404)
       res.send(participant)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve participant with userKey ' + req.params.userKey)
