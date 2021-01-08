@@ -141,20 +141,21 @@ export default async function (db) {
     // gets an unused invitation code
     async getNewInvitationCode () {
       let repeat = true
-      let random = undefined
+      let invitationCode = undefined
       do {
         // generate a random 6 digits number
-        random = ('' + Math.round(Math.random() * 999999)).padStart(6, '0')
+        invitationCode = ('' + Math.round(Math.random() * 999999)).padStart(6, '0')
         // check if the number is already used
-        var query = `FOR study IN studies FILTER study.invitationCode == @number RETURN study`
-        let bindings = { number: random }
+        var query = `FOR study IN studies FILTER study.invitationCode == @invitationCode RETURN study`
+        let bindings = { invitationCode: invitationCode }
         applogger.trace(bindings, 'Querying "' + query + '"')
         let cursor = await db.query(query, bindings)
         let study = await cursor.all()
         if (study.length) repeat = true
         else repeat = false
       } while (repeat)
-      return random + ''
+      applogger.info({invitationCode: invitationCode},'Invitation code generated:')
+      return invitationCode + ''
     },
     // Gets the one study that matches the invitation code
     async getInvitationalStudy (invitationCode) {
@@ -191,7 +192,7 @@ export default async function (db) {
       AND participant.studiesSuggestions == TRUE
       AND study.inclusionCriteria.diseases[*].conceptId ALL IN participant.diseases[*].conceptId
       AND study.inclusionCriteria.medications[*].conceptId ALL IN participant.medications[*].conceptId
-      AND !study.generalities.invitational
+      AND study.invitational == FALSE
       RETURN study._key`
 
       let bindings = { userKey: userKey }
