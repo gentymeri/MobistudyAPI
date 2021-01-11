@@ -18,12 +18,9 @@ export default async function () {
       res.sendStatus(403)
     } else {
       try {
-        sendEmail(req.body.address, req.body.subject, req.body.content)
-        applogger.info(req.body, 'Test email sent')
+        await sendEmail(req.body.address, req.body.subject, req.body.content)
         res.sendStatus(200)
       } catch (error) {
-        console.error(error)
-        applogger.error(req.body, 'Test email cannot be sent sent')
         res.status(500).send(error)
       }
     }
