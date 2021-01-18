@@ -120,8 +120,12 @@ export const stopArangoContainer = async function () {
 export const addDataToCollection = async function (collname, data) {
   let collection = await utils.getCollection(db, collname)
   let meta = await collection.save(data)
-  data._key = meta._key
-  return data
+  return meta._key
+}
+
+export const removeFromCollection = async function (collname, key) {
+  let collection = await utils.getCollection(db, collname)
+  return collection.remove(key)
 }
 
 export { db as DB }
