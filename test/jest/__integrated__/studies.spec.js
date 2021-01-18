@@ -1,4 +1,9 @@
-import { startArango, stopArango, ARANGOPORT, addDataToCollection } from './arangoTools'
+import {
+  ARANGOPORT,
+  pullArango, getArangoImage, getArangoContainer,
+  createArangoContainer, startArangoContainer, stopArangoContainer,
+  initArangoContainer
+} from '../../arangoTools'
 const axios = require('axios')
 // import studiesDB from '../../../src/DB/studiesDB'
 // import utils from '../../../src/DB/utils'
@@ -10,12 +15,24 @@ const axios = require('axios')
 describe('when arangodb is running with mock data', () => {
 
   beforeAll(async () => {
-    await startArango()
-    console.log('arango started')
-  }, 120000)
+    let image = await getArangoImage()
+    try {
+      await image.status()
+    } catch (error) {
+      await pullArango()
+    }
+
+    let arangoContainer = await getArangoContainer()
+    if (!arangoContainer) {
+      await createArangoContainer()
+    }
+    await startArangoContainer()
+
+    await initArangoContainer()
+  }, 60000)
 
   afterAll(async () => {
-    await stopArango()
+    await stopArangoContainer()
   })
 
   test('user mobistudy can access db mobistudy', async () => {
