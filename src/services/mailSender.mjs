@@ -6,11 +6,12 @@ const config = getConfig()
 
 export async function sendEmail (contact, subject, message) {
   return new Promise(async (resolve, reject) => {
+    console.log('--->', config.outlook.user)
     applogger.debug({ contact, subject, message, config: config.outlook }, 'sending email')
     try {
       nodeoutlook.sendEmail({
         auth: {
-          user: config.outlook.email,
+          user: config.outlook.user,
           pass: config.outlook.password
         },
         from: config.outlook.email,
@@ -20,11 +21,17 @@ export async function sendEmail (contact, subject, message) {
         text: '',
         replyTo: '',
         attachments: [],
-        onError: (e) => console.log(e),
-        onSuccess: (i) => console.log(i)
+        onError: (error) => {
+          applogger.error(error, 'Cannot send email to ' + contact)
+          reject(error)
+        },
+        onSuccess: (i) => {
+          resolve()
+          applogger.info(i, 'Email sent to ' + contact)
+        }
       })
     } catch (error) {
-      console.log('Error:', error)
+      console.error('Error:', error)
       applogger.error(error, 'Cannot send email to ' + contact)
     }
   })
