@@ -95,6 +95,45 @@ export default async function () {
     }
   })
 
+  // Delete a user
+  router.delete('/participants/byuserkey/:userKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
+    if (req.user.role === 'researcher') return res.status(403)
+    try {
+      let userKey = req.params.userKey
+      let participant = await db.getParticipantByUserKey(userKey)
+      if (!participant) return res.status(404)
+
+      // Remove Answers
+      await db.deleteAnswersByUser(userKey)
+
+      // Remove Health Store Data
+      await db.deleteHealthStoreDataByUser(userKey)
+
+      // Remove Miband3 Data
+      await db.deleteMiband3DataByUser(userKey)
+
+      // Remove QCST Data
+      await db.deleteQCSTDataByUser(userKey)
+
+      // Remove SMWT Data
+      await db.deleteSMWTDataByUser(userKey)
+
+      // Remove Audit logs
+      await db.deleteLogsByUser(userKey)
+
+      await db.removeParticipant(participant._key)
+      await db.removeUser(req.params.userKey)
+      res.sendStatus(200)
+      applogger.info({ userKey: participant._key }, 'Participant profile deleted')
+      auditLogger.log('participantDeleted', req.user._key, undefined, undefined, 'Participant deleted', 'participants', participant._key, undefined)
+    } catch (err) {
+      // respond to request with error
+      applogger.error({ error: err }, 'Cannot delete participant')
+      res.sendStatus(500)
+    }
+  })
+
   // Delete Specified participant. Called from Web API by Admin.
   router.delete('/participants/:participant_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
@@ -104,32 +143,32 @@ export default async function () {
       if (participant === null) return res.sendStatus(404)
       // Participant can remove only himself from Participant and Users DB
       let userKey = participant.userKey
-      if (req.user.role === 'admin' || req.user.role === 'participant') {
-        if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
-        // Remove Answers
-        let answers = await db.getAllAnswersByUser(userKey)
-        for (let i = 0; i < answers.length; i++) {
-          let answerKey = answers[i]._key
-          await db.deleteAnswer(answerKey)
-        }
-        // Remove Health Store Data
-        let healthData = await db.getHealthStoreDataByUser(userKey)
-        for (let j = 0; j < healthData.length; j++) {
-          let healthDataKey = healthData[j]._key
-          await db.deleteHealthStoreData(healthDataKey)
-        }
-        // Remove Audit logs
-        let auditLogs = await db.getLogsByUser(userKey)
-        for (let k = 0; k < auditLogs.length; k++) {
-          let auditLogKey = auditLogs[k]._key
-          await db.deleteLog(auditLogKey)
-        }
-        await db.removeParticipant(partKey)
-        await db.removeUser(userKey)
-        res.sendStatus(200)
-        applogger.info({ participantKey: partKey }, 'Participant profile deleted')
-        auditLogger.log('participantDeleted', req.user._key, undefined, undefined, 'Participant deleted', 'participants', partKey, undefined)
-      }
+      if (req.user.role === 'researcher') return res.sendStatus(403)
+      if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
+
+      // Remove Answers
+      await db.deleteAnswersByParticipant(userKey)
+
+      // Remove Health Store Data
+      await db.deletHealthStoreDataByParticipant(userKey)
+
+      // Remove Miband3 Data TODO: Refactor the above, answers and healthData as well
+      await db.deleteMiband3DataByParticipant(userKey)
+
+      // Remove QCST Data
+      await db.deleteQCSTDataByParticipant(userKey)
+
+      // Remove SMWT Data
+      await db.deleteSMWTDataByParticipant(userKey)
+
+      // Remove Audit logs
+      await db.deleteLogsByUser(userKey)
+
+      await db.removeParticipant(partKey)
+      await db.removeUser(userKey)
+      res.sendStatus(200)
+      applogger.info({ participantKey: partKey }, 'Participant profile deleted')
+      auditLogger.log('participantDeleted', req.user._key, undefined, undefined, 'Participant deleted', 'participants', partKey, undefined)
     } catch (err) {
       // respond to request with error
       applogger.error({ error: err }, 'Cannot delete participant')
@@ -146,7 +185,7 @@ export default async function () {
     }
     try {
       let participant = await db.getParticipantByUserKey(req.params.userKey)
-      if (!participant) return res.status(404)
+      if (!participant) return res.sendStatus(404)
       res.send(participant)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve participant with userKey ' + req.params.userKey)
@@ -173,44 +212,6 @@ export default async function () {
       auditLogger.log('participantUpdated', req.user._key, undefined, undefined, 'Participant updated', 'participants', participant._key, newparticipant)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot update participant with _key ' + req.params.participant_key)
-      res.sendStatus(500)
-    }
-  })
-
-  // participant deletes himself
-  router.delete('/participants/byuserkey/:userKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
-    if (req.user.role === 'researcher') return res.status(403)
-    try {
-      let userKey = req.params.userKey
-      let participant = await db.getParticipantByUserKey(userKey)
-      if (!participant) return res.status(404)
-      // Remove Answers
-      let answers = await db.getAllAnswersByUser(userKey)
-      for (let i = 0; i < answers.length; i++) {
-        let answerKey = answers[i]._key
-        await db.deleteAnswer(answerKey)
-      }
-      // Remove Health Store Data
-      let healthData = await db.getHealthStoreDataByUser(userKey)
-      for (let j = 0; j < healthData.length; j++) {
-        let healthDataKey = healthData[j]._key
-        await db.deleteHealthStoreData(healthDataKey)
-      }
-      // Remove Audit logs
-      let auditLogs = await db.getLogsByUser(userKey)
-      for (let k = 0; k < auditLogs.length; k++) {
-        let auditLogKey = auditLogs[k]._key
-        await db.deleteLog(auditLogKey)
-      }
-      await db.removeParticipant(participant._key)
-      await db.removeUser(req.params.userKey)
-      res.sendStatus(200)
-      applogger.info({ userKey: participant._key }, 'Participant profile deleted')
-      auditLogger.log('participantDeleted', req.user._key, undefined, undefined, 'Participant deleted', 'participants', participant._key, undefined)
-    } catch (err) {
-      // respond to request with error
-      applogger.error({ error: err }, 'Cannot delete participant')
       res.sendStatus(500)
     }
   })

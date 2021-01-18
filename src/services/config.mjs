@@ -12,15 +12,15 @@ var config
 /**
 * Retrieves Docker secrets from /run/secrets
 */
-function getSwarmSecret(secret){
-  try{
+function getSwarmSecret (secret) {
+  try {
     // Swarm secret are accessible within tmpfs /run/secrets dir
     return fs.readFileSync(util.format('/run/secrets/%s', secret), 'utf8').trim()
-   }
-   catch(e){
-     return false
-   }
- }
+  }
+  catch (e) {
+    return false
+  }
+}
 
 export default function () {
   if (!config) {
@@ -37,7 +37,7 @@ export default function () {
 
     if (config.logs === undefined) config.logs = {}
     if (config.logs.folder === undefined) config.logs.folder = (process.env.LOGS_FOLDER || 'logs')
-    if (config.logs.rotationsize) config.logs.rotationsize = (process.env.LOGS_ROTATIONSIZE || '1M')
+    if (config.logs.rotationsize === undefined) config.logs.rotationsize = (process.env.LOGS_ROTATIONSIZE || '1M')
     if (config.logs.console === undefined) config.logs.console = (process.env.LOGS_CONSOLE || false)
     if (config.logs.level === undefined) config.logs.level = parseInt(process.env.LOGS_LEVEL || '30')
 
@@ -54,13 +54,9 @@ export default function () {
     if (config.user === undefined) config.user = (getSwarmSecret('DB_USER') || process.env.DB_USER)
     if (config.password === undefined) config.password = (getSwarmSecret('DB_PASSWORD') || process.env.DB_PASSWORD)
 
-
-    if (config.gmail === undefined) config.gmail = {}
-    if (config.email === undefined) config.email = process.env.GMAIL_EMAIL
-    if (config.client_id === undefined) config.client_id = (getSwarmSecret('GMAIL_CLIENTID') || process.env.GMAIL_CLIENTID)
-    if (config.project_id === undefined) config.project_id = (getSwarmSecret('GMAIL_PROJECTID') || process.env.GMAIL_PROJECTID)
-    if (config.client_secret === undefined) config.client_secret = (getSwarmSecret('GMAIL_SECRET') || process.env.GMAIL_SECRET)
-    if (config.refresh_token === undefined) config.refresh_token = (getSwarmSecret('GMAIL_REFESHTOKEN') || process.env.GMAIL_REFESHTOKEN)
+    if (config.outlook === undefined) config.outlook = {}
+    if (config.outlook.email === undefined) config.outlook.email = process.env.OUTLOOK_EMAIL
+    if (config.outlook.password === undefined) config.outlook.password = (getSwarmSecret('OUTLOOK_PASSWORD') || process.env.OUTLOOK_PASSWORD)
   }
   return config
 }

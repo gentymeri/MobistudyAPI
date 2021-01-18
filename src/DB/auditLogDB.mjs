@@ -21,12 +21,12 @@ export default async function (db) {
       let cursor = await db.query(query)
       return cursor.all()
     },
-    async getAuditLogs (countOnly, after, before, eventType, studyKey, taskId, userEmail, sortDirection, offset, count) {
+    async getAuditLogs (countOnly, after, before, eventType, studyKey, taskId, userEmail, sortDirection, offset, rowsPerPage) {
       let queryString = ''
       if (countOnly) {
         queryString = 'RETURN COUNT ( '
       }
-      let bindings = { }
+      let bindings = {}
       queryString += `FOR log IN auditlogs `
       if (!countOnly || userEmail) {
         queryString += ` FOR user IN users
@@ -35,6 +35,14 @@ export default async function (db) {
       if (after && before) {
         queryString += `FILTER DATE_DIFF(log.timestamp, @after, 's') <=0 AND DATE_DIFF(log.timestamp, @before, 's') >=0 `
         bindings.after = after
+        bindings.before = before
+      }
+      if (after && !before) {
+        queryString += `FILTER DATE_DIFF(log.timestamp, @after, 's') <=0 `
+        bindings.after = after
+      }
+      if (!after && before) {
+        queryString += `FILTER DATE_DIFF(log.timestamp, @before, 's') >=0 `
         bindings.before = before
       }
       if (eventType) {
@@ -59,10 +67,10 @@ export default async function (db) {
         }
         queryString += `SORT log.timestamp @sortDirection `
         bindings.sortDirection = sortDirection
-        if (!!offset && !!count) {
-          queryString += `LIMIT @offset, @count `
+        if (!!offset && !!rowsPerPage) {
+          queryString += `LIMIT @offset, @rowsPerPage `
           bindings.offset = parseInt(offset)
-          bindings.count = parseInt(count)
+          bindings.rowsPerPage = parseInt(rowsPerPage)
         }
       }
 
@@ -88,6 +96,7 @@ export default async function (db) {
         else return undefined
       } else return cursor.all()
     },
+
     async getLogsByUser (userKey) {
       let bindings = { 'userKey': userKey }
       let query = 'FOR log IN auditlogs FILTER log.userKey == @userKey RETURN log'
@@ -95,10 +104,18 @@ export default async function (db) {
       let cursor = await db.query(query, bindings)
       return cursor.all()
     },
+
     // deletes a log
     async deleteLog (_key) {
       await collection.remove(_key)
       return true
+    },
+
+    async deleteLogsByUser (userKey) {
+      let bindings = { 'userKey': userKey }
+      let query = 'FOR log IN auditlogs FILTER log.userKey == @userKey REMOVE log IN auditlogs'
+      applogger.trace('Querying "' + query + '"')
+      return db.query(query, bindings)
     }
   }
 }

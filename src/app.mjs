@@ -26,6 +26,7 @@ import testerRouter from './routes/tester.mjs'
 import vocabularyRouter from './routes/vocabulary.mjs'
 import SMWTRouter from './routes/SMWTData.mjs'
 import QCSTRouter from './routes/QCSTData.mjs'
+import Miband3Router from './routes/miband3.mjs'
 
 export default async function () {
   authConfig()
@@ -40,6 +41,14 @@ export default async function () {
   app.use(bodyParser.urlencoded({ limit: '20mb', extended: false }))
   app.use(bodyParser.json({ limit: '20mb' }))
   app.use(bodyParser.text({ limit: '20mb' }))
+
+
+  // this needs to be called by apps, allow CORS for everybody
+  app.use(function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*')
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+    next()
+  })
 
   app.use(passport.initialize())
 
@@ -58,6 +67,7 @@ export default async function () {
   app.use(api_prefix, await vocabularyRouter())
   app.use(api_prefix, await SMWTRouter())
   app.use(api_prefix, await QCSTRouter())
+  app.use(api_prefix, await Miband3Router())
 
   // error handler
   app.use(function (err, req, res, next) {

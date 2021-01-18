@@ -52,7 +52,7 @@ export default async function () {
       newform = await db.createForm(newform)
       res.send(newform)
       applogger.info(newform, 'New form created')
-      auditLogger.log('formCreated', req.user._key, undefined, undefined, 'New form created ' + newform.name, 'forms', newform._key, newform)
+      auditLogger.log('formCreated', req.user._key, undefined, undefined, 'New form created', 'forms', newform._key, newform)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new form')
       res.sendStatus(500)
@@ -66,7 +66,7 @@ export default async function () {
       newform = await db.replaceForm(req.params.form_key, newform)
       res.send(newform)
       applogger.info(newform, 'Form has been replaced')
-      auditLogger.log('formReplaced', req.user._key, undefined, undefined, 'Form ' + newform.name + ' has been replaced', 'forms', newform._key, newform)
+      auditLogger.log('formReplaced', req.user._key, undefined, undefined, 'Form has been replaced', 'forms', newform._key, newform)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot replace form with _key ' + req.params.form_key)
       res.sendStatus(500)
@@ -80,7 +80,7 @@ export default async function () {
       newform = await db.updateForm(req.params.form_key, newform)
       res.send(newform)
       applogger.info(newform, 'Form has been updated')
-      auditLogger.log('formUpdate', req.user._key, undefined, undefined, 'Form ' + newform.name + ' has been updated', 'forms', newform._key, newform)
+      auditLogger.log('formUpdate', req.user._key, undefined, undefined, 'Form has been updated', 'forms', newform._key, newform)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot update form with _key ' + req.params.form_key)
       res.sendStatus(500)

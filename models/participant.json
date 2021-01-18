@@ -8,6 +8,8 @@
   "dateOfBirth": "2019-02-27T12:46:07.294Z",
   "country": "gb",
   "language": "en",
+  "height": 180,
+  "weight": 78,
   "diseases": [
     {
       "term": "Heart Failure",
@@ -18,7 +20,8 @@
   "medications": [
     {
       "term": "Aspirin",
-      "conceptId": "555544" "vocabulary": "SNOMED"
+      "conceptId": "555544",
+      "vocabulary": "SNOMED"
     }
   ],
   "studiesSuggestions": true,

@@ -14,6 +14,7 @@ import getParticipantsDB from './participantsDB.mjs'
 import getHealthStoreDataDB from './healthStoreDataDB.mjs'
 import getSMWTDataDB from './SMWTDataDB.mjs'
 import getQCSTDataDB from './QCSTDataDB.mjs'
+import getMiband3DataDB from './miband3DataDB.mjs'
 import getAuditLogDB from './auditLogDB.mjs'
 
 import getConfig from '../services/config.mjs'
@@ -48,6 +49,8 @@ export default async function () {
     dao = Object.assign(SMWTData, dao)
     let QCSTData = await getQCSTDataDB(db)
     dao = Object.assign(QCSTData, dao)
+    let miband3Data = await getMiband3DataDB(db)
+    dao = Object.assign(miband3Data, dao)
 
     // add new collections here
     return dao

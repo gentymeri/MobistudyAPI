@@ -154,6 +154,51 @@ export default async function () {
     }
   })
 
+  // NEW GET USER FUNCTION
+  router.get('/getUsers', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    if (req.user.role !== 'admin') {
+      console.log(`not an admin`)
+      res.sendStatus(403)
+    } else {
+      try {
+        let result = await db.getUsers(false,
+          req.query.roleType,
+          req.query.userEmail,
+          req.query.sortDirection,
+          req.query.offset,
+          req.query.rowsPerPage
+        )
+        console.log('routes/users.mjs RESULT:', result)
+        res.send(result)
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot retrieve users')
+        res.sendStatus(500)
+      }
+    }
+  })
+
+  // NEW GET USER COUNT FUNCTION
+  router.get('/getUsers/count', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    if (req.user.role !== 'admin') {
+      console.log(`not an admin`)
+      res.sendStatus(403)
+    } else {
+      try {
+        let result = await db.getUsers(true,
+          req.query.roleType,
+          req.query.userEmail,
+          req.query.sortDirection,
+          req.query.offset,
+          req.query.rowsPerPage
+        )
+        res.send(result)
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot retrieve users count')
+        res.sendStatus(500)
+      }
+    }
+  })
+
   // Get All Users in Db (TO DELETE ?? DUPLICATED BY GET/ALL )
   router.get('/users/all', passport.authenticate('jwt', { session: false }), async (req, res) => {
     try {

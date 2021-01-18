@@ -1,18 +1,18 @@
 {
   "web": {
-    "port" : 3000,
-    "cluster" : true
+    "port": 3000,
+    "cluster": true
   },
   "cert": {
-    "key" : "https certificate pem file",
-    "file" : "https certificate crt file"
+    "key": "https certificate pem file",
+    "file": "https certificate crt file"
   },
   "db": {
-    "host" : "localhost",
-    "port" : 8529,
-    "name" : "dbname",
-    "user" : "dbuser",
-    "password" : "xxxxxxxx"
+    "host": "localhost",
+    "port": 8529,
+    "name": "dbname",
+    "user": "dbuser",
+    "password": "xxxxxxxx"
   },
   "logs": {
     "folder": "path to logs",
@@ -25,11 +25,9 @@
     "adminEmail": "admin@mobistudy.org",
     "adminPassword": "password"
   },
-  "gmail": {
-    "email": "xxx@gmail.com",
-    "client_id":"LONG STRING",
-    "project_id":"project ID",
-    "client_secret":"LONG STRING",
-    "refresh_token": "LONG STRING"
+  "outlook": {
+    "email": "mobistudy@mau.se",
+    "user": "actual user",
+    "password": "actual user password"
   }
 }

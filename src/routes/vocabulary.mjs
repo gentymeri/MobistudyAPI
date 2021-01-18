@@ -17,22 +17,26 @@ export default async function () {
   router.get('/vocabulary/:lang/:type/search', async function (req, res) {
     try {
       let lang = req.params.lang
-      if (lang !== 'en' && lang !== 'sv') {
+      if (lang !== 'en' && lang !== 'sv') { // TODO: se or sv?
         res.sendStatus(400)
         return
       }
+
       let type = req.params.type
       if (type !== 'substance' && type !== 'disorder') {
         res.sendStatus(400)
         return
       }
+
       let term = req.query.term
       if (!term) {
         res.sendStatus(400)
         return
       }
+
       let limit = req.query.limit
       if (!limit) limit = 10 // default limit
+      
       applogger.error({ term, lang, type, limit  }, 'Querying medical term')
       let concepts = await getTerm(term, type, lang, limit)
       res.json(concepts)

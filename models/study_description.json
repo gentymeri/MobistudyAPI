@@ -5,7 +5,7 @@
   "publishedTS": "2019-02-27T12:46:07.294Z",
   "teamKey": "123456",
   "generalities": {
-    "inviteOnly": true,
+    "invitational": true,
     "invitationCode": 123456,
     "languages": [
       "en",
@@ -79,7 +79,9 @@
         "conceptId": "12222",
         "vocabulary": "SNOMED"
       }
-    ]
+    ],
+    "minBMI": 28,
+    "maxBMI": 30
   },
   "tasks": [
     {
@@ -170,7 +172,11 @@
       "scheduling": {
         "startEvent": "consent",
         "intervalType": "d",
-        "interval": 3
+        "interval": 3,
+        "occurrences": 20,
+        "months": [],
+        "monthDays": [],
+        "weekDays": []
       }
     }
   ],
@@ -207,15 +213,15 @@
       },
       {
         "description": {
-          "en": "I agree to perform the Queens College Stepn Test once a week.",
-          "sv": "Jag accepterar att utföra Queens College Stepn Test en gång i veckan."
+          "en": "I agree to perform the Queens College Step Test once a week.",
+          "sv": "Jag accepterar att utföra Queens College Step Test en gång i veckan."
         },
         "taskId": 4
       },
       {
         "description": {
-          "en": "I agree to provide my data collected from the MiBand3 fittness tracker.",
-          "sv": "Jag accepterar att skicka mina samladade data från MiBand3 träningsspårare."
+          "en": "I agree to provide my data collected from the MiBand3 fitness tracker.",
+          "sv": "Jag accepterar att skicka min samlade data från MiBand3 träningsspåraren."
         },
         "taskId": 5
       }

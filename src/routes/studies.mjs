@@ -14,6 +14,52 @@ const router = express.Router()
 
 export default async function () {
   var db = await getDB()
+  // NEW GET STUDIES FUNCTION FOR TableStudies.vue
+  router.get('/getStudies', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    if (req.user.role !== 'admin') {
+      console.log(`not an admin`)
+      res.sendStatus(403)
+    } else {
+      try {
+        let result = await db.getStudies(false,
+          req.query.after,
+          req.query.before,
+          req.query.studyTitle,
+          req.query.sortDirection,
+          req.query.offset,
+          req.query.rowsPerPage
+        )
+        console.log('routes/studies.mjs RESULT:', result)
+        res.send(result)
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot retrieve studies')
+        res.sendStatus(500)
+      }
+    }
+  })
+
+  // NEW GET STUDIES COUNT FUNCTION
+  router.get('/getStudies/count', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    if (req.user.role !== 'admin') {
+      console.log(`not an admin`)
+      res.sendStatus(403)
+    } else {
+      try {
+        let result = await db.getStudies(true,
+          req.query.after,
+          req.query.before,
+          req.query.studyTitle,
+          req.query.sortDirection,
+          req.query.offset,
+          req.query.rowsPerPage
+        )
+        res.send(result)
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot retrieve studies count')
+        res.sendStatus(500)
+      }
+    }
+  })
 
   // query parameters:
   // teamKey (optional)
@@ -74,7 +120,7 @@ export default async function () {
       res.send(newstudy)
 
       applogger.info(newstudy, 'New study description added')
-      auditLogger.log('studyDescriptionAdded', req.user._key, newstudy._key, undefined, 'New study description added ' + newstudy.generalities.title, 'studies', newstudy._key, newstudy)
+      auditLogger.log('studyDescriptionAdded', req.user._key, newstudy._key, undefined, 'New study description added', 'studies', newstudy._key, newstudy)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new study')
       res.sendStatus(500)
@@ -90,7 +136,7 @@ export default async function () {
       newstudy = await db.replaceStudy(req.params.study_key, newstudy)
       res.send(newstudy)
       applogger.info(newstudy, 'Study replaced')
-      auditLogger.log('studyDescriptionReplaced', req.user._key, newstudy._key, undefined, 'Study description replaced ' + newstudy.generalities.title, 'studies', newstudy._key, newstudy)
+      auditLogger.log('studyDescriptionReplaced', req.user._key, newstudy._key, undefined, 'Study description replaced', 'studies', newstudy._key, newstudy)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot replace study with _key ' + req.params.study_key)
       res.sendStatus(500)
@@ -106,7 +152,7 @@ export default async function () {
       newstudy = await db.updateStudy(req.params.study_key, newstudy)
       res.send(newstudy)
       applogger.info(newstudy, 'Study updated')
-      auditLogger.log('studyDescriptionUpdated', req.user._key, newstudy._key, undefined, 'Study description updated ' + newstudy.generalities.title, 'studies', newstudy._key, newstudy)
+      auditLogger.log('studyDescriptionUpdated', req.user._key, newstudy._key, undefined, 'Study description updated', 'studies', newstudy._key, newstudy)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot update study with _key ' + req.params.study_key)
       res.sendStatus(500)
@@ -149,7 +195,16 @@ export default async function () {
             await db.replaceParticipant(partKey, participant)
           }
         }
+        // Data needs to be deleted before the study TODO: Should do this for the other type of data as well
+        await db.deleteAnswersByStudy(studyKey)
+        await db.deleteHealthStoreByStudy(studykey)
+        await db.deleteQCSTDataByStudy(studyKey)
+        await db.deleteSMWTDataByStudy(studyKey)
+        await db.deleteMiband3DataByStudy(studyKey)
+
+        // Deleting the study
         await db.deleteStudy(studykey)
+        
         res.sendStatus(200)
         applogger.info({ studyKey: studykey }, 'Study deleted')
         auditLogger.log('studyDescriptionDeleted', req.user._key, studykey, undefined, 'Study description with key ' + studykey + ' deleted', 'studies', studykey, undefined)
@@ -174,12 +229,27 @@ export default async function () {
 
   router.get('/newInvitationCode', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
-      if (req.user.role !== 'participant') return res.sendStatus(403)
+      if (req.user.role !== 'researcher') return res.sendStatus(403)
       let studyCode = await db.getNewInvitationCode()
-      res.send(studyCode)
+      applogger.info({ studyCode: studyCode }, 'Study code sending back from server')
+      if(!studyCode) throw new Error('Cannot retrieve study code', studyCode)
+      res.json(studyCode)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve study code')
       res.sendStatus(500)
+    }
+  })
+
+    router.get('/invitationalStudy/:invitationalCode', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    try {
+      let invitationalCode = req.params.invitationalCode
+      let study = await db.getInvitationalStudy(invitationalCode)
+      applogger.info({study: study}, 'Study:')
+      if(!study) throw new Error('Cannot find study based on code.')
+      res.send(study)
+    } catch (err) {
+      applogger.error({ error: err }, err.message)
+      res.sendStatus(404) // TODO: Why can i not send a custom error message if no study exists?
     }
   })
 
