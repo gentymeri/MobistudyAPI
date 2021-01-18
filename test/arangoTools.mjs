@@ -1,6 +1,5 @@
 import Docker from 'node-docker-api'
 import Arango from 'arangojs'
-import utils from '../src/DB/utils.mjs'
 
 let docker = new Docker.Docker({ socketPath: '/var/run/docker.sock' })
 let image
@@ -49,7 +48,6 @@ export const getArangoContainer = async function () {
 }
 
 export const createArangoContainer = async function () {
-  console.log('creating container')
   container = await docker.container.create({
     Image: 'arangodb:3.7',
     name: 'arangodb',
@@ -66,10 +64,10 @@ export const createArangoContainer = async function () {
       }
     }
   })
+  console.log('container created')
 }
 
 export const startArangoContainer = async function () {
-  console.log('starting container')
   container = await container.start()
   console.log('container started')
   return container
@@ -77,8 +75,6 @@ export const startArangoContainer = async function () {
 
 export const initArangoContainer = async function () {
   await wait(10000)
-
-  console.log('executing init script')
 
   let creationscript = "db._createDatabase('mobistudy');\
   var users = require('@arangodb/users');\
@@ -104,10 +100,12 @@ export const initArangoContainer = async function () {
   })
   console.log('mobistudy db created')
 
-  db = new Arango({ url: 'http://localhost:' + ARANGOPORT })
+  db = new Arango({ url: 'http://localhost:' + ARANGOPORT, precaptureStackTraces: true })
 
   db.useDatabase('mobistudy')
   db.useBasicAuth('mobistudy', 'testpwd')
+
+  console.log('connected to mobistudy db')
 }
 
 export const stopArangoContainer = async function () {
@@ -117,14 +115,26 @@ export const stopArangoContainer = async function () {
   return
 }
 
+export const getCollection = async function (collname) {
+  // load or create collection
+  let names = await db.listCollections()
+
+  for (var ii = 0; ii < names.length; ii++) {
+    if (names[ii].name === collname) {
+      return db.collection(collname)
+    }
+  }
+  return db.createCollection(collname)
+}
+
 export const addDataToCollection = async function (collname, data) {
-  let collection = await utils.getCollection(db, collname)
+  let collection = await getCollection(collname)
   let meta = await collection.save(data)
   return meta._key
 }
 
 export const removeFromCollection = async function (collname, key) {
-  let collection = await utils.getCollection(db, collname)
+  let collection = await getCollection(collname)
   return collection.remove(key)
 }
 
