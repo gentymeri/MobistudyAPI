@@ -10,7 +10,7 @@
     "test:unit": "jest --updateSnapshot",
     "test:unit:watch": "jest --watch",
     "test:unit:watchAll": "jest --watchAll",
-    "test:integrated": "jest --updateSnapshot --verbose true --detectOpenHandles ./test/jest/__integrated__",
+    "test:integrated": "jest --updateSnapshot ./test/jest/__integrated__",
     "test:integrated:watch": "jest --watch ./test/jest/__integrated__",
     "test:integrated:watchAll": "jest --watchAll ./test/jest/__integrated__"
   },
