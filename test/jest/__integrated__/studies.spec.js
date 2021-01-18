@@ -1,4 +1,4 @@
-import {startArango, stopArango, ARANGOPORT, addDataToCollection} from './arangoTools'
+import { startArango, stopArango, ARANGOPORT, addDataToCollection } from './arangoTools'
 const axios = require('axios')
 // import studiesDB from '../../../src/DB/studiesDB'
 // import utils from '../../../src/DB/utils'
@@ -12,7 +12,7 @@ describe('when arangodb is running with mock data', () => {
   beforeAll(async () => {
     await startArango()
     console.log('arango started')
-  }, 60000)
+  }, 120000)
 
   afterAll(async () => {
     await stopArango()
