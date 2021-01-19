@@ -154,9 +154,10 @@ export default async function (db) {
         if (study.length) repeat = true
         else repeat = false
       } while (repeat)
-      applogger.info({invitationCode: invitationCode},'Invitation code generated:')
+      applogger.info({ invitationCode: invitationCode }, 'Invitation code generated:')
       return invitationCode + ''
     },
+
     // Gets the one study that matches the invitation code
     async getInvitationalStudy (invitationCode) {
       const query = `FOR study IN studies FILTER study.invitationCode == @invitationCode RETURN study`
@@ -192,7 +193,7 @@ export default async function (db) {
       AND participant.studiesSuggestions == TRUE
       AND study.inclusionCriteria.diseases[*].conceptId ALL IN participant.diseases[*].conceptId
       AND study.inclusionCriteria.medications[*].conceptId ALL IN participant.medications[*].conceptId
-      AND study.invitational == FALSE
+      AND !study.invitational
       RETURN study._key`
 
       let bindings = { userKey: userKey }
