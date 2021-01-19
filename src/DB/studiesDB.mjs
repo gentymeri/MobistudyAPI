@@ -154,7 +154,7 @@ export default async function (db) {
         if (study.length) repeat = true
         else repeat = false
       } while (repeat)
-      applogger.info({invitationCode: invitationCode},'Invitation code generated:')
+      applogger.info({ invitationCode: invitationCode }, 'Invitation code generated:')
       return invitationCode + ''
     },
     // Gets the one study that matches the invitation code

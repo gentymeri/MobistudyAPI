@@ -1,16 +1,16 @@
 import {
-  ARANGOPORT, DB,
+  DB,
   pullArango, getArangoImage, getArangoContainer,
   createArangoContainer, startArangoContainer, stopArangoContainer,
-  initArangoContainer, getCollection, addDataToCollection, removeFromCollection
+  connectToDatabase, dropDatabase, addDataToCollection, removeFromCollection
 } from '../../arangoTools'
 import createStudiesDB from '../../../src/DB/studiesDB'
 
-jest.mock('../../../src/DB/utils')
-import utils from '../../../src/DB/utils'
 jest.mock('../../../src/services/logger')
 
 describe('when arangodb is running', () => {
+
+  const DBNAME = 'test_studies'
 
   beforeAll(async () => {
     let image = await getArangoImage()
@@ -26,19 +26,17 @@ describe('when arangodb is running', () => {
     }
     await startArangoContainer()
 
-    await initArangoContainer()
+    await connectToDatabase(DBNAME)
   }, 60000)
 
   afterAll(async () => {
-    await stopArangoContainer()
+    await dropDatabase(DBNAME)
+    // await stopArangoContainer()
   })
 
   describe('when a bunch of users and teams are set', () => {
     let studiesDB, researcher1Key, team1Key, study1Key
     beforeAll(async () => {
-      // mocking utils.getCollection('studies')
-      let studiesCollection = getCollection('studies')
-      utils.getCollection.mockImplementation(() => studiesCollection)
       // create the studiesDB
       studiesDB = await createStudiesDB(DB)
 
