@@ -7,14 +7,17 @@ let container
 let db
 
 const pullImage = function (docker, image, tag) {
-  return new Promise((resolve, reject) => {
-    docker.image.create({}, { fromImage: image, tag: tag })
-      .then((stream) => {
-        stream.on('end', resolve)
-        stream.on('error', reject)
-      })
-  })
+  docker.image.create({}, { fromImage: image, tag: tag })
+    .then((stream) => {
+      return promisifyStream(stream)
+    })
 }
+
+const promisifyStream = stream => new Promise((resolve, reject) => {
+  stream.on('data', data => console.log(data.toString()))
+  stream.on('end', resolve)
+  stream.on('error', reject)
+})
 
 const wait = async function (millis) {
   return new Promise((resolve, reject) => {
@@ -31,6 +34,7 @@ export const pullArango = async function () {
   image = await pullImage(docker, 'arangodb', ARANGO_VERSION)
   console.log('...image pulled')
 }
+
 
 export const getArangoImage = async function () {
   return docker.image.get('arangodb:' + ARANGO_VERSION)

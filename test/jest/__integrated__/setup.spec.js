@@ -11,18 +11,18 @@ describe('when arangodb is running with mock data', () => {
   const DBNAME = 'test_setup'
 
   beforeAll(async () => {
-    let image = await getArangoImage()
-    try {
-      await image.status()
-    } catch (error) {
-      await pullArango()
-    }
+    // let image = await getArangoImage()
+    // try {
+    //   await image.status()
+    // } catch (error) {
+    //   await pullArango()
+    // }
 
-    let arangoContainer = await getArangoContainer()
-    if (!arangoContainer) {
-      await createArangoContainer()
-    }
-    await startArangoContainer()
+    // let arangoContainer = await getArangoContainer()
+    // if (!arangoContainer) {
+    //   await createArangoContainer()
+    // }
+    // await startArangoContainer()
 
     await connectToDatabase(DBNAME)
   }, 60000)
