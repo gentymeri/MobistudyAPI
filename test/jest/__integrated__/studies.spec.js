@@ -90,6 +90,10 @@ describe('when arangodb is running', () => {
       await removeFromCollection('studies', newStudy._key)
     })
 
+    // TODO: create invitational study and get with invitation code
+
+    // TODO: test participants matches
+
     afterAll(async () => {
       await removeFromCollection('users', researcher1Key)
       await removeFromCollection('teams', team1Key)
