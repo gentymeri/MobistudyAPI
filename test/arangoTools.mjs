@@ -3,6 +3,7 @@ import Arango from 'arangojs'
 import utils from '../src/DB/utils.mjs'
 
 let docker = new Docker.Docker({ socketPath: '/var/run/docker.sock' })
+let image
 let container
 let db
 
@@ -22,27 +23,13 @@ const wait = async function (millis) {
   })
 }
 
-const execStart = async function (exec) {
-  return new Promise((resolve, reject) => {
-    exec.start()
-      .then((stream) => {
-        stream.on('data', (info) => {
-          if (info.toString().includes('ERROR')) reject(info.toString())
-          else resolve()
-        })
-        stream.on('end', resolve)
-        stream.on('error', reject)
-      })
-  })
-}
-
 const ARANGO_VERSION = '3.7'
 
 export const ARANGOPORT = '5555'
 
 export const pullArango = async function () {
   console.log('pulling image...')
-  await pullImage(docker, 'arangodb', ARANGO_VERSION)
+  image = await pullImage(docker, 'arangodb', ARANGO_VERSION)
   console.log('...image pulled')
 }
 
@@ -104,7 +91,17 @@ export const initArangoContainer = async function () {
     AttachStdout: true
   })
 
-  await execStart(exec)
+  await new Promise((resolve, reject) => {
+    exec.start()
+      .then((stream) => {
+        stream.on('data', (info) => {
+          if (info.toString().includes('ERROR')) reject(info.toString())
+          else resolve()
+        })
+        stream.on('end', resolve)
+        stream.on('error', reject)
+      })
+  })
   console.log('mobistudy db created')
 
   db = new Arango({ url: 'http://localhost:' + ARANGOPORT })
@@ -123,8 +120,12 @@ export const stopArangoContainer = async function () {
 export const addDataToCollection = async function (collname, data) {
   let collection = await utils.getCollection(db, collname)
   let meta = await collection.save(data)
-  data._key = meta._key
-  return data
+  return meta._key
+}
+
+export const removeFromCollection = async function (collname, key) {
+  let collection = await utils.getCollection(db, collname)
+  return collection.remove(key)
 }
 
 export { db as DB }
