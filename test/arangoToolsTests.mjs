@@ -2,7 +2,7 @@ import {
     ARANGOPORT,
     pullArango, getArangoImage, getArangoContainer,
     createArangoContainer, startArangoContainer, stopArangoContainer,
-    initArangoContainer
+    connectToDatabase, dropDatabase
 } from './arangoTools.mjs'
 import axios from 'axios'
 
@@ -23,9 +23,9 @@ import axios from 'axios'
         }
         await startArangoContainer()
 
-        await initArangoContainer()
+        await connectToDatabase('mobsitudydb')
 
-        let resp = await axios.get('http://localhost:' + ARANGOPORT + '/_db/mobistudy/', {
+        let resp = await axios.get('http://localhost:' + ARANGOPORT + '/_db/mobsitudydb/', {
             auth: {
                 username: 'mobistudy',
                 password: 'testpwd'
@@ -34,7 +34,8 @@ import axios from 'axios'
 
         console.log(resp.status)
 
-        await stopArangoContainer()
+        await dropDatabase('mobsitudydb')
+        // await stopArangoContainer()
 
         console.log('Dario is cool')
     } catch (err) {

@@ -69,43 +69,35 @@ export const createArangoContainer = async function () {
 
 export const startArangoContainer = async function () {
   container = await container.start()
+  // some wait time is needed before connections are allowed
+  await wait(5000)
   console.log('container started')
   return container
 }
 
-export const initArangoContainer = async function () {
-  await wait(10000)
-
-  let creationscript = "db._createDatabase('mobistudy');\
-  var users = require('@arangodb/users');\
-  users.save('mobistudy', 'testpwd');\
-  users.grantDatabase('mobistudy', 'mobistudy');"
-
-  let exec = await container.exec.create({
-    Cmd: ['arangosh', '--server.username', 'root', '--server.password', 'testtest', '--javascript.execute-string', creationscript],
-    AttachStderr: true,
-    AttachStdout: true
+export const connectToDatabase = async function (dbname) {
+  db = new Arango({
+    url: 'http://localhost:' + ARANGOPORT,
+    precaptureStackTraces: true,
+    auth: { username: 'root', password: 'testtest' },
   })
+  const names = await db.listUserDatabases()
+  if (!names.includes(dbname)) {
+    await db.createDatabase(dbname, {
+      users: [{ username: 'mobistudy', passwd: 'testpwd' }]
+    })
+  }
 
-  await new Promise((resolve, reject) => {
-    exec.start()
-      .then((stream) => {
-        stream.on('data', (info) => {
-          if (info.toString().includes('ERROR')) reject(info.toString())
-          else resolve()
-        })
-        stream.on('end', resolve)
-        stream.on('error', reject)
-      })
-  })
-  console.log('mobistudy db created')
-
-  db = new Arango({ url: 'http://localhost:' + ARANGOPORT, precaptureStackTraces: true })
-
-  db.useDatabase('mobistudy')
+  db.useDatabase(dbname)
   db.useBasicAuth('mobistudy', 'testpwd')
 
   console.log('connected to mobistudy db')
+}
+
+export const dropDatabase = async function (dbname) {
+  db.useDatabase('_system')
+  db.useBasicAuth('root', 'testtest')
+  await db.dropDatabase(dbname)
 }
 
 export const stopArangoContainer = async function () {
