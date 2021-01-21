@@ -27,6 +27,7 @@ import vocabularyRouter from './routes/vocabulary.mjs'
 import SMWTRouter from './routes/SMWTData.mjs'
 import QCSTRouter from './routes/QCSTData.mjs'
 import Miband3Router from './routes/miband3.mjs'
+import PO60Router from './routes/po60.mjs'
 
 export default async function () {
   authConfig()
@@ -68,6 +69,7 @@ export default async function () {
   app.use(api_prefix, await SMWTRouter())
   app.use(api_prefix, await QCSTRouter())
   app.use(api_prefix, await Miband3Router())
+  app.use(api_prefix, await PO60Router())
 
   // error handler
   app.use(function (err, req, res, next) {
