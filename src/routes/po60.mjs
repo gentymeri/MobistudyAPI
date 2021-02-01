@@ -1,7 +1,7 @@
 'use strict'
 
 /**
-* This provides the API endpoints for the miband data of the participant.
+* This provides the API endpoints for the PO60 pulseoximeter data of the participant.
 */
 
 import express from 'express'
@@ -15,7 +15,7 @@ const router = express.Router()
 export default async function () {
   var db = await getDB()
 
-  // Get all miband data
+  // Get all PO60 data
   // query params: studyKey to filter by study
   router.get('/po60Data', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
@@ -47,7 +47,7 @@ export default async function () {
     }
   })
 
-  // Get health store data for a user
+  // Get PO60for a user
   router.get('/po60Data/:userKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       let po60Data = await db.getPO60DataByUser(req.params.userKey)
@@ -58,7 +58,7 @@ export default async function () {
     }
   })
 
-  // Get health store data for a study for a user
+  // Get PO60 for a study for a user
   router.get('/po60Data/:userKey/:studyKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       let po60Data = await db.getPO60DataByUserAndStudy(req.params.userKey, req.params.studyKey)

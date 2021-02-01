@@ -47,7 +47,7 @@ export default async function () {
     }
   })
 
-  // Get health store data for a user
+  // Get miband3 data for a user
   router.get('/miband3Data/:userKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       let miband3Data = await db.getMiband3DataByUser(req.params.userKey)
@@ -58,7 +58,7 @@ export default async function () {
     }
   })
 
-  // Get health store data for a study for a user
+  // Get miband3 data for a study for a user
   router.get('/miband3Data/:userKey/:studyKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       let miband3Data = await db.getMiband3DataByUserAndStudy(req.params.userKey, req.params.studyKey)

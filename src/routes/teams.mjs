@@ -191,6 +191,7 @@ export default async function () {
           for (let l = 0; l < answers.length; l++) {
             await db.deleteAnswer(answers[l]._key)
           }
+          // TODO: delete also other data (or add a deleteStudyAndData into studiesDB)
           // Delete the study
           await db.deleteStudy(teamStudies[i]._key)
         }
