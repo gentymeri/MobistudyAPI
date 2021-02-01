@@ -84,7 +84,8 @@
         {
           "taskId": 1,
           "consented": true,
-          "lastExecuted": "2019-02-27T12:46:07.294Z"
+          "lastExecuted": "2019-02-27T12:46:07.294Z",
+          "lastMiband3SampleTS": "2019-03-05T12:46:07.294Z"
         }
       ]
     },
