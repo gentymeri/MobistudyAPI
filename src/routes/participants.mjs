@@ -286,6 +286,53 @@ export default async function () {
       res.sendStatus(500)
     }
   })
+
+
+  // this endpoint is for the app to update the status of the participant regarding a study and a task
+  // example: { taskId: 3, consented: true, lastExecuted: "2019-02-27T12:46:07.294Z", lastMiband3SampleTS: "2019-03-05T12:46:07.294Z" }
+  router.patch('/participants/studies/:studyKey/taskItemsConsent/:taskId', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    let userKey = req.user._key
+    let studyKey = req.params.studyKey
+    let taskId = req.params.taskId
+    let payload = req.body
+    payload.studyKey = studyKey
+
+    try {
+      if (req.user.role != 'participant') return res.sendStatus(403)
+      if (!userKey || !studyKey) return res.sendStatus(400)
+      let participant = await db.getParticipantByUserKey(userKey)
+      if (!participant) return res.status(404)
+
+      // find the study
+      let studyIndex = -1
+      if (!participant.studies) return res.status(404)
+
+      studyIndex = participant.studies.findIndex((s) => {
+        return s.studyKey === studyKey
+      })
+      if (studyIndex === -1) return res.status(404)
+
+      let taskIndex = -1
+      participant.studies[studyIndex].taskItemsConsent.findIndex((t) => {
+        return t.taskId === taskId
+      })
+      if (taskIndex === -1) return res.status(404)
+
+      // TODO: use [deepmerge](https://github.com/TehShrike/deepmerge) instead
+      participant.studies[studyIndex].taskItemsConsent[taskIndex] = payload
+
+      // Update the DB
+      await db.updateParticipant(participant._key, participant)
+
+      res.sendStatus(200)
+      applogger.info({ participantKey: participant._key, taskItemConsent: payload }, 'Participant has changed task item consent status')
+      auditLogger.log('participantStudyUpdate', req.user._key, payload.studyKey, undefined, 'Participant with key ' + participant._key + ' has changed task item consent status', 'participants', participant._key, payload)
+    } catch (err) {
+      applogger.error({ error: err }, 'Cannot update participant with user key ' + userKey)
+      res.sendStatus(500)
+    }
+  })
+
   // gets simple statistics about the study
   router.get('/participants/statusStats/:studyKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
