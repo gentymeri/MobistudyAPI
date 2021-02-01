@@ -179,6 +179,19 @@
         "monthDays": [],
         "weekDays": []
       }
+    },
+    {
+      "id": 6,
+      "type": "po60",
+      "scheduling": {
+        "startEvent": "consent",
+        "intervalType": "d",
+        "interval": 3,
+        "occurrences": 20,
+        "months": [],
+        "monthDays": [],
+        "weekDays": []
+      }
     }
   ],
   "consent": {
