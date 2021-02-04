@@ -301,22 +301,24 @@ export default async function () {
       if (req.user.role != 'participant') return res.sendStatus(403)
       if (!userKey || !studyKey) return res.sendStatus(400)
       let participant = await db.getParticipantByUserKey(userKey)
-      if (!participant) return res.status(404)
+      if (!participant) return res.sendStatus(404)
 
       // find the study
       let studyIndex = -1
-      if (!participant.studies) return res.status(404)
+      if (!participant.studies) return res.sendStatus(404)
+
 
       studyIndex = participant.studies.findIndex((s) => {
         return s.studyKey === studyKey
       })
-      if (studyIndex === -1) return res.status(404)
+      if (studyIndex === -1) return res.sendStatus(404)
+
 
       let taskIndex = -1
-      participant.studies[studyIndex].taskItemsConsent.findIndex((t) => {
-        return t.taskId === taskId
+      taskIndex = participant.studies[studyIndex].taskItemsConsent.findIndex((t) => {
+        return t.taskId == taskId // TODO: taskId sent is a string, while on the server its stored as a number.
       })
-      if (taskIndex === -1) return res.status(404)
+      if (taskIndex === -1) return res.sendStatus(404)
 
       // TODO: use [deepmerge](https://github.com/TehShrike/deepmerge) instead
       participant.studies[studyIndex].taskItemsConsent[taskIndex] = payload

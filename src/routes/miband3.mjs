@@ -90,7 +90,7 @@ export default async function () {
       // update the participant
       await db.replaceParticipant(participant._key, participant)
       res.sendStatus(200)
-      applogger.info({ userKey: req.user._key, taskId: newMiband3Data.taskId, studyKey: newMiband3Data.studyKey }, 'Participant has sent health store data')
+      applogger.info({ userKey: req.user._key, taskId: newMiband3Data.taskId, studyKey: newMiband3Data.studyKey }, 'Participant has sent miband data')
       auditLogger.log('Miband3DataCreated', req.user._key, newMiband3Data.studyKey, newMiband3Data.taskId, 'Miband3Data data created by participant with key ' + participant._key + ' for study with key ' + newMiband3Data.studyKey, 'Miband3Data', newMiband3Data._key, newMiband3Data)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new Miband3Data Data')

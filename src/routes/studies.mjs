@@ -201,6 +201,7 @@ export default async function () {
         await db.deleteQCSTDataByStudy(studyKey)
         await db.deleteSMWTDataByStudy(studyKey)
         await db.deleteMiband3DataByStudy(studyKey)
+        await db.deletePO60DataByStudy(studyKey)
 
         // Deleting the study
         await db.deleteStudy(studykey)

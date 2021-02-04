@@ -181,17 +181,13 @@ export default async function () {
             participant.studies = studyArray
             await db.replaceParticipant(partKey, participant)
           }
-          // Delete store health data associated with study
-          let healthStoreData = await db.getHealthStoreDataByStudy(teamStudies[i]._key)
-          for (let k = 0; k < healthStoreData.length; k++) {
-            await db.deleteHealthStoreData(healthStoreData[k]._key)
-          }
-          // Delete answers associated with study
-          let answers = await db.getAnswerByStudy(teamStudies[i]._key)
-          for (let l = 0; l < answers.length; l++) {
-            await db.deleteAnswer(answers[l]._key)
-          }
-          // TODO: delete also other data (or add a deleteStudyAndData into studiesDB)
+          await db.deleteAnswersByStudy(teamStudies[i]._key)
+          await db.deleteHealthStoreByStudy(teamStudies[i]._key)
+          await db.deleteQCSTDataByStudy(teamStudies[i]._key)
+          await db.deleteSMWTDataByStudy(teamStudies[i]._key)
+          await db.deleteMiband3DataByStudy(teamStudies[i]._key)
+          await db.deletePO60DataByStudy(teamStudies[i]._key)
+          // TODO: (delete also other data (or )add a deleteStudyAndData into studiesDB)
           // Delete the study
           await db.deleteStudy(teamStudies[i]._key)
         }
