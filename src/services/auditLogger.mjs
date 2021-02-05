@@ -3,13 +3,12 @@
 /**
 * Audit log, uses the DB to log events and it includes the file logger too.
 */
-import getDB from '../DB/DB.mjs'
+import { DAO } from '../DAO/DAO.mjs'
 
 export default {
-  db: undefined,
   async log (event, userKey, studyKey, taskId, message, refData, refKey, data) {
-    if (!this.db) this.db = await getDB()
-    this.db.addAuditLog({ timestamp: new Date(),
+    DAO.addAuditLog({
+      timestamp: new Date(),
       event,
       userKey,
       studyKey,
@@ -17,6 +16,7 @@ export default {
       message,
       refData,
       refKey,
-      data })
+      data
+    })
   }
 }

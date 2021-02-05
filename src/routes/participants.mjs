@@ -6,7 +6,7 @@
 
 import express from 'express'
 import passport from 'passport'
-import getDB from '../DB/DB.mjs'
+import { DAO } from '../DAO/DAO.mjs'
 import { applogger } from '../services/logger.mjs'
 import auditLogger from '../services/auditLogger.mjs'
 import { studyStatusUpdateCompose } from '../services/emailComposer.mjs'
@@ -15,7 +15,6 @@ import { sendEmail } from '../services/mailSender.mjs'
 const router = express.Router()
 
 export default async function () {
-  var db = await getDB()
 
   // query parameters:
   // teamKey, studyKey, currentStatus
@@ -24,36 +23,36 @@ export default async function () {
     try {
       if (req.user.role === 'participant') {
         // participants can retrieve only themselves
-        let result = await db.getParticipantByUserKey(req.user._key)
+        let result = await DAO.getParticipantByUserKey(req.user._key)
         res.send(result)
       } else if (req.user.role === 'researcher' || req.user.role === 'admin') {
         if (req.user.role === 'researcher') {
           // extra check about the teams
           if (req.query.teamKey) {
-            let team = await db.getOneTeam(req.query.teamKey)
+            let team = await DAO.getOneTeam(req.query.teamKey)
             if (!team.researchersKeys.includes(req.user._key)) return res.sendStatus(403)
           }
           if (req.query.studyKey) {
-            let team = await db.getAllTeams(req.user._key, req.query.studyKey)
+            let team = await DAO.getAllTeams(req.user._key, req.query.studyKey)
             if (team.length === 0) return res.sendStatus(403)
           }
         }
         let participants = []
         if (req.query.studyKey) {
-          participants = await db.getParticipantsByStudy(req.query.studyKey, req.query.currentStatus)
+          participants = await DAO.getParticipantsByStudy(req.query.studyKey, req.query.currentStatus)
         } else if (req.query.teamKey) {
-          participants = await db.getParticipantsByTeam(req.query.teamKey, req.query.currentStatus)
+          participants = await DAO.getParticipantsByTeam(req.query.teamKey, req.query.currentStatus)
         } else if (req.query.currentStatus) {
           if (req.user.role === 'researcher') {
-            participants = await db.getParticipantsByResearcher(req.user._key, req.query.currentStatus)
+            participants = await DAO.getParticipantsByResearcher(req.user._key, req.query.currentStatus)
           } else { // admin
-            participants = await db.getParticipantsByCurrentStatus(req.query.currentStatus)
+            participants = await DAO.getParticipantsByCurrentStatus(req.query.currentStatus)
           }
         } else {
           if (req.user.role === 'researcher') {
-            participants = await db.getParticipantsByResearcher(req.user._key)
+            participants = await DAO.getParticipantsByResearcher(req.user._key)
           } else {
-            participants = await db.getAllParticipants()
+            participants = await DAO.getAllParticipants()
           }
         }
         res.json(participants)
@@ -68,10 +67,10 @@ export default async function () {
     try {
       if (req.user.role === 'participant' && req.params.participant_key !== req.user._key) return res.sendStatus(403)
       else if (req.user.role === 'researcher') {
-        let parts = await db.getParticipantsByResearcher(req.user._key)
+        let parts = await DAO.getParticipantsByResearcher(req.user._key)
         if (!parts.includes(req.params.participant_key)) return res.sendStatus(403)
       } else {
-        let participant = await db.getOneParticipant(req.params.participant_key)
+        let participant = await DAO.getOneParticipant(req.params.participant_key)
         res.send(participant)
       }
     } catch (err) {
@@ -85,7 +84,7 @@ export default async function () {
     newparticipant.createdTS = new Date()
     try {
       if (req.user.role === 'participant') {
-        newparticipant = await db.createParticipant(newparticipant)
+        newparticipant = await DAO.createParticipant(newparticipant)
         res.send(newparticipant)
         applogger.info({ userKey: newparticipant.userKey, participantKey: newparticipant._key }, 'New participant profile created')
         auditLogger.log('participantCreated', req.user._key, undefined, undefined, 'New participant created', 'participants', newparticipant._key, newparticipant)
@@ -102,29 +101,29 @@ export default async function () {
     if (req.user.role === 'researcher') return res.status(403)
     try {
       let userKey = req.params.userKey
-      let participant = await db.getParticipantByUserKey(userKey)
+      let participant = await DAO.getParticipantByUserKey(userKey)
       if (!participant) return res.status(404)
 
       // Remove Answers
-      await db.deleteAnswersByUser(userKey)
+      await DAO.deleteAnswersByUser(userKey)
 
       // Remove Health Store Data
-      await db.deleteHealthStoreDataByUser(userKey)
+      await DAO.deleteHealthStoreDataByUser(userKey)
 
       // Remove Miband3 Data
-      await db.deleteMiband3DataByUser(userKey)
+      await DAO.deleteMiband3DataByUser(userKey)
 
       // Remove QCST Data
-      await db.deleteQCSTDataByUser(userKey)
+      await DAO.deleteQCSTDataByUser(userKey)
 
       // Remove SMWT Data
-      await db.deleteSMWTDataByUser(userKey)
+      await DAO.deleteSMWTDataByUser(userKey)
 
       // Remove Audit logs
-      await db.deleteLogsByUser(userKey)
+      await DAO.deleteLogsByUser(userKey)
 
-      await db.removeParticipant(participant._key)
-      await db.removeUser(req.params.userKey)
+      await DAO.removeParticipant(participant._key)
+      await DAO.removeUser(req.params.userKey)
       res.sendStatus(200)
       applogger.info({ userKey: participant._key }, 'Participant profile deleted')
       auditLogger.log('participantDeleted', req.user._key, undefined, undefined, 'Participant deleted', 'participants', participant._key, undefined)
@@ -140,7 +139,7 @@ export default async function () {
     try {
       let partKey = req.params.participant_key
       // Get User Key of participant first. Then remove participant and then user.
-      let participant = await db.getOneParticipant(partKey)
+      let participant = await DAO.getOneParticipant(partKey)
       if (participant === null) return res.sendStatus(404)
       // Participant can remove only himself from Participant and Users DB
       let userKey = participant.userKey
@@ -148,25 +147,25 @@ export default async function () {
       if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
 
       // Remove Answers
-      await db.deleteAnswersByParticipant(userKey)
+      await DAO.deleteAnswersByParticipant(userKey)
 
       // Remove Health Store Data
-      await db.deletHealthStoreDataByParticipant(userKey)
+      await DAO.deletHealthStoreDataByParticipant(userKey)
 
       // Remove Miband3 Data TODO: Refactor the above, answers and healthData as well
-      await db.deleteMiband3DataByParticipant(userKey)
+      await DAO.deleteMiband3DataByParticipant(userKey)
 
       // Remove QCST Data
-      await db.deleteQCSTDataByParticipant(userKey)
+      await DAO.deleteQCSTDataByParticipant(userKey)
 
       // Remove SMWT Data
-      await db.deleteSMWTDataByParticipant(userKey)
+      await DAO.deleteSMWTDataByParticipant(userKey)
 
       // Remove Audit logs
-      await db.deleteLogsByUser(userKey)
+      await DAO.deleteLogsByUser(userKey)
 
-      await db.removeParticipant(partKey)
-      await db.removeUser(userKey)
+      await DAO.removeParticipant(partKey)
+      await DAO.removeUser(userKey)
       res.sendStatus(200)
       applogger.info({ participantKey: partKey }, 'Participant profile deleted')
       auditLogger.log('participantDeleted', req.user._key, undefined, undefined, 'Participant deleted', 'participants', partKey, undefined)
@@ -181,11 +180,11 @@ export default async function () {
   router.get('/participants/byuserkey/:userKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
     if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
     if (req.user.role === 'researcher') {
-      let allowedParts = await db.getParticipantsByResearcher(req.user._key)
+      let allowedParts = await DAO.getParticipantsByResearcher(req.user._key)
       if (!allowedParts.includes(req.params.user)) return res.sendStatus(403)
     }
     try {
-      let participant = await db.getParticipantByUserKey(req.params.userKey)
+      let participant = await DAO.getParticipantByUserKey(req.params.userKey)
       if (!participant) return res.sendStatus(404)
       res.send(participant)
     } catch (err) {
@@ -205,9 +204,9 @@ export default async function () {
     if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
     if (req.user.role === 'researcher') return res.status(403)
     try {
-      let participant = await db.getParticipantByUserKey(req.params.userKey)
+      let participant = await DAO.getParticipantByUserKey(req.params.userKey)
       if (!participant) return res.status(404)
-      newparticipant = await db.updateParticipant(participant._key, newparticipant)
+      newparticipant = await DAO.updateParticipant(participant._key, newparticipant)
       res.send(newparticipant)
       applogger.info({ participantKey: participant._key }, 'Participant profile updated')
       auditLogger.log('participantUpdated', req.user._key, undefined, undefined, 'Participant updated', 'participants', participant._key, newparticipant)
@@ -236,11 +235,11 @@ export default async function () {
     try {
       if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
       if (req.user.role === 'researcher') {
-        let allowedParts = await db.getParticipantsByResearcher(req.user._key)
+        let allowedParts = await DAO.getParticipantsByResearcher(req.user._key)
         if (!allowedParts.includes(req.params.user)) return res.sendStatus(403)
       }
       if (!userKey || !studyKey) return res.sendStatus(400)
-      let participant = await db.getParticipantByUserKey(userKey)
+      let participant = await DAO.getParticipantByUserKey(userKey)
       if (!participant) return res.status(404)
 
       // Updated Time Stamp
@@ -271,7 +270,7 @@ export default async function () {
       // TODO: use [deepmerge](https://github.com/TehShrike/deepmerge) instead
       participant.studies[studyIndex] = payload
       // Update the DB
-      await db.updateParticipant(participant._key, participant)
+      await DAO.updateParticipant(participant._key, participant)
 
       // if there is a change in status, then send email reflecting updated status change
       if (updatedCurrentStatus !== currentStatus) {
@@ -300,7 +299,7 @@ export default async function () {
     try {
       if (req.user.role != 'participant') return res.sendStatus(403)
       if (!userKey || !studyKey) return res.sendStatus(400)
-      let participant = await db.getParticipantByUserKey(userKey)
+      let participant = await DAO.getParticipantByUserKey(userKey)
       if (!participant) return res.status(404)
 
       // find the study
@@ -322,7 +321,7 @@ export default async function () {
       participant.studies[studyIndex].taskItemsConsent[taskIndex] = payload
 
       // Update the DB
-      await db.updateParticipant(participant._key, participant)
+      await DAO.updateParticipant(participant._key, participant)
 
       res.sendStatus(200)
       applogger.info({ participantKey: participant._key, taskItemConsent: payload }, 'Participant has changed task item consent status')
@@ -340,10 +339,10 @@ export default async function () {
         res.sendStatus(403)
       } else if (req.user.role === 'researcher') {
         if (req.user.role === 'researcher') {
-          let team = await db.getAllTeams(req.user._key, req.params.studyKey)
+          let team = await DAO.getAllTeams(req.user._key, req.params.studyKey)
           if (team.length === 0) return res.sendStatus(403)
         }
-        let participants = await db.getParticipantsStatusCountByStudy(req.params.studyKey)
+        let participants = await DAO.getParticipantsStatusCountByStudy(req.params.studyKey)
         res.json(participants)
       }
     } catch (err) {

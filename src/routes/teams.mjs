@@ -8,7 +8,7 @@ import express from 'express'
 import passport from 'passport'
 import jwt from 'jsonwebtoken'
 
-import getDB from '../DB/DB.mjs'
+import { DAO } from '../DAO/DAO.mjs'
 import getConfig from '../services/config.mjs'
 import { applogger } from '../services/logger.mjs'
 import auditLogger from '../services/auditLogger.mjs'
@@ -16,16 +16,15 @@ import auditLogger from '../services/auditLogger.mjs'
 const router = express.Router()
 
 export default async function () {
-  var db = await getDB()
   var config = getConfig()
 
   router.get('/teams', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       let teams
       if (req.user.role === 'admin') {
-        teams = await db.getAllTeams()
+        teams = await DAO.getAllTeams()
       } else if (req.user.role === 'researcher') {
-        teams = await db.getAllTeams(req.user._key)
+        teams = await DAO.getAllTeams(req.user._key)
       } else return res.sendStatus(403)
       res.send(teams)
     } catch (err) {
@@ -38,10 +37,10 @@ export default async function () {
     try {
       let team
       if (req.user.role === 'admin') {
-        team = await db.getOneTeam(req.params.team_key)
+        team = await DAO.getOneTeam(req.params.team_key)
         res.send(team)
       } else if (req.user.role === 'researcher') {
-        team = await db.getOneTeam(req.params.team_key)
+        team = await DAO.getOneTeam(req.params.team_key)
         if (team.researchersKeys.includes(req.user._key)) res.send(team)
         else res.sendStatus(403)
       } else res.sendStatus(403)
@@ -58,9 +57,9 @@ export default async function () {
       newteam.createdTS = new Date()
       newteam.researchersKeys = []
       try {
-        let existingTeam = await db.findTeam(newteam.name)
+        let existingTeam = await DAO.findTeam(newteam.name)
         if (existingTeam) return res.sendStatus(409)
-        newteam = await db.createTeam(newteam)
+        newteam = await DAO.createTeam(newteam)
         res.send(newteam)
         applogger.info(newteam, 'New team created')
         auditLogger.log('teamCreated', req.user._key, undefined, undefined, 'New team created ' + newteam.name, 'teams', newteam._key, newteam)
@@ -76,7 +75,7 @@ export default async function () {
       try {
         let teamkey = req.params.teamKey
 
-        let team = await db.getOneTeam(teamkey)
+        let team = await DAO.getOneTeam(teamkey)
         if (!team) return res.sendStatus(400)
 
         let weeksecs = 7 * 24 * 60 * 60
@@ -87,7 +86,7 @@ export default async function () {
         })
         team.invitationCode = token
         team.invitationExpiry = new Date(new Date().getTime() + (weeksecs * 1000))
-        await db.replaceTeam(teamkey, team)
+        await DAO.replaceTeam(teamkey, team)
         res.send(token)
       } catch (err) {
         applogger.error({ error: err }, 'Cannot generate invitation code for team ' + req.params.teamKey)
@@ -114,14 +113,14 @@ export default async function () {
         res.sendStatus(400)
       } else {
         let decodedTeamKey = decoded.teamKey
-        let selTeam = await db.getOneTeam(decodedTeamKey)
+        let selTeam = await DAO.getOneTeam(decodedTeamKey)
         if (selTeam) {
           if (selTeam.researchersKeys.includes(researcherKeyUpdt)) {
             applogger.error('Adding researcher to team, researcher already added')
             res.sendStatus(409)
           } else {
             selTeam.researchersKeys.push(researcherKeyUpdt)
-            await db.replaceTeam(decodedTeamKey, selTeam)
+            await DAO.replaceTeam(decodedTeamKey, selTeam)
             res.json({ teamName: selTeam.name })
             applogger.info(selTeam, 'Reseacher added to a team')
             auditLogger.log('researcherAddedToTeam', req.user._key, undefined, undefined, 'Researcher with key ' + researcherKeyUpdt + ' added to team ' + selTeam.name, 'teams', selTeam._key, selTeam)
@@ -144,12 +143,12 @@ export default async function () {
     let userKey = req.body.userRemoved.userKey
     if (req.user.role === 'admin') {
       try {
-        let selTeam = await db.getOneTeam(teamKey)
+        let selTeam = await DAO.getOneTeam(teamKey)
         let index = selTeam.researchersKeys.indexOf(userKey)
         if (index !== null) {
           selTeam.researchersKeys.splice(index, 1)
         }
-        await db.replaceTeam(teamKey, selTeam)
+        await DAO.replaceTeam(teamKey, selTeam)
         res.sendStatus(200)
         applogger.info(selTeam, 'Reseacher removed from team')
         auditLogger.log('researcherRemovedFromTeam', req.user._key, undefined, undefined, 'Researcher with key ' + userKey + ' removed from team ' + selTeam.name, 'teams', selTeam._key, selTeam)
@@ -167,35 +166,35 @@ export default async function () {
       if (req.user.role === 'admin') {
         let teamkey = req.params.team_key
         // look for studies of that team
-        let teamStudies = await db.getAllTeamStudies(teamkey)
+        let teamStudies = await DAO.getAllTeamStudies(teamkey)
         let participantsByStudy = []
         // Get list of participants per study. Then delete each study.
         for (let i = 0; i < teamStudies.length; i++) {
-          participantsByStudy = await db.getParticipantsByStudy(teamStudies[i]._key, null)
+          participantsByStudy = await DAO.getParticipantsByStudy(teamStudies[i]._key, null)
           for (let j = 0; j < participantsByStudy.length; j++) {
             // Per participant, remove the study
             let partKey = participantsByStudy[j]._key
-            let participant = await db.getOneParticipant(partKey)
+            let participant = await DAO.getOneParticipant(partKey)
             let studyArray = participant.studies
             studyArray = studyArray.filter(study => study.studyKey !== teamStudies[i]._key)
             participant.studies = studyArray
-            await db.replaceParticipant(partKey, participant)
+            await DAO.replaceParticipant(partKey, participant)
           }
           // Delete store health data associated with study
-          let healthStoreData = await db.getHealthStoreDataByStudy(teamStudies[i]._key)
+          let healthStoreData = await DAO.getHealthStoreDataByStudy(teamStudies[i]._key)
           for (let k = 0; k < healthStoreData.length; k++) {
-            await db.deleteHealthStoreData(healthStoreData[k]._key)
+            await DAO.deleteHealthStoreData(healthStoreData[k]._key)
           }
           // Delete answers associated with study
-          let answers = await db.getAnswerByStudy(teamStudies[i]._key)
+          let answers = await DAO.getAnswerByStudy(teamStudies[i]._key)
           for (let l = 0; l < answers.length; l++) {
-            await db.deleteAnswer(answers[l]._key)
+            await DAO.deleteAnswer(answers[l]._key)
           }
           // TODO: delete also other data (or add a deleteStudyAndData into studiesDB)
           // Delete the study
-          await db.deleteStudy(teamStudies[i]._key)
+          await DAO.deleteStudy(teamStudies[i]._key)
         }
-        await db.removeTeam(teamkey)
+        await DAO.removeTeam(teamkey)
         res.sendStatus(200)
         applogger.info({ teamKey: teamkey }, 'Team deleted')
         auditLogger.log('teamDeleted', req.user._key, undefined, undefined, 'Team with key ' + teamkey + ' deleted', 'teams', teamkey, undefined)

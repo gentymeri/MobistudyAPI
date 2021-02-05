@@ -3,26 +3,24 @@
 /**
 * This allows email to be structured and sent to participants wrt studies.
 */
-import { applogger } from './logger.mjs'
-import getDB from '../DB/DB.mjs'
+import { DAO } from '../DAO/DAO.mjs'
 import i18n from '../i18n/i18n.mjs'
 
 // creates the email when a user requests password recovery
 // returns { title: '...', content: '...'}
-export async function passwordRecoveryCompose(serverlink, token, language) {
+export async function passwordRecoveryCompose (serverlink, token, language) {
   i18n.locale = language
 
   let title = i18n.t('account.passwordRecoveryTitle')
-  let content = i18n.t('account.passwordRecoveryContent', {serverlink: serverlink, token: token})
+  let content = i18n.t('account.passwordRecoveryContent', { serverlink: serverlink, token: token })
   return { title: title, content: content }
 }
 
 // Creates the content of an email to be sent to a user when the status of a study changes
 // returns { title: '...', content: '...'}
-export async function studyStatusUpdateCompose(studyKey, participant) {
-  let db = await getDB()
+export async function studyStatusUpdateCompose (studyKey, participant) {
 
-  let study = await db.getOneStudy(studyKey)
+  let study = await DAO.getOneStudy(studyKey)
   i18n.locale = participant.language
   let studyTitle = study.generalities.title
   let emailTitle = ''
@@ -31,7 +29,7 @@ export async function studyStatusUpdateCompose(studyKey, participant) {
   let taskNotConDesc = ''
 
   // get the participant's role in this study
-  let partStudy = participant.studies.find( s => s.studyKey === studyKey )
+  let partStudy = participant.studies.find(s => s.studyKey === studyKey)
 
   // Send EMAILS according to status
   if (partStudy.currentStatus === 'accepted') {
@@ -49,7 +47,7 @@ export async function studyStatusUpdateCompose(studyKey, participant) {
       }
       for (let i = 0; i < partStudy.extraItemsConsent.length; i++) {
         let descr = '\u2022 ' + study.consent.extraItems[i].description + '\n'
-        if(partStudy.extraItemsConsent[i].consented) taskConDesc += descr
+        if (partStudy.extraItemsConsent[i].consented) taskConDesc += descr
         else taskNotConDesc += descr
       }
       emailContent += i18n.t('studyStatusUpdate.studyAcceptedConsentedTasks') + '\n'

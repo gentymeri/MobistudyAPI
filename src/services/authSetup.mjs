@@ -9,19 +9,18 @@ import PassportJWT from 'passport-jwt'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import { applogger } from './logger.mjs'
-import getDB from '../DB/DB.mjs'
+import { DAO } from '../DAO/DAO.mjs'
 import getConfig from './config.mjs'
 
 export default async function () {
-  var db = await getDB()
   var config = getConfig()
 
   if (config.auth.adminEmail) {
     // generate admin user from config if not already existing
     try {
-      let admin = await db.findUser(config.auth.adminEmail)
+      let admin = await DAO.findUser(config.auth.adminEmail)
       if (!admin) {
-        await db.createUser({
+        await DAO.createUser({
           email: config.auth.adminEmail,
           hashedPassword: bcrypt.hashSync(config.auth.adminPassword, 8),
           role: 'admin'
@@ -29,7 +28,7 @@ export default async function () {
         applogger.info('Admin user created')
       }
       applogger.debug('Admin user already exists')
-    } catch(err) {
+    } catch (err) {
       applogger.fatal(err, 'Cannot create admin user')
       process.exit(1)
     }
@@ -40,7 +39,7 @@ export default async function () {
     usernameField: 'email',
     passwordField: 'password'
   }, async function (email, password, done) {
-    let user = await db.findUser(email)
+    let user = await DAO.findUser(email)
     if (!user) {
       return done(null, false, { message: 'Incorrect email or password.' })
     } else {

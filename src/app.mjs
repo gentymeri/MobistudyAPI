@@ -13,6 +13,8 @@ import passport from 'passport'
 import { applogger, httplogger } from './services/logger.mjs'
 import authConfig from './services/authSetup.mjs'
 
+import { initializeDAO } from './DAO/DAO.mjs'
+
 import indexRouter from './routes/index.mjs'
 import studiesRouter from './routes/studies.mjs'
 import formsRouter from './routes/forms.mjs'
@@ -30,8 +32,6 @@ import Miband3Router from './routes/miband3.mjs'
 import PO60Router from './routes/po60.mjs'
 
 export default async function () {
-  authConfig()
-
   var app = express()
 
   app.use(helmet())
@@ -51,6 +51,10 @@ export default async function () {
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
     next()
   })
+
+  await initializeDAO()
+
+  await authConfig()
 
   app.use(passport.initialize())
 

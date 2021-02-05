@@ -9,7 +9,7 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import owasp from 'owasp-password-strength-test'
 import zxcvbn from 'zxcvbn'
-import getDB from '../DB/DB.mjs'
+import { DAO } from '../DAO/DAO.mjs'
 import getConfig from '../services/config.mjs'
 import { applogger } from '../services/logger.mjs'
 import auditLogger from '../services/auditLogger.mjs'
@@ -42,7 +42,6 @@ const pwdCheck = function (email, password) {
 }
 
 export default async function () {
-  const db = await getDB()
 
   router.post('/login', passport.authenticate('local', { session: false }), function (req, res, next) {
     res.send(req.user)
@@ -52,7 +51,7 @@ export default async function () {
   router.post('/sendResetPasswordEmail', async function (req, res) {
     if (req.body.email) {
       let email = req.body.email
-      let existing = await db.findUser(email)
+      let existing = await DAO.findUser(email)
       if (!existing) return res.sendStatus(200)
 
       let daysecs = 24 * 60 * 60
@@ -65,7 +64,7 @@ export default async function () {
       let language = 'en'
       if (existing.role === 'participant') {
         // find language of the participant
-        let part = await db.getParticipantByUserKey(existing._key)
+        let part = await DAO.getParticipantByUserKey(existing._key)
         language = part.language
       }
       let { title, content } = passwordRecoveryCompose(serverlink, token, language)
@@ -92,12 +91,12 @@ export default async function () {
         let newPasssword = req.body.password
         if (!pwdCheck(email, newPasssword)) return res.status(400).send('Password too weak')
         let hashedPassword = bcrypt.hashSync(newPasssword, 8)
-        let existing = await db.findUser(email)
+        let existing = await DAO.findUser(email)
         if (!existing) {
           applogger.info('Resetting password, email ' + email + ' not registered')
           return res.status(409).send('This email is not registered')
         }
-        await db.updateUser(existing._key, {
+        await DAO.updateUser(existing._key, {
           hashedPassword: hashedPassword
         })
         res.sendStatus(200)
@@ -115,10 +114,10 @@ export default async function () {
     delete user.password
     user.hashedPassword = hashedPassword
     try {
-      let existing = await db.findUser(user.email)
+      let existing = await DAO.findUser(user.email)
       if (existing) return res.status(409).send('This email is already registered')
       if (user.role === 'admin') return res.sendStatus(403)
-      let newuser = await db.createUser(user)
+      let newuser = await DAO.createUser(user)
       res.sendStatus(200)
       applogger.info({ email: newuser.email }, 'New user created')
       auditLogger.log('userCreated', newuser._key, undefined, undefined, 'New user created with email ' + newuser.email, 'users', newuser._key, undefined)
@@ -135,17 +134,17 @@ export default async function () {
     try {
       let val
       if (req.user.role === 'admin') {
-        val = await db.getAllUsersByCriteria(null, req.query.studyKey)
+        val = await DAO.getAllUsersByCriteria(null, req.query.studyKey)
       } else if (req.user.role === 'researcher') {
         // TODO: make sure the study Key is among the ones the researcher is allowed
-        if (req.query.studyKey) val = await db.getAllUsersByCriteria('participant', req.query.studyKey)
+        if (req.query.studyKey) val = await DAO.getAllUsersByCriteria('participant', req.query.studyKey)
         else {
           // TODO: retrieve studies where this participant is involved in
           let studyKeys
-          val = await db.getAllUsersByCriteria('participant', undefined, studyKeys)
+          val = await DAO.getAllUsersByCriteria('participant', undefined, studyKeys)
         }
       } else { // a participant
-        val = await db.getOneUser(req.user._key)
+        val = await DAO.getOneUser(req.user._key)
       }
       res.send(val)
     } catch (err) {
@@ -161,7 +160,7 @@ export default async function () {
       res.sendStatus(403)
     } else {
       try {
-        let result = await db.getUsers(false,
+        let result = await DAO.getUsers(false,
           req.query.roleType,
           req.query.userEmail,
           req.query.sortDirection,
@@ -184,7 +183,7 @@ export default async function () {
       res.sendStatus(403)
     } else {
       try {
-        let result = await db.getUsers(true,
+        let result = await DAO.getUsers(true,
           req.query.roleType,
           req.query.userEmail,
           req.query.sortDirection,
@@ -205,7 +204,7 @@ export default async function () {
       let val
       // Only Admin can get a list of all users
       if (req.user.role === 'admin') {
-        val = await db.getAllUsersInDb()
+        val = await DAO.getAllUsersInDb()
       } else if (req.user.role === 'researcher') {
         // See all Users associated to teams to which this researcher belongs
       }
@@ -220,10 +219,10 @@ export default async function () {
     try {
       let val
       if (req.user.role === 'admin') {
-        val = await db.getOneUser(req.params.user_key)
+        val = await DAO.getOneUser(req.params.user_key)
       } else if (req.user.role === 'researcher') {
         // TODO: make sure the user Key is among the ones the researcher is allowed. i.e is part of the team key
-        val = await db.getOneUser(req.params.user_key)
+        val = await DAO.getOneUser(req.params.user_key)
       }
       res.send(val)
     } catch (err) {
@@ -239,20 +238,20 @@ export default async function () {
       // Only admin can remove a team
       if (req.user.role === 'admin') {
         // Remove user from all teams
-        let teamsOfUser = await db.getAllTeams(userKey)
+        let teamsOfUser = await DAO.getAllTeams(userKey)
         // For each team, find the user key in the researcher keys and remove
         for (let i = 0; i < teamsOfUser.length; i++) {
           let teamKeyOfUser = teamsOfUser[i]._key
-          let selTeam = await db.getOneTeam(teamKeyOfUser)
+          let selTeam = await DAO.getOneTeam(teamKeyOfUser)
           let index = selTeam.researchersKeys.indexOf(userKey)
           if (index !== null) {
             selTeam.researchersKeys.splice(index, 1)
           }
-          await db.replaceTeam(teamKeyOfUser, selTeam)
+          await DAO.replaceTeam(teamKeyOfUser, selTeam)
         }
-        // Then, FINALLY, remove user from db
-        let user = await db.getOneUser(userKey)
-        await db.removeUser(userKey)
+        // Then, FINALLY, remove user from DAO
+        let user = await DAO.getOneUser(userKey)
+        await DAO.removeUser(userKey)
         res.sendStatus(200)
 
         applogger.info({ email: user.email }, 'User deleted')

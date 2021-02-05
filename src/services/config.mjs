@@ -1,8 +1,7 @@
 'use strict'
 
 /**
-* Sets-up the loggers.
-* Returns two loggers, one for the http raw stuff and one for the application.
+* Sets-up configuration.
 */
 
 import fs from 'fs'
@@ -42,17 +41,17 @@ export default function () {
     if (config.logs.level === undefined) config.logs.level = parseInt(process.env.LOGS_LEVEL || '30')
 
     if (config.auth === undefined) config.auth = {}
-    if (config.secret === undefined) config.secret = (getSwarmSecret('AUTH_SECRET') || process.env.AUTH_SECRET)
-    if (config.tokenExpires === undefined) config.tokenExpires = (process.env.AUTH_TOKEN_EXPIRES || '30 days')
-    if (config.adminEmail === undefined) config.adminEmail = (getSwarmSecret('AUTH_ADMIN_EMAIL') || process.env.AUTH_ADMIN_EMAIL)
-    if (config.adminPassword === undefined) config.adminPassword = (getSwarmSecret('AUTH_ADMIN_PASSWORD') || process.env.AUTH_ADMIN_PASSWORD)
+    if (config.auth.secret === undefined) config.auth.secret = (getSwarmSecret('AUTH_SECRET') || process.env.AUTH_SECRET)
+    if (config.auth.tokenExpires === undefined) config.auth.tokenExpires = (process.env.AUTH_TOKEN_EXPIRES || '30 days')
+    if (config.auth.adminEmail === undefined) config.auth.adminEmail = (getSwarmSecret('AUTH_ADMIN_EMAIL') || process.env.AUTH_ADMIN_EMAIL)
+    if (config.auth.adminPassword === undefined) config.auth.adminPassword = (getSwarmSecret('AUTH_ADMIN_PASSWORD') || process.env.AUTH_ADMIN_PASSWORD)
 
     if (config.db === undefined) config.db = {}
-    if (config.host === undefined) config.host = (process.env.DB_HOST || 'localhost')
-    if (config.port === undefined) config.port = parseInt(process.env.DB_PORT || '8529')
-    if (config.name === undefined) config.name = (getSwarmSecret('DB_NAME') || process.env.DB_NAME)
-    if (config.user === undefined) config.user = (getSwarmSecret('DB_USER') || process.env.DB_USER)
-    if (config.password === undefined) config.password = (getSwarmSecret('DB_PASSWORD') || process.env.DB_PASSWORD)
+    if (config.db.host === undefined) config.db.host = (process.env.DB_HOST || 'localhost')
+    if (config.db.port === undefined) config.db.port = parseInt(process.env.DB_PORT || '8529')
+    if (config.db.name === undefined) config.db.name = (getSwarmSecret('DB_NAME') || process.env.DB_NAME)
+    if (config.db.user === undefined) config.db.user = (getSwarmSecret('DB_USER') || process.env.DB_USER)
+    if (config.db.password === undefined) config.db.password = (getSwarmSecret('DB_PASSWORD') || process.env.DB_PASSWORD)
 
     if (config.outlook === undefined) config.outlook = {}
     if (config.outlook.email === undefined) config.outlook.email = process.env.OUTLOOK_EMAIL
