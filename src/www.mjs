@@ -21,7 +21,7 @@ import getApp from './app.mjs'
   // pass parameters down the application
   app.set('port', config.web.port)
 
-  if (config.cluster && cluster.isMaster) {
+  if (config.web.cluster && cluster.isMaster) {
     console.log(`Master process ${process.pid} is running`)
 
     // Fork workers.
