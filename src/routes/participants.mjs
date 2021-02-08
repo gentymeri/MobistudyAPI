@@ -20,7 +20,6 @@ export default async function () {
   // query parameters:
   // teamKey, studyKey, currentStatus
   router.get('/participants', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    console.log('Getting participants...')
     try {
       if (req.user.role === 'participant') {
         // participants can retrieve only themselves
