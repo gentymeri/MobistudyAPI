@@ -231,7 +231,7 @@ export default async function () {
     }
   })
 
-  // Remove Specified User
+  // Remove Specified User (currently only removes researchers)
   router.delete('/users/:user_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       let userKey = req.params.user_key

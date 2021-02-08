@@ -180,17 +180,12 @@ export default async function () {
             participant.studies = studyArray
             await DAO.replaceParticipant(partKey, participant)
           }
-          // Delete store health data associated with study
-          let healthStoreData = await DAO.getHealthStoreDataByStudy(teamStudies[i]._key)
-          for (let k = 0; k < healthStoreData.length; k++) {
-            await DAO.deleteHealthStoreData(healthStoreData[k]._key)
-          }
-          // Delete answers associated with study
-          let answers = await DAO.getAnswerByStudy(teamStudies[i]._key)
-          for (let l = 0; l < answers.length; l++) {
-            await DAO.deleteAnswer(answers[l]._key)
-          }
-          // TODO: delete also other data (or add a deleteStudyAndData into studiesDB)
+          await DAO.deleteAnswersByStudy(teamStudies[i]._key)
+          await DAO.deleteHealthStoreByStudy(teamStudies[i]._key)
+          await DAO.deleteQCSTDataByStudy(teamStudies[i]._key)
+          await DAO.deleteSMWTDataByStudy(teamStudies[i]._key)
+          await DAO.deleteMiband3DataByStudy(teamStudies[i]._key)
+          await DAO.deletePO60DataByStudy(teamStudies[i]._key)
           // Delete the study
           await DAO.deleteStudy(teamStudies[i]._key)
         }
