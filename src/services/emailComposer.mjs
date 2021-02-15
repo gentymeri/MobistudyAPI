@@ -6,6 +6,16 @@
 import { DAO } from '../DAO/DAO.mjs'
 import i18n from '../i18n/i18n.mjs'
 
+// creates the email when a user registers
+// returns { title: '...', content: '...'}
+export async function userRegistrationCompose (serverlink, token, language) {
+  i18n.locale = language
+
+  let title = i18n.t('account.registrationTitle')
+  let content = i18n.t('account.registrationContent')
+  return { title: title, content: content }
+}
+
 // creates the email when a user requests password recovery
 // returns { title: '...', content: '...'}
 export async function passwordRecoveryCompose (serverlink, token, language) {

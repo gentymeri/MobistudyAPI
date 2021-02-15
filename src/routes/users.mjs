@@ -14,6 +14,7 @@ import getConfig from '../services/config.mjs'
 import { applogger } from '../services/logger.mjs'
 import auditLogger from '../services/auditLogger.mjs'
 import { sendEmail } from '../services/mailSender.mjs'
+import { userRegistrationCompose, passwordRecoveryCompose } from '../services/emailComposer.mjs'
 
 owasp.config({
   allowPassphrases: true,
@@ -121,10 +122,15 @@ export default async function () {
       res.sendStatus(200)
       applogger.info({ email: newuser.email }, 'New user created')
       auditLogger.log('userCreated', newuser._key, undefined, undefined, 'New user created with email ' + newuser.email, 'users', newuser._key, undefined)
-      sendEmail(newuser.email, 'Mobistudy Registration Confirmation', `<p>You have been successfully registered on Mobistudy.</p>`)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new user')
       res.sendStatus(500)
+    }
+    try {
+      let { title, content } = userRegistrationCompose(language)
+      sendEmail(newuser.email, title, content)
+    } catch {
+      applogger.error({ error: err }, 'Cannot send  new user')
     }
   })
 

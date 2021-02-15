@@ -11,6 +11,8 @@ export default {
     studyWithdrawnThanks: 'Du har upphävt ditt deltagande i studien { studyTitle }. Tack för din tid.'
   },
   account: {
+    registrationTitle: 'Mobistudy registreringsbekräftelse',
+    registrationContent: `<p>Du har registrerats på Mobistudy.</p> <p>Om du inte känner igen det här meddelandet kan du svara på det här e-postmeddelandet och be oss ta bort ditt konto.</p>`,
     passwordRecoveryTitle: 'Mobistudy återställning av lösenord',
     passwordRecoveryContent: `<p>Du har begärt att återställa ditt lösenord hos Mobistudy.</p>
     <p>Navigera till <a href={serverlink}>den här hemsidan</a> för att återställa lösenordet.</p>
