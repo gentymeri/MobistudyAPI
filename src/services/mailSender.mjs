@@ -6,7 +6,6 @@ const config = getConfig()
 
 export async function sendEmail (contact, subject, message) {
   return new Promise(async (resolve, reject) => {
-    console.log('--->', config.outlook.user)
     applogger.debug({ contact, subject, message, config: config.outlook }, 'sending email')
     try {
       nodeoutlook.sendEmail({

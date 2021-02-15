@@ -55,6 +55,7 @@ export default function () {
 
     if (config.outlook === undefined) config.outlook = {}
     if (config.outlook.email === undefined) config.outlook.email = process.env.OUTLOOK_EMAIL
+    if (config.outlook.user === undefined) config.outlook.user = (getSwarmSecret('OUTLOOK_USER') || process.env.OUTLOOK_USER)
     if (config.outlook.password === undefined) config.outlook.password = (getSwarmSecret('OUTLOOK_PASSWORD') || process.env.OUTLOOK_PASSWORD)
   }
   return config
