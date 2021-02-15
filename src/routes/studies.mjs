@@ -194,7 +194,7 @@ export default async function () {
             await DAO.replaceParticipant(partKey, participant)
           }
         }
-        // Data needs to be deleted before the study TODO: Should do this for the other type of data as well
+        // Data needs to be deleted before the study
         await DAO.deleteAnswersByStudy(studyKey)
         await DAO.deleteHealthStoreByStudy(studykey)
         await DAO.deleteQCSTDataByStudy(studyKey)
