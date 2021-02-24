@@ -20,10 +20,10 @@ To start Arango, you can either [install it](https://www.arangodb.com/), or use 
 
 ## Run
 
-The code is written using ES6 module, which are still experimental in nodejs.
+The code is written using ES6 module, so you need a recent version of NodeJS.
 To start it:
 
-    node --experimental-modules ./src/www.mjs
+    npm start
 
 You also need to provide either a configuration file with the name config.json
 inside the /config folder (see /config/config.template.json for an example) or
@@ -34,7 +34,7 @@ See section about Docker for details about environmental variables.
 ## Test
 
 Run `npm run test:unit`. If you want to have the tests run continuously (as you
-change the code), add ` -- --watch`.
+change the code), run `npm run test:watch`.
 
 ## Develop
 
@@ -43,18 +43,19 @@ The code is written mostly in ES6 and uses ES6 modules, please be consistent.
 The folder structure is vaguely inspired by [this](https://softwareontheroad.com/ideal-nodejs-project-structure).
 ```
 project
-└───config        // contains the runtime configuration files
-└───models        // examples of data managed by the app, in json
-└───src           // application code
-│   └───DB        // access to the database
-│   └───i18n      // internationalised text
-│   │   └───en    // English text
-│   │   └───sv    // Swedish text
-│   └───routes    // API endpoints
-│   └───services  // application logic
-└───test          // automatic tests and experiments
-    └───jest      // unit tests
-    └───__tests__ // test specs
+└───config                  // contains the runtime configuration files
+└───models                  // examples of data managed by the app, in json
+└───src                     // application code
+│   └───DAO                 // access to the database
+│   └───i18n                // internationalised text
+│   │   └───en              // English text
+│   │   └───sv              // Swedish text
+│   └───routes              // API endpoints
+│   └───services            // application logic
+└───test                    // automatic tests and experiments
+    └───jest                // unit tests
+        └───__tests__       // unit test specs
+        └───__integrated__  // integrated test specs (require docker)
 ```
 
 ## Contribute
@@ -108,11 +109,9 @@ also consider using environmental variables. This is the full list of variables:
 | DB_NAME            | string  | NA          | YES    |
 | DB_USER            | string  | NA          | YES    |
 | DB_PASSWORD        | string  | NA          | YES    |
-| GMAIL_EMAIL        | string  | NA          | YES    |
-| GMAIL_CLIENTID     | string  | NA          | YES    |
-| GMAIL_PROJECTID    | string  | NA          | YES    |
-| GMAIL_SECRET       | string  | NA          | YES    |
-| GMAIL_REFESHTOKEN  | string  | NA          | YES    |
+| OUTLOOK_USER       | string  | NA          | YES    |
+| OUTLOOK_PASSWORD   | string  | NA          | YES    |
+| OUTLOOK_EMAIL      | string  | NA          | NO     |
 
 AUTH_ADMIN_EMAIL and AUTH_ADMIN_PASSWORD are used at the first start, to generate
 an admin user that can be used to access the website the first time.
@@ -132,6 +131,8 @@ Development:
 - [Arvind Goburdhun](https://github.com/arvgo)
 - [Elin Forsnor](https://github.com/elinforsnor)
 - [Felix Morau](https://github.com/femosc2)
+- [Milo Bengtsson](https://github.com/palladog)
+- [Daniel Abella](https://github.com/assimilate)
 
 ## License
 
