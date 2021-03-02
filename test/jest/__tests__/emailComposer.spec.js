@@ -1,7 +1,7 @@
-import getDB from '../../../src/DB/DB.mjs'
+import { DAO } from '../../../src/DAO/DAO'
 import { studyStatusUpdateCompose, passwordRecoveryCompose } from '../../../src/services/emailComposer.mjs'
 
-jest.mock('../../../src/DB/DB.mjs');
+jest.mock('../../../src/DAO/DAO')
 
 describe('when composing an email', () => {
 
@@ -15,17 +15,17 @@ describe('when composing an email', () => {
   })
 
   test('the email for a completed study is correct', async () => {
-    getDB.mockResolvedValue({
-      getOneStudy: async () => {
-        return {
-          generalities: {
-            title: 'teststudy'
-          },
-          consent: {
-            taskItems: [],
-            extraItems: []
-          }
+    DAO.__setReturnedValue({
+      generalities: {
+        languages: ['en', 'it'],
+        title: {
+          en: 'teststudy',
+          it: 'studio test'
         }
+      },
+      consent: {
+        taskItems: [],
+        extraItems: []
       }
     })
 
@@ -41,13 +41,15 @@ describe('when composing an email', () => {
   })
 
   test('the email for a withdrawn study is correct', async () => {
-    getDB.mockResolvedValue({
-      getOneStudy: async () => {
-        return {
-          generalities: { title: 'teststudy' },
-          consent: { taskItems: [], extraItems: [] }
+    DAO.__setReturnedValue({
+      generalities: {
+        languages: ['en', 'it'],
+        title: {
+          en: 'teststudy',
+          it: 'studio test'
         }
-      }
+      },
+      consent: { taskItems: [], extraItems: [] }
     })
 
     let email = await studyStatusUpdateCompose('1', {
@@ -62,22 +64,22 @@ describe('when composing an email', () => {
   })
 
   test('the email for an accepted study is correct', async () => {
-    getDB.mockResolvedValue({
-      getOneStudy: async () => {
-        return {
-          generalities: {
-            title: 'teststudy'
-          },
-          consent: {
-            taskItems: [{
-              description: 'task1',
-              taskId: 1
-            }],
-            extraItems: [{
-              description: 'extra1'
-            }]
-          }
+    DAO.__setReturnedValue({
+      generalities: {
+        languages: ['en', 'it'],
+        title: {
+          en: 'teststudy',
+          it: 'studio test'
         }
+      },
+      consent: {
+        taskItems: [{
+          description: 'task1',
+          taskId: 1
+        }],
+        extraItems: [{
+          description: 'extra1'
+        }]
       }
     })
 

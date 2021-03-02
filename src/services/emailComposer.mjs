@@ -32,7 +32,7 @@ export async function studyStatusUpdateCompose (studyKey, participant) {
 
   let study = await DAO.getOneStudy(studyKey)
   i18n.locale = participant.language
-  let studyTitle = study.generalities.title
+  let studyTitle = study.generalities.title[participant.language]
   let emailTitle = ''
   let emailContent = ''
   let taskConDesc = ''
