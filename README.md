@@ -16,7 +16,7 @@ also a dedicated user with its password.
 
 To start Arango, you can either [install it](https://www.arangodb.com/), or use Docker. For development, use:
 
-`docker run -e ARANGO_NO_AUTH=1 -p 8529:8529 arangodb/arangodb arangod  --server.endpoint tcp://0.0.0.0:8529`
+`docker run -e ARANGO_NO_AUTH=1 -p 127.0.0.1:8529:8529 --name mobiArango arangodb`
 
 ## Run
 
