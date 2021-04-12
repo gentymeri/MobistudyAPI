@@ -1,41 +1,84 @@
 {
-  "userKey":"asdasd",
-  "studyKey":"asdasd",
-  "taskId":2,
+  "userKey": "asdasd",
+  "studyKey": "asdasd",
+  "taskId": 2,
   "createdTS": "2019-02-27T12:46:07.294Z",
-  "responses":[
+  "responses": [
     {
-      "questionId":"Q1",
-      "questionType":"singleChoice",
-      "questionText":"How are you?",
-      "answer":{
-        "answerText":"Very well",
-        "answerId":"Q1A2"
+      "questionId": "Q1",
+      "questionType": "singleChoice",
+      "questionText": {
+        "en": "How are you?"
       },
-      "timeStamp":"2019-02-27T12:46:07.294Z"
+      "answer": {
+        "answerText": {
+          "en": "Very well"
+        },
+        "answerId": "Q1A2"
+      },
+      "timeStamp": "2019-02-27T12:46:07.294Z"
     },
     {
-      "questionId":"Q2",
-      "questionType":"multiChoice",
-      "questionText":"What colors do you like?",
-      "answer":[
+      "questionId": "Q2",
+      "questionType": "multiChoice",
+      "questionText": {
+        "en": "What colors do you like?"
+      },
+      "answer": [
         {
-          "answerText":"Red",
-          "answerId":"Q1A1"
+          "answerText": {
+            "en": "Red"
+          },
+          "answerId": "Q2A1"
         },
         {
-          "answerText":"Green",
-          "answerId":"Q1A4"
+          "answerText": "Green",
+          "answerId": "Q2A4"
         }
       ],
-      "timeStamp":"2019-02-27T12:46:07.294Z"
+      "timeStamp": "2019-02-27T12:46:07.294Z"
     },
     {
-      "questionId":"Q3",
-      "questionType":"freetext",
-      "questionText":"Tell me",
-      "answer":"hello hello hello",
-      "timeStamp":"2019-02-27T12:46:07.294Z"
+      "questionId": "Q3",
+      "questionType": "multiChoice",
+      "questionText": {
+        "en": "Which is your favourite food?"
+      },
+      "answer": [
+        {
+          "answerText": {
+            "en": "Icecream"
+          },
+          "answerId": "Q3A1"
+        },
+        {
+          "answerText": {
+            "en": "Other"
+          },
+          "answerId": "Q3A6",
+          "freetextAnswer": "hot dogs",
+          "includeFreeText": true
+        }
+      ],
+      "timeStamp": "2019-02-27T12:46:07.294Z"
+    },
+    {
+      "questionId": "Q4",
+      "questionType": "freetext",
+      "questionText": {
+        "en": "Tell me"
+      },
+      "answer": "hello hello hello",
+      "timeStamp": "2019-02-27T12:46:07.294Z"
+    },
+    {
+      "questionId": "Q5",
+      "questionType": "number",
+      "questionText": {
+        "en": "You favourite number"
+      },
+      "answer": 9,
+      "timeStamp": "2019-02-27T12:46:07.294Z"
     }
   ]
 }
