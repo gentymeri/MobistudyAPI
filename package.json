@@ -1,7 +1,7 @@
 {
-  "name": "MobistudyAPI",
+  "name": "mobistudyapi",
   "author": "MobyStudy team",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The REST API of Mobistudy",
   "main": "./src/www.mjs",
   "scripts": {
