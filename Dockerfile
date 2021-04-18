@@ -1,4 +1,4 @@
-FROM node:15-alpine3.10  as build
+FROM node:14-alpine3.10  as build
 
 RUN apk --no-cache add --virtual native-deps \
   g++ gcc libgcc libstdc++ linux-headers autoconf automake make nasm python git && \
