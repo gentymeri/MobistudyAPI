@@ -39,7 +39,7 @@ export default async function (db) {
         filter = ' FILTER participant.userKey == @userkey '
       }
       var query = 'FOR participant IN participants ' +
-      filter + ' RETURN participant'
+        filter + ' RETURN participant'
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
       let parts = await cursor.all()
@@ -63,6 +63,21 @@ export default async function (db) {
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
       return cursor.all()
+    },
+
+    async getParticipantsByStudyForZipper (studykey, callback) {
+      let query = `FOR participant IN participants 
+            FILTER @studyKey IN participant.studies[*].studyKey
+            LET filteredStudies = participant.studies[* FILTER CURRENT.studyKey == @studyKey]
+            LET retval = UNSET(participant, 'studies')
+            RETURN MERGE_RECURSIVE(retval, { studies: filteredStudies })`
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, { 'studyKey': studykey })
+
+      while (cursor.hasNext()) {
+        let p = await cursor.next()
+        callback(p)
+      }
     },
 
     async getParticipantsByResearcher (researcherKey, currentStatus) {
@@ -115,9 +130,9 @@ export default async function (db) {
       }
 
       let query = 'FOR study IN studies FILTER study.teamKey == @teamKey ' +
-      'FOR participant IN participants FILTER study._key IN participant.studies[*].studyKey ' +
-      statusFilter +
-      'RETURN  participant'
+        'FOR participant IN participants FILTER study._key IN participant.studies[*].studyKey ' +
+        statusFilter +
+        'RETURN  participant'
 
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)

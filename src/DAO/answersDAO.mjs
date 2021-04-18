@@ -47,6 +47,17 @@ export default async function (db) {
       return cursor.all()
     },
 
+    async getAnswersByStudyForZipper (studyKey, callback) {
+      var query = 'FOR answer IN answers FILTER answer.studyKey == @studyKey RETURN answer'
+      let bindings = { studyKey: studyKey }
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      while (cursor.hasNext()) {
+        let a = await cursos.next()
+        callback(a)
+      }
+    },
+
     async createAnswer (newanswer) {
       let meta = await collection.save(newanswer)
       newanswer._key = meta._key

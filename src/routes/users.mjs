@@ -241,7 +241,7 @@ export default async function () {
   router.delete('/users/:user_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       let userKey = req.params.user_key
-      // Only admin can remove a team
+      // Only admin can remove a user
       if (req.user.role === 'admin') {
         // Remove user from all teams
         let teamsOfUser = await DAO.getAllTeams(userKey)
