@@ -63,7 +63,7 @@ export default async function () {
 
   app.use(api_prefix, await indexRouter())
   app.use(api_prefix, await studiesRouter())
-  app.use(api_prefix, await dataDownload())
+  app.use(api_prefix, await dataDownload(app))
   app.use(api_prefix, await formsRouter())
   app.use(api_prefix, await usersRouter())
   app.use(api_prefix, await participantsRouter())

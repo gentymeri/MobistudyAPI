@@ -4,8 +4,8 @@
 * This zips data collected in a study.
 */
 import { promises as fs } from 'fs'
-import { archiver } from 'archiver'
-import { applogger } from 'logger.mjs'
+import archiver from 'archiver'
+import { applogger } from './logger.mjs'
 
 const PATH = 'studyzipfiles/'
 

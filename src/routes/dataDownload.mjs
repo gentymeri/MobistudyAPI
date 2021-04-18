@@ -7,16 +7,19 @@
 import { promises as fs } from 'fs'
 import express from 'express'
 import passport from 'passport'
-import { dataZipper } from '../services/dataZipper.mjs'
+import dataZipper from '../services/dataZipper.mjs'
 
 const router = express.Router()
 
-export default async function (app) {
+export default function (app) {
 
     // serve static files
-    app.use(api_prefix + '/studydata', [
+    // TODO: this breaks 2 things
+    // 1) api prefix is here hard coded
+    // 2) file path is hard coded
+    app.use('/api/studydata', [
         passport.authenticate('jwt', { session: false }),
-        function (req, res, next) {
+        async function (req, res, next) {
             if (req.user.role !== 'admin' && req.user.role !== 'researcher') {
                 res.sendStatus(403)
             } else {
@@ -34,7 +37,7 @@ export default async function (app) {
             }
             next();
         },
-        express.static(path.join(__dirname, 'studyzipfiles'))])
+        express.static('studyzipfiles')])
 
     router.post('/studydatacreate/:studyKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
         if (!req.params.studyKey) {
