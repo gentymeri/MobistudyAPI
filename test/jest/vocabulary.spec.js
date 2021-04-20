@@ -1,4 +1,4 @@
-import { getTerm } from '../../../src/services/vocabulary.mjs'
+import { getTerm } from '../../src/services/vocabulary.mjs'
 
 describe('when searching for a medical term', () => {
 
