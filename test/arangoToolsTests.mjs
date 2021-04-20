@@ -7,6 +7,8 @@ import {
 import axios from 'axios'
 
 
+const DB_NAME = 'mobsitudydbtest';
+
 (async () => {
     try {
         let image = await getArangoImage()
@@ -23,9 +25,9 @@ import axios from 'axios'
         }
         await startArangoContainer()
 
-        await connectToDatabase('mobsitudydb')
+        await connectToDatabase(DB_NAME)
 
-        let resp = await axios.get('http://localhost:' + ARANGOPORT + '/_db/mobsitudydb/', {
+        let resp = await axios.get('http://localhost:' + ARANGOPORT + '/_db/' + DB_NAME + '/', {
             auth: {
                 username: 'mobistudy',
                 password: 'testpwd'
@@ -34,10 +36,10 @@ import axios from 'axios'
 
         console.log(resp.status)
 
-        await dropDatabase('mobsitudydb')
+        await dropDatabase(DB_NAME)
         // await stopArangoContainer()
 
-        console.log('Dario is cool')
+        console.log('Test completed')
     } catch (err) {
         console.error(err)
     }

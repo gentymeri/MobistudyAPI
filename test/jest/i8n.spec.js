@@ -1,4 +1,4 @@
-import i18n from '../../../src/i18n/i18n.mjs'
+import i18n from '../../src/i18n/i18n.mjs'
 
 describe('when using i18n', () => {
   beforeAll(() => {

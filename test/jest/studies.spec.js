@@ -3,10 +3,10 @@ import {
   pullArango, getArangoImage, getArangoContainer,
   createArangoContainer, startArangoContainer, stopArangoContainer,
   connectToDatabase, dropDatabase, addDataToCollection, removeFromCollection
-} from '../../arangoTools'
-import createStudiesDB from '../../../src/DB/studiesDB'
+} from '../arangoTools'
+import createStudiesDB from '../../src/DAO/studiesDAO'
 
-jest.mock('../../../src/services/logger')
+jest.mock('../../src/services/logger')
 
 Date.prototype.addDays = function (days) {
   var date = new Date(this.valueOf());
@@ -17,10 +17,6 @@ Date.prototype.addDays = function (days) {
 Date.prototype.toISODateString = function () {
   return this.toISOString().slice(0, 10)
 }
-
-var date = new Date();
-
-console.log(date.addDays(5));
 
 describe('when arangodb is running', () => {
 

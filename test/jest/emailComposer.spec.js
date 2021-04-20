@@ -1,7 +1,7 @@
-import { DAO } from '../../../src/DAO/DAO'
-import { studyStatusUpdateCompose, passwordRecoveryCompose } from '../../../src/services/emailComposer.mjs'
+import { DAO } from '../../src/DAO/DAO'
+import { studyStatusUpdateCompose, passwordRecoveryCompose } from '../../src/services/emailComposer.mjs'
 
-jest.mock('../../../src/DAO/DAO')
+jest.mock('../../src/DAO/DAO')
 
 describe('when composing an email', () => {
 

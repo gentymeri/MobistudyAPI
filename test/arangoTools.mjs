@@ -43,7 +43,7 @@ export const getArangoImage = async function () {
 export const getArangoContainer = async function () {
   let containers = await docker.container.list()
   for (const c of containers) {
-    if (c.data.Names.includes('/arangodb')) {
+    if (c.data.Names.includes('/arangodb_tests')) {
       container = c
       return c
     }
@@ -54,7 +54,7 @@ export const getArangoContainer = async function () {
 export const createArangoContainer = async function () {
   container = await docker.container.create({
     Image: 'arangodb:3.7',
-    name: 'arangodb',
+    name: 'arangodb_tests',
     Env: [
       'ARANGO_ROOT_PASSWORD=testtest'
     ],
