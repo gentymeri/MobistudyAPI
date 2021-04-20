@@ -39,23 +39,17 @@ export default async function (db) {
       return cursor.all()
     },
 
-    async getAnswersByStudy (studyKey) {
+    async getAnswersByStudy (studyKey, dataCallback) {
       var query = 'FOR answer IN answers FILTER answer.studyKey == @studyKey RETURN answer'
       let bindings = { studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
-      return cursor.all()
-    },
-
-    async getAnswersByStudyForZipper (studyKey, callback) {
-      var query = 'FOR answer IN answers FILTER answer.studyKey == @studyKey RETURN answer'
-      let bindings = { studyKey: studyKey }
-      applogger.trace(bindings, 'Querying "' + query + '"')
-      let cursor = await db.query(query, bindings)
-      while (cursor.hasNext()) {
-        let a = await cursos.next()
-        callback(a)
-      }
+      if (dataCallback) {
+        while (cursor.hasNext()) {
+          let a = await cursos.next()
+          callback(a)
+        }
+      } else return cursor.all()
     },
 
     async createAnswer (newanswer) {

@@ -3,63 +3,78 @@
 /**
 * This zips data collected in a study.
 */
-import { promises as fs } from 'fs'
+import fs from 'fs'
 import archiver from 'archiver'
 import { applogger } from './logger.mjs'
+import { DAO } from '../DAO/DAO.mjs'
 
-const PATH = 'studyzipfiles/'
 
 export default {
 
-    async purgeOldFiles () {
-        let files = fs.readdir(PATH)
-        let weekAgo = new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7)
+    tempFolderPath: 'tmp/',
 
-        for (const filename of files) {
-            let stat = await file.stat(PATH + filename)
+    async purgeOldFiles (timeoutSecs) {
+        let filenames = await fs.promises.readdir(this.tempFolderPath)
+        let timeAgo = new Date(new Date().getTime() - (timeoutSecs * 60 * 60 * 24 * 7))
 
-            if (stat.birthtime < weekAgo) {
-                fs.unlink(PATH + filename)
+        for (let filename of filenames) {
+            let stat = await fs.promises.stat(this.tempFolderPath + filename)
+            if (timeoutSecs == -1 || stat.birthtime < timeAgo) {
+                await fs.promises.unlink(this.tempFolderPath + filename)
             }
         }
     },
 
-    async zipStudyData (db, studyKey) {
+    async zipStudyData (studyKey) {
         return new Promise(async (resolve, reject) => {
-            applogger.info('Creating zip file for study ' + studyKey)
+            let finished = false
+            let filename = (Math.floor((Math.random() * 999999)) + '').padStart(6, '0') + '_' + studyKey + '.zip'
+            applogger.info('Creating zip file for study ' + studyKey + ', filename: ' + filename)
 
-            const output = fs.createWriteStream(PATH + studyKey + '.zip')
+            const output = fs.createWriteStream(this.tempFolderPath + filename)
             const archive = archiver('zip', {
                 zlib: { level: 9 } // compression level
             })
+            output.on('end', function () {
+                if (!finished) resolve(filename)
+                finished = true
+            })
+            output.on('finish', function () {
+                if (!finished) resolve(filename)
+                finished = true
+            })
             output.on('close', function () {
-                console.log(archive.pointer() + ' total bytes')
-                resolve()
+                if (!finished) resolve(filename)
+                finished = true
             })
 
+            archive.pipe(output)
+
             archive.on('warning', function (err) {
+                console.warn(err)
                 applogger.warn(err, 'Warning while creating zip file for study ' + studyKey)
             })
 
-            // good practice to catch this error explicitly
+            // catch error explicitly
             archive.on('error', function (err) {
                 reject(err)
             })
 
             // participants
-            await db.getParticipantsByStudyForZipper(studyKey, (p) => {
+            DAO.getParticipantsByStudy(studyKey, null, (p) => {
                 archive.append(JSON.stringify(p), { name: 'participants/' + p._key + '.json' });
+            }).then(() => {
+                // answers
+                DAO.getAnswersByStudy(studyKey, (a) => {
+                    archive.append(JSON.stringify(a), { name: 'answers/' + a._key + '.json' });
+                })
+            }).then(() => {
+                // TODO:
+                // healthstore, miband, po60, qcst, smwt
+                return archive.finalize()
+            }).catch((err) => {
+                reject(err)
             })
-
-            // answers
-            await db.getAnswersByStudyForZipper(studyKey, (a) => {
-                archive.append(JSON.stringify(a), { name: 'answers/' + a._key + '.json' });
-            })
-
-            // TODO:
-            // healthstore, miband, po60, qcst, smwt
-
-            archive.finalize()
         })
     }
 }

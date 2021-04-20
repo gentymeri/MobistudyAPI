@@ -48,7 +48,7 @@ export default async function (db) {
     },
 
     // currentStatus is optional
-    async getParticipantsByStudy (studykey, currentStatus) {
+    async getParticipantsByStudy (studykey, currentStatus, dataCallback) {
       let bindings = { 'studyKey': studykey }
 
       let query = 'FOR participant IN participants '
@@ -62,22 +62,12 @@ export default async function (db) {
       query += ` RETURN MERGE_RECURSIVE(retval, { studies: filteredStudies })`
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
-      return cursor.all()
-    },
-
-    async getParticipantsByStudyForZipper (studykey, callback) {
-      let query = `FOR participant IN participants 
-            FILTER @studyKey IN participant.studies[*].studyKey
-            LET filteredStudies = participant.studies[* FILTER CURRENT.studyKey == @studyKey]
-            LET retval = UNSET(participant, 'studies')
-            RETURN MERGE_RECURSIVE(retval, { studies: filteredStudies })`
-      applogger.trace(bindings, 'Querying "' + query + '"')
-      let cursor = await db.query(query, { 'studyKey': studykey })
-
-      while (cursor.hasNext()) {
-        let p = await cursor.next()
-        callback(p)
-      }
+      if (dataCallback) {
+        while (cursor.hasNext()) {
+          let p = await cursor.next()
+          dataCallback(p)
+        }
+      } else return cursor.all()
     },
 
     async getParticipantsByResearcher (researcherKey, currentStatus) {
