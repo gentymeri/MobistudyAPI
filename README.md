@@ -6,17 +6,19 @@ This is the back-end REST API of MobiStudy.
 
 You need to install the following on your system:
 
-- nodejs (v 10 or bigger)
+- nodejs (v 14 or higher)
 - arango DB (v 3)
+
+In order to guarantee that the same version of node is used across developers, it is recommendable to use [nvm](https://github.com/nvm-sh/nvm) and run `nvm install && nvm use` to switch to the node version used in this project.
 
 Install all other dependencies with `npm install`.
 
 On Arango, you must have created a dedicated database for Mobistudy, and, possibly,
 also a dedicated user with its password.
 
-To start Arango, you can either [install it](https://www.arangodb.com/), or use Docker. For development, use:
-
+To start Arango, you can either [install it](https://www.arangodb.com/), or use Docker. For development, you can use:
 `docker run -e ARANGO_NO_AUTH=1 -p 127.0.0.1:8529:8529 --name mobiArango arangodb`
+to start a Docker container with Arango. You can then access the web interface on http://localhost:8529
 
 ## Run
 
