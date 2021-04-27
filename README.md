@@ -55,9 +55,7 @@ project
 │   └───routes              // API endpoints
 │   └───services            // application logic
 └───test                    // automatic tests and experiments
-    └───jest                // unit tests
-        └───__tests__       // unit test specs
-        └───__integrated__  // integrated test specs (require docker)
+    └───jest                // unit tests specs
 ```
 
 ## Contribute

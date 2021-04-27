@@ -15,6 +15,7 @@ import { applogger } from '../services/logger.mjs'
 import auditLogger from '../services/auditLogger.mjs'
 import { sendEmail } from '../services/mailSender.mjs'
 import { userRegistrationCompose, passwordRecoveryCompose } from '../services/emailComposer.mjs'
+import { getLanguageFromAcceptedList } from '../i18n/i18n.mjs'
 
 owasp.config({
   allowPassphrases: true,
@@ -111,6 +112,18 @@ export default async function () {
     let user = req.body
     let password = user.password
     if (!pwdCheck(user.email, password)) return res.status(400).send('Password too weak')
+
+    // get the language from the browser, at this stage the user preferences are unknown
+    let language = getLanguageFromAcceptedList(req.acceptsLanguages())
+    try {
+      let msg = userRegistrationCompose(language)
+      await sendEmail(user.email, msg.title, msg.content)
+    } catch (err) {
+      res.status(400).send('Cannot send confirmation email')
+      applogger.warn({ error: err }, 'Cannot send new user confirmation email')
+      return
+    }
+
     let hashedPassword = bcrypt.hashSync(password, 8)
     delete user.password
     user.hashedPassword = hashedPassword
@@ -125,12 +138,6 @@ export default async function () {
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new user')
       res.sendStatus(500)
-    }
-    try {
-      let { title, content } = userRegistrationCompose(language)
-      sendEmail(newuser.email, title, content)
-    } catch {
-      applogger.error({ error: err }, 'Cannot send  new user')
     }
   })
 
