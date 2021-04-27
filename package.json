@@ -6,7 +6,7 @@
   "main": "./src/www.mjs",
   "scripts": {
     "start": "node ./src/www.mjs",
-    "devstart": "nodemon ",
+    "dev": "nodemon ",
     "test": "jest --updateSnapshot -i",
     "test:watch": "jest --watch -i",
     "test:watchAll": "jest --watchAll -i"
