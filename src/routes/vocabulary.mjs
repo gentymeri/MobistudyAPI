@@ -36,8 +36,8 @@ export default async function () {
 
       let limit = req.query.limit
       if (!limit) limit = 10 // default limit
-      
-      applogger.error({ term, lang, type, limit  }, 'Querying medical term')
+
+      applogger.debug({ term, lang, type, limit }, 'Querying medical term')
       let concepts = await getTerm(term, type, lang, limit)
       res.json(concepts)
     } catch (err) {
