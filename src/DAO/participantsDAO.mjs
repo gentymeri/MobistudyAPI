@@ -33,13 +33,11 @@ export default async function (db) {
     },
 
     async getParticipantByUserKey (userKey) {
-      let filter = ''
-      let bindings = { 'userkey': userKey }
-      if (userKey) {
-        filter = ' FILTER participant.userKey == @userkey '
+      if (!userKey) {
+        throw new Error('user key must be specified')
       }
-      var query = 'FOR participant IN participants ' +
-      filter + ' RETURN participant'
+      let bindings = { 'userkey': userKey }
+      var query = 'FOR participant IN participants FILTER participant.userKey == @userkey RETURN participant'
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
       let parts = await cursor.all()
@@ -115,9 +113,9 @@ export default async function (db) {
       }
 
       let query = 'FOR study IN studies FILTER study.teamKey == @teamKey ' +
-      'FOR participant IN participants FILTER study._key IN participant.studies[*].studyKey ' +
-      statusFilter +
-      'RETURN  participant'
+        'FOR participant IN participants FILTER study._key IN participant.studies[*].studyKey ' +
+        statusFilter +
+        'RETURN  participant'
 
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
