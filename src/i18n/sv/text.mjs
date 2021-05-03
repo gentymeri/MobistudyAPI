@@ -17,8 +17,8 @@ export default {
     <p>Gå till <a href={serverlink}>den här webbsida</a> för att återställa lösenordet.</p>
     <p>Du kan också manuellt använda följande kod: {token}</p>
     <p>Denna kod upphör att gälla om 24 timmar.</p>`,
-    newPasswordTitle: 'CARL: You have set a new password on Mobsitudy',
-    newPasswordContent: `CARL: <p>You have set a new password on Mobistudy.</p>
-    <p>If you don't recognize this action, please contact mobistudy@mau.se immediately.</p>`
+    newPasswordTitle: 'Nytt lösenord på Mobistudy',
+    newPasswordContent: `<p>Du har skapat in ett nytt lösenord på Mobistudy.</p>
+    <p>Om du inte känner igen den här åtgärden, vänligen kontakta mobistudy@mau.se omedelbart.</p>`
   }
 }
