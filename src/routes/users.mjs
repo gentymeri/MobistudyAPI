@@ -14,7 +14,7 @@ import getConfig from '../services/config.mjs'
 import { applogger } from '../services/logger.mjs'
 import auditLogger from '../services/auditLogger.mjs'
 import { sendEmail } from '../services/mailSender.mjs'
-import { userRegistrationCompose, passwordRecoveryCompose } from '../services/emailComposer.mjs'
+import { userRegistrationCompose, passwordRecoveryCompose, newPasswordCompose } from '../services/emailComposer.mjs'
 import { getLanguageFromAcceptedList } from '../i18n/i18n.mjs'
 
 owasp.config({
@@ -69,8 +69,8 @@ export default async function () {
         let part = await DAO.getParticipantByUserKey(existing._key)
         language = part.language
       }
-      let { title, content } = passwordRecoveryCompose(serverlink, token, language)
-      sendEmail(email, title, content)
+      let msg = passwordRecoveryCompose(serverlink, token, language)
+      sendEmail(email, msg.title, msg.content)
       res.sendStatus(200)
       applogger.info({ email: req.body.email }, 'Reset password email sent')
       auditLogger.log('resetPasswordEmail', existing._key, undefined, undefined, 'User ' + email + ' has requested a reset password email', 'users', existing._key, undefined)
@@ -98,9 +98,19 @@ export default async function () {
           applogger.info('Resetting password, email ' + email + ' not registered')
           return res.status(409).send('This email is not registered')
         }
+        let language = 'en'
+        if (existing.role === 'participant') {
+          // find language of the participant
+          let part = await DAO.getParticipantByUserKey(existing._key)
+          language = part.language
+        }
+        let msg = newPasswordCompose(language)
+        await sendEmail(email, msg.title, msg.content)
+
         await DAO.updateUser(existing._key, {
           hashedPassword: hashedPassword
         })
+
         res.sendStatus(200)
         applogger.info({ email: email }, 'User has changed the password')
         auditLogger.log('resetPassword', existing._key, undefined, undefined, 'User ' + email + ' has changed the password', 'users', existing._key, undefined)
@@ -245,6 +255,7 @@ export default async function () {
   })
 
   // Remove Specified User (currently only removes researchers)
+  // TODO: remove participants as well
   router.delete('/users/:user_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       let userKey = req.params.user_key
