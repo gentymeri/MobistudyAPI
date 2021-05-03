@@ -62,7 +62,7 @@ export default async function () {
       }, config.auth.secret, {
         expiresIn: daysecs
       })
-      let serverlink = req.protocol + '://' + req.headers.host + '/#/resetPassword?email=' + email + '&token=' + token
+      let serverlink = 'https://app.mobistudy.org/#/resetPassword?email=' + email + '&token=' + token
       let language = 'en'
       if (existing.role === 'participant') {
         // find language of the participant
