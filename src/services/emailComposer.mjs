@@ -17,11 +17,21 @@ export function userRegistrationCompose (language) {
 
 // creates the email when a user requests password recovery
 // returns { title: '...', content: '...'}
-export async function passwordRecoveryCompose (serverlink, token, language) {
+export function passwordRecoveryCompose (serverlink, token, language) {
   i18n.locale = language
 
   let title = i18n.t('account.passwordRecoveryTitle')
   let content = i18n.t('account.passwordRecoveryContent', { serverlink: serverlink, token: token })
+  return { title: title, content: content }
+}
+
+// creates the email when a user sets a new password
+// returns { title: '...', content: '...'}
+export function newPasswordCompose (language) {
+  i18n.locale = language
+
+  let title = i18n.t('account.newPasswordTitle')
+  let content = i18n.t('account.newPasswordContent')
   return { title: title, content: content }
 }
 

@@ -16,6 +16,9 @@ export default {
     passwordRecoveryContent: `<p>Du har begärt att återställa ditt lösenord på Mobistudy.</p>
     <p>Gå till <a href={serverlink}>den här webbsida</a> för att återställa lösenordet.</p>
     <p>Du kan också manuellt använda följande kod: {token}</p>
-    <p>Denna kod upphör att gälla om 24 timmar.</p>`
+    <p>Denna kod upphör att gälla om 24 timmar.</p>`,
+    newPasswordTitle: 'CARL: You have set a new password on Mobsitudy',
+    newPasswordContent: `CARL: <p>You have set a new password on Mobistudy.</p>
+    <p>If you don't recognize this action, please contact mobistudy@mau.se immediately.</p>`
   }
 }
