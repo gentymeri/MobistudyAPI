@@ -45,6 +45,11 @@ describe('when using lang from list', () => {
     let lang = getLanguageFromAcceptedList(['it', 'de', 'sv-SW'])
     expect(lang).toBe('sv')
   })
+
+  test('a list with es, it and en gives es', () => {
+    let lang = getLanguageFromAcceptedList(['es', 'it', 'en'])
+    expect(lang).toBe('es')
+  })
 })
 
 describe('when using i18n', () => {

@@ -14,6 +14,11 @@ describe('when composing an email', () => {
     <p>This code will expire after 24 hours.</p>`)
   })
 
+  test('the email password recovery in Spanish is correct', async () => {
+    let email = await passwordRecoveryCompose('link', 'token', 'es')
+    expect(email.title).toBe('Recuperación de contraseña de Mobistudy')
+  })
+
   test('the email for a completed study is correct', async () => {
     DAO.__setReturnedValue({
       generalities: {

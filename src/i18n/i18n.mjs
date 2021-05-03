@@ -1,5 +1,6 @@
 import entext from './en/text.mjs'
 import svtext from './sv/text.mjs'
+import estext from './es/text.mjs'
 
 // extracts a property using a string, see https://stackoverflow.com/a/6491621/1097607
 let byString = function (o, s) {
@@ -23,6 +24,7 @@ export function getLanguageFromAcceptedList (list) {
   for (let i = 0; i < list.length; i++) {
     if (list[i].startsWith('en')) return 'en'
     if (list[i].startsWith('sv')) return 'sv'
+    if (list[i].startsWith('es')) return 'es'
   }
   return 'en'
 }
@@ -32,7 +34,8 @@ export default {
   locale: 'en', // default locale
   text: {
     en: entext,
-    sv: svtext
+    sv: svtext,
+    es: estext
   },
   t: function (id, args) {
     let text = byString(this.text[this.locale], id)
