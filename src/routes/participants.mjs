@@ -270,15 +270,20 @@ export default async function () {
       participant.studies[studyIndex] = payload
       // Update the DB
       await DAO.updateParticipant(participant._key, participant)
-
-      // if there is a change in status, then send email reflecting updated status change
-      if (updatedCurrentStatus !== currentStatus) {
-        let em = await studyStatusUpdateCompose(studyKey, participant)
-        sendEmail(req.user.email, em.title, em.content)
-      }
-      res.sendStatus(200)
       applogger.info({ participantKey: participant._key, study: payload }, 'Participant has changed studies status')
       auditLogger.log('participantStudyUpdate', req.user._key, payload.studyKey, undefined, 'Participant with key ' + participant._key + ' has changed studies status', 'participants', participant._key, payload)
+      res.sendStatus(200)
+
+      // if there is a change in status, then send email reflecting updated status change
+      // this should fail gracefully
+      try {
+        if (updatedCurrentStatus !== currentStatus) {
+          let em = await studyStatusUpdateCompose(studyKey, participant)
+          await sendEmail(req.user.email, em.title, em.content)
+        }
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot send study update email to user key ' + userKey)
+      }
     } catch (err) {
       applogger.error({ error: err }, 'Cannot update participant with user key ' + userKey)
       res.sendStatus(500)

@@ -60,12 +60,12 @@ export async function studyStatusUpdateCompose (studyKey, participant) {
       for (let i = 0; i < partStudy.taskItemsConsent.length; i++) {
         let taskID = partStudy.taskItemsConsent[i].taskId
         // get description of task from study description using ID
-        let descr = '\u2022 ' + study.consent.taskItems.find(t => t.taskId == taskID).description + '\n'
+        let descr = '\u2022 ' + study.consent.taskItems.find(t => t.taskId == taskID).description[participant.language] + '\n'
         if (partStudy.taskItemsConsent[i].consented === true) taskConDesc += descr
         else taskNotConDesc += descr
       }
       for (let i = 0; i < partStudy.extraItemsConsent.length; i++) {
-        let descr = '\u2022 ' + study.consent.extraItems[i].description + '\n'
+        let descr = '\u2022 ' + study.consent.extraItems[i].description[participant.language] + '\n'
         if (partStudy.extraItemsConsent[i].consented) taskConDesc += descr
         else taskNotConDesc += descr
       }

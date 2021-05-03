@@ -74,11 +74,17 @@ describe('when composing an email', () => {
       },
       consent: {
         taskItems: [{
-          description: 'task1',
+          description: {
+            en: 'task1',
+            it: 'attivita 1'
+          },
           taskId: 1
         }],
         extraItems: [{
-          description: 'extra1'
+          description: {
+            en: 'extra1',
+            it: 'addizionale 1'
+          }
         }]
       }
     })
