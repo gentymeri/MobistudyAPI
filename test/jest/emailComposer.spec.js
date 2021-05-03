@@ -10,7 +10,7 @@ describe('when composing an email', () => {
     expect(email.title).toBe('Mobistudy password recovery')
     expect(email.content).toBe(`<p>You have requested to reset your password on Mobistudy.</p>
     <p>Please go to <a href=link>this webpage</a> to set another password.</p>
-    <p>Or use the following code if required: token</p>
+    <p>Or copy/paste the following code in the app: token</p>
     <p>This code will expire after 24 hours.</p>`)
   })
 
