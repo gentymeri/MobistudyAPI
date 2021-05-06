@@ -17,7 +17,7 @@ export default async function () {
   router.get('/vocabulary/:lang/:type/search', async function (req, res) {
     try {
       let lang = req.params.lang
-      if (lang !== 'en' && lang !== 'sv') { // TODO: se or sv?
+      if (lang !== 'en' && lang !== 'sv' && lang !== 'es') {
         res.sendStatus(400)
         return
       }
