@@ -16,6 +16,7 @@ import getSMWTDataDAO from './SMWTDataDAO.mjs'
 import getQCSTDataDAO from './QCSTDataDAO.mjs'
 import getMiband3DataDAO from './miband3DataDAO.mjs'
 import getPO60DataDAO from './po60DataDAO.mjs'
+import getPeakFlowDataDAO from './peakflowDataDAO.mjs'
 import getAuditLogDAO from './auditLogDAO.mjs'
 
 import getConfig from '../services/config.mjs'
@@ -58,6 +59,8 @@ export async function initializeDAO () {
   DAO = Object.assign(miband3Data, DAO)
   let po60Data = await getPO60DataDAO(db)
   DAO = Object.assign(po60Data, DAO)
+  let peakflowData = await getPeakFlowDataDAO(db)
+  DAO = Object.assign(peakflowData, DAO)
 
   // add new collections here
 }
