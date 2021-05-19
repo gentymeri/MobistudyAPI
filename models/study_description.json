@@ -204,6 +204,19 @@
         "monthDays": [],
         "weekDays": []
       }
+    },
+    {
+      "id": 8,
+      "type": "gps",
+      "scheduling": {
+        "startEvent": "consent",
+        "intervalType": "d",
+        "interval": 1,
+        "occurrences": 20,
+        "months": [],
+        "monthDays": [],
+        "weekDays": []
+      }
     }
   ],
   "consent": {
@@ -264,6 +277,13 @@
           "sv": "Jag accepterar att skicka min samlade data från Smart Peak Flow Meter."
         },
         "taskId": 7
+      },
+      {
+        "description": {
+          "en": "I agree to provide my location.",
+          "sv": "Jag godkänner att ange min plats."
+        },
+        "taskId": 8
       }
     ],
     "extraItems": [
