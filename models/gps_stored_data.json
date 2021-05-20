@@ -3,5 +3,5 @@
     "studyKey": "studyKey",
     "taskId": "taskId",
     "createdTS": "new Date()",
-    "postcode": "storedData"
+    "position": "storedData"
 }
