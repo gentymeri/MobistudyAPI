@@ -3,5 +3,8 @@
     "studyKey": "studyKey",
     "taskId": "taskId",
     "createdTS": "new Date()",
-    "position": "storedData"
+    "position": {},
+    "weather": {},
+    "pollution": 3,
+    "pollen": {}
 }
