@@ -118,6 +118,9 @@ export default async function () {
       // Remove SMWT Data
       await DAO.deleteSMWTDataByUser(userKey)
 
+      // Remove tapping Data
+      await DAO.deletetappingDataByUser(userKey)
+
       // Remove Audit logs
       await DAO.deleteLogsByUser(userKey)
 
@@ -159,6 +162,9 @@ export default async function () {
 
       // Remove SMWT Data
       await DAO.deleteSMWTDataByParticipant(userKey)
+
+      // Remove tapping Data
+      await DAO.deletetappingByParticipant(userKey)
 
       // Remove Audit logs
       await DAO.deleteLogsByUser(userKey)

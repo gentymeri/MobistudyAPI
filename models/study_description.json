@@ -191,6 +191,19 @@
         "monthDays": [],
         "weekDays": []
       }
+    },
+    {
+      "id": 9,
+      "type": "tapping",
+      "scheduling": {
+        "startEvent": "consent",
+        "intervalType": "d",
+        "interval": 1,
+        "occurrences": 20,
+        "months": [],
+        "monthDays": [],
+        "weekDays": []
+      }
     }
   ],
   "consent": {
@@ -237,6 +250,13 @@
           "sv": "Jag accepterar att skicka min samlade data från MiBand3 träningsspåraren."
         },
         "taskId": 5
+      },
+      {
+        "description": {
+          "en": "I agree to provide my data collected from the tapping feature.",
+          "sv": "Jag accepterar att skicka min samlade data från tapping feature."
+        },
+        "taskId": 9
       }
     ],
     "extraItems": [
