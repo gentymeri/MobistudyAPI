@@ -1,40 +1,43 @@
 'use strict'
 
 /**
-* This provides the data access for the form descriptions.
-*/
+ * This provides the data access for the form descriptions.
+ */
 
 import utils from './utils.mjs'
 import { applogger } from '../services/logger.mjs'
 
 export default async function (db) {
-  let collection = await utils.getCollection(db, 'forms')
+  const collection = await utils.getCollection(db, 'forms')
 
   return {
     async getFormsList () {
-      var filter = ''
+      const filter = ''
 
       // TODO: use LIMIT @offset, @count in the query for pagination
 
-      var query = 'FOR form in forms ' + filter + ' SORT form.created RETURN { name: form.name, _key: form._key, created: form.created }'
+      const query =
+        'FOR form in forms ' +
+        filter +
+        ' SORT form.created RETURN { name: form.name, _key: form._key, created: form.created }'
       applogger.trace('Querying "' + query + '"')
-      let cursor = await db.query(query)
+      const cursor = await db.query(query)
       return cursor.all()
     },
 
     async getAllForms () {
-      var filter = ''
+      const filter = ''
 
       // TODO: use LIMIT @offset, @count in the query for pagination
 
-      var query = 'FOR form in forms ' + filter + ' RETURN form'
+      const query = 'FOR form in forms ' + filter + ' RETURN form'
       applogger.trace('Querying "' + query + '"')
-      let cursor = await db.query(query)
+      const cursor = await db.query(query)
       return cursor.all()
     },
 
     async createForm (newform) {
-      let meta = await collection.save(newform)
+      const meta = await collection.save(newform)
       newform._key = meta._key
       return newform
     },
@@ -46,14 +49,18 @@ export default async function (db) {
 
     // udpates a form, we assume the _key is the correct one
     async replaceForm (_key, form) {
-      let meta = await collection.replace(_key, form)
+      const meta = await collection.replace(_key, form)
       form._key = meta._key
       return form
     },
 
     // udpates a form, we assume the _key is the correct one
     async updateForm (_key, form) {
-      let newval = await collection.update(_key, form, { keepNull: false, mergeObjects: true, returnNew: true })
+      const newval = await collection.update(_key, form, {
+        keepNull: false,
+        mergeObjects: true,
+        returnNew: true
+      })
       return newval
     },
 
