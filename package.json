@@ -5,6 +5,7 @@
   "description": "The REST API of Mobistudy",
   "main": "./src/www.mjs",
   "scripts": {
+    "lint": "eslint --ext .js,.mjs src",
     "start": "node ./src/www.mjs",
     "dev": "nodemon ",
     "test": "jest --updateSnapshot -i",
@@ -30,6 +31,11 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
+    "eslint": "^7.27.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.23.3",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
     "jest": "^24.9.0",
     "jest-esnext": "0.0.4",
     "node-docker-api": "^1.1.22",
