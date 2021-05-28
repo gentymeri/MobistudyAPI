@@ -1,0 +1,7 @@
+{
+    "userKey": "userinfo.user._key",
+    "studyKey": "studyKey",
+    "taskId": "taskId",
+    "createdTS": "new Date()",
+    "pef": "300"
+}

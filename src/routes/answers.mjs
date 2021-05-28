@@ -31,7 +31,7 @@ export default async function () {
           let team = await DAO.getAllTeams(req.user._key, req.query.studyKey)
           if (team.length === 0) return res.sendStatus(403)
           else {
-            let answers = await DAO.getAnswerByStudy(req.query.studyKey)
+            let answers = await DAO.getAnswersByStudy(req.query.studyKey)
             res.send(answers)
           }
         }

@@ -30,6 +30,8 @@ import SMWTRouter from './routes/SMWTData.mjs'
 import QCSTRouter from './routes/QCSTData.mjs'
 import Miband3Router from './routes/miband3.mjs'
 import PO60Router from './routes/po60.mjs'
+import PeakFlowRouter from './routes/peakflow.mjs'
+import GPSRouter from './routes/gps.mjs'
 
 export default async function () {
   var app = express()
@@ -75,6 +77,8 @@ export default async function () {
   app.use(api_prefix, await QCSTRouter())
   app.use(api_prefix, await Miband3Router())
   app.use(api_prefix, await PO60Router())
+  app.use(api_prefix, await PeakFlowRouter())
+  app.use(api_prefix, await GPSRouter())
 
   // error handler
   app.use(function (err, req, res, next) {
