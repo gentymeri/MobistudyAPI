@@ -1,9 +1,9 @@
 'use strict'
 
 /**
-* Sets-up the application.
-* Returns an express app.
-*/
+ * Sets-up the application.
+ * Returns an express app.
+ */
 
 import express from 'express'
 import helmet from 'helmet'
@@ -31,10 +31,10 @@ import QCSTRouter from './routes/QCSTData.mjs'
 import Miband3Router from './routes/miband3.mjs'
 import PO60Router from './routes/po60.mjs'
 import PeakFlowRouter from './routes/peakflow.mjs'
-import GPSRouter from './routes/gps.mjs'
+import EnvironmentRouter from './routes/environment.mjs'
 
 export default async function () {
-  var app = express()
+  const app = express()
 
   app.use(helmet())
   app.use(httplogger)
@@ -45,12 +45,14 @@ export default async function () {
   app.use(bodyParser.json({ limit: '20mb' }))
   app.use(bodyParser.text({ limit: '20mb' }))
 
-
   // this needs to be called by apps, allow CORS for everybody
   app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')
     res.header('Access-Control-Allow-Methods', 'PUT, PATCH, DELETE, GET, POST')
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+    res.header(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+    )
     next()
   })
 
@@ -60,25 +62,25 @@ export default async function () {
 
   app.use(passport.initialize())
 
-  const api_prefix = '/api'
+  const apiPrefix = '/api'
 
-  app.use(api_prefix, await indexRouter())
-  app.use(api_prefix, await studiesRouter())
-  app.use(api_prefix, await formsRouter())
-  app.use(api_prefix, await usersRouter())
-  app.use(api_prefix, await participantsRouter())
-  app.use(api_prefix, await teamsRouter())
-  app.use(api_prefix, await answersRouter())
-  app.use(api_prefix, await healthStoreDataRouter())
-  app.use(api_prefix, await auditLogRouter())
-  app.use(api_prefix, await testerRouter())
-  app.use(api_prefix, await vocabularyRouter())
-  app.use(api_prefix, await SMWTRouter())
-  app.use(api_prefix, await QCSTRouter())
-  app.use(api_prefix, await Miband3Router())
-  app.use(api_prefix, await PO60Router())
-  app.use(api_prefix, await PeakFlowRouter())
-  app.use(api_prefix, await GPSRouter())
+  app.use(apiPrefix, await indexRouter())
+  app.use(apiPrefix, await studiesRouter())
+  app.use(apiPrefix, await formsRouter())
+  app.use(apiPrefix, await usersRouter())
+  app.use(apiPrefix, await participantsRouter())
+  app.use(apiPrefix, await teamsRouter())
+  app.use(apiPrefix, await answersRouter())
+  app.use(apiPrefix, await healthStoreDataRouter())
+  app.use(apiPrefix, await auditLogRouter())
+  app.use(apiPrefix, await testerRouter())
+  app.use(apiPrefix, await vocabularyRouter())
+  app.use(apiPrefix, await SMWTRouter())
+  app.use(apiPrefix, await QCSTRouter())
+  app.use(apiPrefix, await Miband3Router())
+  app.use(apiPrefix, await PO60Router())
+  app.use(apiPrefix, await PeakFlowRouter())
+  app.use(apiPrefix, await EnvironmentRouter())
 
   // error handler
   app.use(function (err, req, res, next) {

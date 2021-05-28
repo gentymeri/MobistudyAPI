@@ -17,7 +17,7 @@ import getQCSTDataDAO from './QCSTDataDAO.mjs'
 import getMiband3DataDAO from './miband3DataDAO.mjs'
 import getPO60DataDAO from './po60DataDAO.mjs'
 import getPeakFlowDataDAO from './peakflowDataDAO.mjs'
-import getGPSDataDAO from './gpsDataDAO.mjs'
+import getEnvironmentDAO from './environmentDAO.mjs'
 import getAuditLogDAO from './auditLogDAO.mjs'
 
 import getConfig from '../services/config.mjs'
@@ -69,8 +69,8 @@ export async function initializeDAO () {
   DAO = Object.assign(po60Data, DAO)
   const peakflowData = await getPeakFlowDataDAO(db)
   DAO = Object.assign(peakflowData, DAO)
-  const gpsData = await getGPSDataDAO(db)
-  DAO = Object.assign(gpsData, DAO)
+  const env = await getEnvironmentDAO(db)
+  DAO = Object.assign(env, DAO)
 
   // add new collections here
 }
