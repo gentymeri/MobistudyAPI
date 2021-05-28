@@ -191,6 +191,32 @@
         "monthDays": [],
         "weekDays": []
       }
+    },
+    {
+      "id": 7,
+      "type": "peakflow",
+      "scheduling": {
+        "startEvent": "consent",
+        "intervalType": "h",
+        "interval": 12,
+        "occurrences": 40,
+        "months": [],
+        "monthDays": [],
+        "weekDays": []
+      }
+    },
+    {
+      "id": 8,
+      "type": "gps",
+      "scheduling": {
+        "startEvent": "consent",
+        "intervalType": "d",
+        "interval": 1,
+        "occurrences": 20,
+        "months": [],
+        "monthDays": [],
+        "weekDays": []
+      }
     }
   ],
   "consent": {
@@ -237,6 +263,27 @@
           "sv": "Jag accepterar att skicka min samlade data från MiBand3 träningsspåraren."
         },
         "taskId": 5
+      },
+      {
+        "description": {
+          "en": "I agree to provide my data collected from the PO60.",
+          "sv": "Jag accepterar att skicka min samlade data från PO60."
+        },
+        "taskId": 6
+      },
+      {
+        "description": {
+          "en": "I agree to provide my data collected from the Smart Peak Flow Meter.",
+          "sv": "Jag accepterar att skicka min samlade data från Smart Peak Flow Meter."
+        },
+        "taskId": 7
+      },
+      {
+        "description": {
+          "en": "I agree to provide my location.",
+          "sv": "Jag godkänner att ange min plats."
+        },
+        "taskId": 8
       }
     ],
     "extraItems": [

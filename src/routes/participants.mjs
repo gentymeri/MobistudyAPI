@@ -118,6 +118,15 @@ export default async function () {
       // Remove SMWT Data
       await DAO.deleteSMWTDataByUser(userKey)
 
+      // Remove PO60 Data
+      await DAO.deletePO60DataByUser(userKey)
+
+      // Remove Peakflow Data
+      await DAO.deletePeakFlowDataByUser(userKey)
+
+      // Remove GPS Data
+      await DAO.deleteGPSDataByUser(userKey)
+
       // Remove Audit logs
       await DAO.deleteLogsByUser(userKey)
 
@@ -159,6 +168,15 @@ export default async function () {
 
       // Remove SMWT Data
       await DAO.deleteSMWTDataByParticipant(userKey)
+
+      // Remove PO60 Data
+      await DAO.deletePO60DataByUser(userKey)
+
+      // Remove PeakFlow Data
+      await DAO.deletePeakFlowDataByParticipant(userKey)
+
+      // Remove GPS Data
+      await DAO.deleteGPSDataByParticipant(userKey)
 
       // Remove Audit logs
       await DAO.deleteLogsByUser(userKey)
