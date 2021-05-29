@@ -1,0 +1,19 @@
+{
+    "userKey": "123345",
+    "studyKey": "4455",
+    "taskId": 4,
+    "createdTS": "2021-05-29T21:32:15.581Z",
+    "position": {
+      "timestamp": 1622323689069,
+      "coords": {
+        "longitude": 13.019884999999999,
+        "latitude": 55.6028994,
+        "accuracy": 21,
+        "altitude": 33,
+        "altitudeAccuracy": 10
+      }
+    },
+    "weather": {},
+    "pollution": 3,
+    "pollen": {}
+}

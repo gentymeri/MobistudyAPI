@@ -11,15 +11,7 @@ export default async function (db) {
 
   return {
     // NEW GET STUDIES FUNCTION
-    async getStudies (
-      countOnly,
-      after,
-      before,
-      studyTitle,
-      sortDirection,
-      offset,
-      rowsPerPage
-    ) {
+    async getStudies (countOnly, after, before, studyTitle, sortDirection, offset, rowsPerPage) {
       let queryString = ''
 
       if (countOnly) {
@@ -93,8 +85,7 @@ export default async function (db) {
     },
 
     async getAllTeamStudies (teamkey) {
-      const query =
-        'FOR study in studies FILTER study.teamKey == @teamkey RETURN study'
+      const query = 'FOR study in studies FILTER study.teamKey == @teamkey RETURN study'
       const bindings = { teamkey: teamkey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
@@ -157,10 +148,7 @@ export default async function (db) {
       let invitationCode
       do {
         // generate a random 6 digits number
-        invitationCode = ('' + Math.round(Math.random() * 999999)).padStart(
-          6,
-          '0'
-        )
+        invitationCode = ('' + Math.round(Math.random() * 999999)).padStart(6, '0')
         // check if the number is already used
         const query = 'FOR study IN studies FILTER study.invitationCode == @invitationCode RETURN study'
         const bindings = { invitationCode: invitationCode }
@@ -170,10 +158,7 @@ export default async function (db) {
         if (study.length) repeat = true
         else repeat = false
       } while (repeat)
-      applogger.info(
-        { invitationCode: invitationCode },
-        'Invitation code generated:'
-      )
+      applogger.info({ invitationCode: invitationCode }, 'Invitation code generated:')
       return invitationCode + ''
     },
 

@@ -8,6 +8,7 @@ import Database from 'arangojs'
 import getStudiesDAO from './studiesDAO.mjs'
 import getFormsDAO from './formsDAO.mjs'
 import getUsersDAO from './usersDAO.mjs'
+import getAuditLogDAO from './auditLogDAO.mjs'
 import getAnswersDAO from './answersDAO.mjs'
 import getTeamsDAO from './teamsDAO.mjs'
 import getParticipantsDAO from './participantsDAO.mjs'
@@ -17,8 +18,7 @@ import getQCSTDataDAO from './QCSTDataDAO.mjs'
 import getMiband3DataDAO from './miband3DataDAO.mjs'
 import getPO60DataDAO from './po60DataDAO.mjs'
 import getPeakFlowDataDAO from './peakflowDataDAO.mjs'
-import getEnvironmentDAO from './environmentDAO.mjs'
-import getAuditLogDAO from './auditLogDAO.mjs'
+import getPositionsDAO from './positionsDAO.mjs'
 
 import getConfig from '../services/config.mjs'
 
@@ -69,7 +69,7 @@ export async function initializeDAO () {
   DAO = Object.assign(po60Data, DAO)
   const peakflowData = await getPeakFlowDataDAO(db)
   DAO = Object.assign(peakflowData, DAO)
-  const env = await getEnvironmentDAO(db)
+  const env = await getPositionsDAO(db)
   DAO = Object.assign(env, DAO)
 
   // add new collections here

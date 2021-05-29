@@ -8,73 +8,73 @@ import utils from './utils.mjs'
 import { applogger } from '../services/logger.mjs'
 
 export default async function (db) {
-  const collection = await utils.getCollection(db, 'environmentSamples')
+  const collection = await utils.getCollection(db, 'positions')
 
   return {
-    async getAllEnvironmentSamples () {
+    async getAllPositions () {
       const filter = ''
-      const query = 'FOR data IN environmentSamples ' + filter + ' RETURN data'
+      const query = 'FOR data IN positions ' + filter + ' RETURN data'
       applogger.trace('Querying "' + query + '"')
       const cursor = await db.query(query)
       return cursor.all()
     },
 
-    async getEnvironmentSamplesByUser (userKey) {
+    async getPositionsByUser (userKey) {
       const query =
-        'FOR data IN environmentSamples FILTER data.userKey == @userKey RETURN data'
+        'FOR data IN positions FILTER data.userKey == @userKey RETURN data'
       const bindings = { userKey: userKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
       return cursor.all()
     },
 
-    async getEnvironmentSamplesByUserAndStudy (userKey, studyKey) {
+    async getPositionsByUserAndStudy (userKey, studyKey) {
       const query =
-        'FOR data IN environmentSamples FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
+        'FOR data IN positions FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
       const bindings = { userKey: userKey, studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
       return cursor.all()
     },
 
-    async getEnvironmentSamplesByStudy (studyKey) {
+    async getPositionsByStudy (studyKey) {
       const query =
-        'FOR data IN environmentSamples FILTER data.studyKey == @studyKey RETURN data'
+        'FOR data IN positions FILTER data.studyKey == @studyKey RETURN data'
       const bindings = { studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
       return cursor.all()
     },
 
-    async createEnvironmentSamples (environmentSamples) {
-      const meta = await collection.save(environmentSamples)
-      environmentSamples._key = meta._key
-      return environmentSamples
+    async createPosition (position) {
+      const meta = await collection.save(position)
+      position._key = meta._key
+      return position
     },
 
-    async getOneEnvironmentSample (_key) {
+    async getOnePosition (_key) {
       const data = await collection.document(_key)
       return data
     },
 
-    async deleteEnvironmentSample (_key) {
+    async deletePosition (_key) {
       await collection.remove(_key)
       return true
     },
 
     // deletes all data based on study
-    async deleteEnvironmentSamplesByStudy (studyKey) {
-      const data = await this.getEnvironmentSampleByStudy(studyKey)
+    async deletePositionsByStudy (studyKey) {
+      const data = await this.getPositionsByStudy(studyKey)
       for (let i = 0; i < data.length; i++) {
-        await this.deleteEnvironmentSample(data[i]._key)
+        await this.deletePosition(data[i]._key)
       }
     },
 
     // deletes all data based on user
-    async deleteEnvironmentSamplesByUser (userKey) {
-      const data = await this.getEnvironmentSampleByUser(userKey)
+    async deletePositionsByUser (userKey) {
+      const data = await this.getPositionsByUser(userKey)
       for (let i = 0; i < data.length; i++) {
-        await this.deleteEnvironmentSample(data[i]._key)
+        await this.deletePosition(data[i]._key)
       }
     }
   }

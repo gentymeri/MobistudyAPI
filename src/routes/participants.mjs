@@ -192,7 +192,7 @@ export default async function () {
         await DAO.deletePeakFlowDataByUser(userKey)
 
         // Remove Environment Data
-        await DAO.deleteEnvironmentSamplesByUser(userKey)
+        await DAO.deletePositionsByUser(userKey)
 
         // Remove Audit logs
         await DAO.deleteLogsByUser(userKey)
@@ -264,7 +264,7 @@ export default async function () {
         await DAO.deletePeakFlowDataByUser(userKey)
 
         // Remove Environment Data
-        await DAO.deleteEnvironmentSamplesByUser(userKey)
+        await DAO.deletePositionsByUser(userKey)
 
         // Remove Audit logs
         await DAO.deleteLogsByUser(userKey)
