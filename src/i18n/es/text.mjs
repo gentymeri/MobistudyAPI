@@ -11,7 +11,7 @@ export default {
   },
   account: {
     registrationTitle: ' Confirmación de resgistro en Mobistudy',
-    registrationContent: `<p>Se has registrado con éxito en Mobistudy.</p><p>Si no reconoce este mensaje, responda a este correo electrónico y pídanos que eliminemos su cuenta.</p>`,
+    registrationContent: '<p>Se has registrado con éxito en Mobistudy.</p><p>Si no reconoce este mensaje, responda a este correo electrónico y pídanos que eliminemos su cuenta.</p>',
     passwordRecoveryTitle: 'Recuperación de contraseña de Mobistudy',
     passwordRecoveryContent: `<p>Ha solicitado restablecer su contraseña en Mobistudy.</p>
     <p>Por favor vaya a  <a href={serverlink}>this webpage</a> para reestablecer contraseña.</p>
