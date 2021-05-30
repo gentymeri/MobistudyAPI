@@ -1,7 +1,7 @@
 'use strict'
 
 /**
- * This provides the API endpoints for the GPS data of the participant.
+ * This provides the API endpoints for the position data of the participant.
  */
 
 import express from 'express'
@@ -13,10 +13,10 @@ import auditLogger from '../services/auditLogger.mjs'
 const router = express.Router()
 
 export default async function () {
-  // Get all GPS data
+  // Get all positions data
   // query params: studyKey to filter by study
   router.get(
-    '/gpsData',
+    '/positions',
     passport.authenticate('jwt', { session: false }),
     async function (req, res) {
       try {
@@ -25,127 +25,111 @@ export default async function () {
           if (req.query.teamKey) {
             const team = await DAO.getOneTeam(req.query.teamKey)
             if (!team.researchersKeys.includes(req.user._key)) { return res.sendStatus(403) } else {
-              const gpsData = await DAO.getAllGPSData()
-              res.send(gpsData)
+              const poss = await DAO.getAllPositions()
+              res.send(poss)
             }
           }
           if (req.query.studyKey) {
             const team = await DAO.getAllTeams(req.user._key, req.query.studyKey)
             if (team.length === 0) return res.sendStatus(403)
             else {
-              const gpsData = await DAO.getGPSDataByStudy(req.query.studyKey)
-              res.send(gpsData)
+              const poss = await DAO.getPositionsByStudy(req.query.studyKey)
+              res.send(poss)
             }
           }
         } else if (req.user.role === 'participant') {
-          const gpsData = await DAO.getGPSDataByUser(req.user._key)
-          res.send(gpsData)
+          const poss = await DAO.getPositionsByUser(req.user._key)
+          res.send(poss)
         }
       } catch (err) {
-        applogger.error({ error: err }, 'Cannot retrieve GPSData')
+        applogger.error({ error: err }, 'Cannot retrieve positions')
         res.sendStatus(500)
       }
     }
   )
 
-  // Get GPSfor a user
+  // Get positions for a user
   router.get(
-    '/gpsData/:userKey',
+    '/positions/:userKey',
     passport.authenticate('jwt', { session: false }),
     async function (req, res) {
       try {
-        const gpsData = await DAO.getGPSDataByUser(req.params.userKey)
-        res.send(gpsData)
+        const poss = await DAO.getPositionsByUser(req.params.userKey)
+        res.send(poss)
       } catch (err) {
-        applogger.error({ error: err }, 'Cannot retrieve GPSData')
+        applogger.error({ error: err }, 'Cannot retrieve positions')
         res.sendStatus(500)
       }
     }
   )
 
-  // Get GPS for a study for a user
+  // Get positions for a study for a user
   router.get(
-    '/gpsData/:userKey/:studyKey',
+    '/positions/:userKey/:studyKey',
     passport.authenticate('jwt', { session: false }),
     async function (req, res) {
       try {
-        const gpsData = await DAO.getGPSDataByUserAndStudy(
+        const poss = await DAO.getPositionsByUserAndStudy(
           req.params.userKey,
           req.params.studyKey
         )
-        res.send(gpsData)
+        res.send(poss)
       } catch (err) {
-        applogger.error({ error: err }, 'Cannot retrieve GPSData')
+        applogger.error({ error: err }, 'Cannot retrieve positions')
         res.sendStatus(500)
       }
     }
   )
 
   router.post(
-    '/gpsData',
+    '/positions',
     passport.authenticate('jwt', { session: false }),
     async function (req, res) {
-      let newGPSData = req.body
+      let newpos = req.body
       if (req.user.role !== 'participant') return res.sendStatus(403)
-      newGPSData.userKey = req.user._key
-      if (!newGPSData.createdTS) newGPSData.createdTS = new Date()
+      newpos.userKey = req.user._key
+      if (!newpos.createdTS) newpos.createdTS = new Date()
       try {
-        newGPSData = await DAO.createGPSData(newGPSData)
+        newpos = await DAO.createPosition(newpos)
         // also update task status
 
         const participant = await DAO.getParticipantByUserKey(req.user._key)
-        applogger.info(
-          {
-            userKey: req.user._key,
-            taskId: newGPSData.taskId,
-            studyKey: newGPSData.studyKey
-          },
-          'Finding participant'
-        )
         if (!participant) return res.status(404)
-        applogger.info(
-          {
-            userKey: req.user._key,
-            taskId: newGPSData.taskId,
-            studyKey: newGPSData.studyKey
-          },
-          'Found participant'
-        )
         const study = participant.studies.find((s) => {
-          return s.studyKey === newGPSData.studyKey
+          return s.studyKey === newpos.studyKey
         })
         if (!study) return res.status(400)
         const taskItem = study.taskItemsConsent.find(
-          (ti) => ti.taskId === newGPSData.taskId
+          (ti) => ti.taskId === newpos.taskId
         )
         if (!taskItem) return res.status(400)
-        taskItem.lastExecuted = newGPSData.createdTS
+        taskItem.lastExecuted = newpos.createdTS
         // update the participant
         await DAO.replaceParticipant(participant._key, participant)
         res.sendStatus(200)
         applogger.info(
           {
             userKey: req.user._key,
-            taskId: newGPSData.taskId,
-            studyKey: newGPSData.studyKey
+            taskId: newpos.taskId,
+            studyKey: newpos.studyKey
           },
-          'Participant has sent health store data'
+          'Participant has sent a position'
         )
         auditLogger.log(
-          'GPSDataCreated',
+          'PositionCreated',
           req.user._key,
-          newGPSData.studyKey,
-          newGPSData.taskId,
-          'GPSData data created by participant with key ' +
+          newpos.studyKey,
+          newpos.taskId,
+          'Position created by participant with key ' +
             participant._key +
             ' for study with key ' +
-            newGPSData.studyKey,
-          'GPSData',
-          newGPSData._key,
-          newGPSData
+            newpos.studyKey,
+          'positions',
+          newpos._key,
+          newpos
         )
       } catch (err) {
-        applogger.error({ error: err }, 'Cannot store new GPSData Data')
+        applogger.error({ error: err }, 'Cannot store new position')
         res.sendStatus(500)
       }
     }
