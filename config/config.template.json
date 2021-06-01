@@ -29,5 +29,9 @@
     "email": "mobistudy@mau.se",
     "user": "actual user",
     "password": "actual user password"
+  },
+  "environment": {
+    "OpenWeatherMap": "KEY",
+    "Ambee": "KEY"
   }
 }

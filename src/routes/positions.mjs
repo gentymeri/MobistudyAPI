@@ -9,10 +9,40 @@ import passport from 'passport'
 import { DAO } from '../DAO/DAO.mjs'
 import { applogger } from '../services/logger.mjs'
 import auditLogger from '../services/auditLogger.mjs'
+import { getWeather, getPollution, getPostcode, getAllergenes } from '../services/environment.mjs'
 
 const router = express.Router()
 
 export default async function () {
+  router.get(
+    '/positions/environment',
+    passport.authenticate('jwt', { session: false }),
+    async function (req, res) {
+      try {
+        const lat = req.query.lat
+        const long = req.query.long
+        if (!lat || !long) return res.sendStatus(400)
+        const env = {
+          lat, long
+        }
+        const result = await Promise.all([
+          getWeather(lat, long),
+          getPollution(lat, long),
+          getPostcode(lat, long),
+          getAllergenes(lat, long)
+        ])
+        env.weather = result[0]
+        env.pollution = result[1]
+        env.postcode = result[2]
+        env.allergens = result[3]
+        res.send(env)
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot retrieve environment')
+        res.sendStatus(500)
+      }
+    }
+  )
+
   // Get all positions data
   // query params: studyKey to filter by study
   router.get(

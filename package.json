@@ -8,9 +8,9 @@
     "lint": "eslint --ext .js,.mjs src",
     "start": "node ./src/www.mjs",
     "dev": "nodemon ",
-    "test": "jest --updateSnapshot -i",
-    "test:watch": "jest --watch -i",
-    "test:watchAll": "jest --watchAll -i"
+    "test": "jest --updateSnapshot -i --env=node",
+    "test:watch": "jest --watch -i --env=node",
+    "test:watchAll": "jest --watchAll -i --env=node"
   },
   "dependencies": {
     "arangojs": "^7.5.0",

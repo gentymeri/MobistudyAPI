@@ -31,7 +31,7 @@ import QCSTRouter from './routes/QCSTData.mjs'
 import Miband3Router from './routes/miband3.mjs'
 import PO60Router from './routes/po60.mjs'
 import PeakFlowRouter from './routes/peakflow.mjs'
-import EnvironmentRouter from './routes/environment.mjs'
+import PositionsRouter from './routes/positions.mjs'
 
 export default async function () {
   const app = express()
@@ -80,7 +80,7 @@ export default async function () {
   app.use(apiPrefix, await Miband3Router())
   app.use(apiPrefix, await PO60Router())
   app.use(apiPrefix, await PeakFlowRouter())
-  app.use(apiPrefix, await EnvironmentRouter())
+  app.use(apiPrefix, await PositionsRouter())
 
   // error handler
   app.use(function (err, req, res, next) {
