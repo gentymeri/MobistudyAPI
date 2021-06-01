@@ -13,7 +13,6 @@ import auditLogger from '../services/auditLogger.mjs'
 const router = express.Router()
 
 export default async function () {
-
   // Get all PO60 data
   // query params: studyKey to filter by study
   router.get('/po60Data', passport.authenticate('jwt', { session: false }), async function (req, res) {
@@ -21,23 +20,23 @@ export default async function () {
       if (req.user.role === 'researcher') {
         // extra check about the teams
         if (req.query.teamKey) {
-          let team = await DAO.getOneTeam(req.query.teamKey)
+          const team = await DAO.getOneTeam(req.query.teamKey)
           if (!team.researchersKeys.includes(req.user._key)) return res.sendStatus(403)
           else {
-            let po60Data = await DAO.getAllPO60Data()
+            const po60Data = await DAO.getAllPO60Data()
             res.send(po60Data)
           }
         }
         if (req.query.studyKey) {
-          let team = await DAO.getAllTeams(req.user._key, req.query.studyKey)
+          const team = await DAO.getAllTeams(req.user._key, req.query.studyKey)
           if (team.length === 0) return res.sendStatus(403)
           else {
-            let po60Data = await DAO.getPO60DataByStudy(req.query.studyKey)
+            const po60Data = await DAO.getPO60DataByStudy(req.query.studyKey)
             res.send(po60Data)
           }
         }
       } else if (req.user.role === 'participant') {
-        let po60Data = await DAO.getPO60DataByUser(req.user._key)
+        const po60Data = await DAO.getPO60DataByUser(req.user._key)
         res.send(po60Data)
       }
     } catch (err) {
@@ -49,7 +48,7 @@ export default async function () {
   // Get PO60for a user
   router.get('/po60Data/:userKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
-      let po60Data = await DAO.getPO60DataByUser(req.params.userKey)
+      const po60Data = await DAO.getPO60DataByUser(req.params.userKey)
       res.send(po60Data)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve PO60Data')
@@ -60,7 +59,7 @@ export default async function () {
   // Get PO60 for a study for a user
   router.get('/po60Data/:userKey/:studyKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
-      let po60Data = await DAO.getPO60DataByUserAndStudy(req.params.userKey, req.params.studyKey)
+      const po60Data = await DAO.getPO60DataByUserAndStudy(req.params.userKey, req.params.studyKey)
       res.send(po60Data)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve PO60Data')
@@ -77,15 +76,15 @@ export default async function () {
       newPO60Data = await DAO.createPO60Data(newPO60Data)
       // also update task status
 
-      let participant = await DAO.getParticipantByUserKey(req.user._key)
+      const participant = await DAO.getParticipantByUserKey(req.user._key)
       applogger.info({ userKey: req.user._key, taskId: newPO60Data.taskId, studyKey: newPO60Data.studyKey }, 'Finding participant')
       if (!participant) return res.status(404)
       applogger.info({ userKey: req.user._key, taskId: newPO60Data.taskId, studyKey: newPO60Data.studyKey }, 'Found participant')
-      let study = participant.studies.find((s) => {
+      const study = participant.studies.find((s) => {
         return s.studyKey === newPO60Data.studyKey
       })
       if (!study) return res.status(400)
-      let taskItem = study.taskItemsConsent.find(ti => ti.taskId === newPO60Data.taskId)
+      const taskItem = study.taskItemsConsent.find(ti => ti.taskId === newPO60Data.taskId)
       if (!taskItem) return res.status(400)
       taskItem.lastExecuted = newPO60Data.createdTS
       // update the participant

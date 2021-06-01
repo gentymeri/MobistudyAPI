@@ -16,19 +16,19 @@ export default async function () {
   // example: /vocabulary/en/disorder/search?term=heart&limit=10
   router.get('/vocabulary/:lang/:type/search', async function (req, res) {
     try {
-      let lang = req.params.lang
+      const lang = req.params.lang
       if (lang !== 'en' && lang !== 'sv' && lang !== 'es') {
         res.sendStatus(400)
         return
       }
 
-      let type = req.params.type
+      const type = req.params.type
       if (type !== 'substance' && type !== 'disorder') {
         res.sendStatus(400)
         return
       }
 
-      let term = req.query.term
+      const term = req.query.term
       if (!term) {
         res.sendStatus(400)
         return
@@ -38,7 +38,7 @@ export default async function () {
       if (!limit) limit = 10 // default limit
 
       applogger.debug({ term, lang, type, limit }, 'Querying medical term')
-      let concepts = await getTerm(term, type, lang, limit)
+      const concepts = await getTerm(term, type, lang, limit)
       res.json(concepts)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot connect to vocabulary API')

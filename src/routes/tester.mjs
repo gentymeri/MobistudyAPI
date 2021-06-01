@@ -6,7 +6,6 @@
 
 import express from 'express'
 import passport from 'passport'
-import { applogger } from '../services/logger.mjs'
 import { sendEmail } from '../services/mailSender.mjs'
 
 const router = express.Router()

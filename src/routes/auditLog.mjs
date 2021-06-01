@@ -12,13 +12,12 @@ import { applogger } from '../services/logger.mjs'
 const router = express.Router()
 
 export default async function () {
-
   router.get('/auditlog/eventTypes', passport.authenticate('jwt', { session: false }), async function (req, res) {
     if (req.user.role !== 'admin' && req.user.role !== 'researcher') {
       res.sendStatus(403)
     } else {
       try {
-        let result = await DAO.getLogEventTypes(req.query)
+        const result = await DAO.getLogEventTypes(req.query)
         res.send(result)
       } catch (err) {
         applogger.error({ error: err }, 'Cannot retrieve audit log')
@@ -39,17 +38,17 @@ export default async function () {
   // rowsPerPage: for pagination
   router.get('/auditlog', passport.authenticate('jwt', { session: false }), async function (req, res) {
     if (req.user.role !== 'admin' && req.user.role !== 'researcher') {
-      console.log(`not a researcher`)
+      console.log('not a researcher')
       res.sendStatus(403)
     } else {
       try {
         // Researcher: a study must be specified and the researcher has to be allowed to see that study
         if (req.user.role === 'researcher') {
           if (!req.query.studyKey) return res.sendStatus(400)
-          let teams = await DAO.getAllTeams(req.user._key, req.query.studyKey)
+          const teams = await DAO.getAllTeams(req.user._key, req.query.studyKey)
           if (teams.length === 0) return res.sendStatus(403)
         }
-        let result = await DAO.getAuditLogs(false,
+        const result = await DAO.getAuditLogs(false,
           req.query.after,
           req.query.before,
           req.query.eventType,
@@ -73,7 +72,7 @@ export default async function () {
       res.sendStatus(403)
     } else {
       try {
-        let result = await DAO.getAuditLogs(true,
+        const result = await DAO.getAuditLogs(true,
           req.query.after,
           req.query.before,
           req.query.eventType,
