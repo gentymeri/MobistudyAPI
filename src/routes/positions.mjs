@@ -22,9 +22,7 @@ export default async function () {
         const lat = req.query.lat
         const long = req.query.long
         if (!lat || !long) return res.sendStatus(400)
-        const env = {
-          lat, long
-        }
+        const env = { }
         const result = await Promise.all([
           getWeather(lat, long),
           getPollution(lat, long),

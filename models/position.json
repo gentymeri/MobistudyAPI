@@ -12,6 +12,8 @@
       "altitude": 33,
       "altitudeAccuracy": 10
     },
+  },
+  "environment": {
     "weather": {
       "location": "Oxford",
       "description": "clear sky",
