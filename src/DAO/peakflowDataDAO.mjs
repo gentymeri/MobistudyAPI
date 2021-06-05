@@ -11,7 +11,7 @@ export default async function (db) {
   let collection = await utils.getCollection(db, 'peakflowData')
 
   return {
-    async getAllPeakFlowData () {
+    async getAllPeakFlows () {
       let filter = ''
       let query = 'FOR data IN peakflowData ' + filter + ' RETURN data'
       applogger.trace('Querying "' + query + '"')
@@ -19,7 +19,7 @@ export default async function (db) {
       return cursor.all()
     },
 
-    async getPeakFlowDataByUser (userKey) {
+    async getPeakFlowsByUser (userKey) {
       var query = 'FOR data IN peakflowData FILTER data.userKey == @userKey RETURN data'
       let bindings = { userKey: userKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
@@ -27,7 +27,7 @@ export default async function (db) {
       return cursor.all()
     },
 
-    async getPeakFlowDataByUserAndStudy (userKey, studyKey) {
+    async getPeakFlowsByUserAndStudy (userKey, studyKey) {
       var query = 'FOR data IN peakflowData FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
       let bindings = { userKey: userKey, studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
@@ -35,7 +35,7 @@ export default async function (db) {
       return cursor.all()
     },
 
-    async getPeakFlowDataByStudy (studyKey) {
+    async getPeakFlowsByStudy (studyKey) {
       var query = 'FOR data IN peakflowData FILTER data.studyKey == @studyKey RETURN data'
       let bindings = { studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
@@ -43,7 +43,7 @@ export default async function (db) {
       return cursor.all()
     },
 
-    async createPeakFlowData (newPeakFlowData) {
+    async createPeakFlow (newPeakFlowData) {
       let meta = await collection.save(newPeakFlowData)
       newPeakFlowData._key = meta._key
       return newPeakFlowData
@@ -62,7 +62,7 @@ export default async function (db) {
 
     // deletes all data based on study
     async deletePeakFlowDataByStudy (studyKey) {
-      let peakflowData = await this.getPeakFlowDataByStudy(studyKey)
+      let peakflowData = await this.getPeakFlowsByStudy(studyKey)
       for (let i = 0; i < peakflowData.length; i++) {
         await this.deletePeakFlowData(peakflowData[i]._key)
       }
@@ -70,7 +70,7 @@ export default async function (db) {
 
     // deletes all data based on user
     async deletePeakFlowDataByUser (userKey) {
-      let peakflowData = await this.getPeakFlowDataByUser(userKey)
+      let peakflowData = await this.getPeakFlowsByUser(userKey)
       for (let i = 0; i < peakflowData.length; i++) {
         await this.deletePeakFlowData(peakflowData[i]._key)
       }
