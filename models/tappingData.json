@@ -3,6 +3,7 @@
   "studyKey":"asdasd",
   "taskId":7,
   "createdTS": "new Date()",
+  "tappingCount": 0,
   "tappingData": [
     {
       "tapTimeStamp": 0,
