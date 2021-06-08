@@ -3,24 +3,25 @@
 /**
  * This provides the data access for the Study TappingData.
  */
-
 import utils from './utils.mjs'
 import { applogger } from '../services/logger.mjs'
 
+const CollectionName = 'fingerTapping'
+
 export default async function (db) {
-  const collection = await utils.getCollection(db, 'tappingData')
+  const collection = await utils.getCollection(db, CollectionName)
 
   return {
     async getAllFingerTappings () {
       const filter = ''
-      const query = 'FOR data IN tappingData ' + filter + ' RETURN data'
+      const query = 'FOR data IN ' + CollectionName + ' ' + filter + ' RETURN data'
       applogger.trace('Querying "' + query + '"')
       const cursor = await db.query(query)
       return cursor.all()
     },
 
     async getFingerTappingsByUser (userKey) {
-      const query = 'FOR data IN tappingData FILTER data.userKey == @userKey RETURN data'
+      const query = 'FOR data IN ' + CollectionName + ' FILTER data.userKey == @userKey RETURN data'
       const bindings = { userKey: userKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
@@ -28,7 +29,7 @@ export default async function (db) {
     },
 
     async getFingerTappingsByUserAndStudy (userKey, studyKey) {
-      const query = 'FOR data IN tappingData FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
+      const query = 'FOR data IN ' + CollectionName + ' FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
       const bindings = { userKey: userKey, studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
@@ -36,7 +37,7 @@ export default async function (db) {
     },
 
     async getFingerTappingsByStudy (studyKey) {
-      const query = 'FOR data IN tappingData FILTER data.studyKey == @studyKey RETURN data'
+      const query = 'FOR data IN ' + CollectionName + ' FILTER data.studyKey == @studyKey RETURN data'
       const bindings = { studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
