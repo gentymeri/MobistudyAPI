@@ -32,6 +32,7 @@ import Miband3Router from './routes/miband3.mjs'
 import PO60Router from './routes/po60.mjs'
 import PeakFlowRouter from './routes/peakflow.mjs'
 import PositionsRouter from './routes/positions.mjs'
+import fingerTappingRouter from './routes/fingerTapping.mjs'
 
 export default async function () {
   const app = express()
@@ -81,6 +82,7 @@ export default async function () {
   app.use(apiPrefix, await PO60Router())
   app.use(apiPrefix, await PeakFlowRouter())
   app.use(apiPrefix, await PositionsRouter())
+  app.use(apiPrefix, await fingerTappingRouter())
 
   // error handler
   app.use(function (err, req, res, next) {

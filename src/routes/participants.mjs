@@ -191,8 +191,11 @@ export default async function () {
         // Remove Peakflow Data
         await DAO.deletePeakFlowDataByUser(userKey)
 
-        // Remove Environment Data
+        // Remove Position Data
         await DAO.deletePositionsByUser(userKey)
+
+        // Remove tapping Data
+        await DAO.deleteFingerTappingsByUser(userKey)
 
         // Remove Audit logs
         await DAO.deleteLogsByUser(userKey)
@@ -263,8 +266,11 @@ export default async function () {
         // Remove PeakFlow Data
         await DAO.deletePeakFlowDataByUser(userKey)
 
-        // Remove Environment Data
+        // Remove Position Data
         await DAO.deletePositionsByUser(userKey)
+
+        // Remove tapping Data
+        await DAO.deletetappingByParticipant(userKey)
 
         // Remove Audit logs
         await DAO.deleteLogsByUser(userKey)

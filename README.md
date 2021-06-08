@@ -35,7 +35,7 @@ See section about Docker for details about environmental variables.
 
 ## Test
 
-Run `npm run test:unit`. If you want to have the tests run continuously (as you
+Run `npm run test`. If you want to have the tests run continuously (as you
 change the code), run `npm run test:watch`.
 
 ## Develop

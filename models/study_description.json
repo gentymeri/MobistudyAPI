@@ -7,7 +7,10 @@
   "invitational": true,
   "invitationCode": 123456,
   "generalities": {
-    "languages": ["en", "it"],
+    "languages": [
+      "en",
+      "it"
+    ],
     "title": {
       "en": "A fantastic study",
       "it": "Uno studio fantastico"
@@ -42,10 +45,17 @@
     ]
   },
   "inclusionCriteria": {
-    "countries": ["gb", "it"],
+    "countries": [
+      "gb",
+      "it"
+    ],
     "minAge": 18,
     "maxAge": 100,
-    "sex": ["male", "female", "other"],
+    "sex": [
+      "male",
+      "female",
+      "other"
+    ],
     "numberOfParticipants": 5,
     "criteriaQuestions": [
       {
@@ -85,9 +95,20 @@
         "occurrences": 100,
         "intervalType": "d",
         "interval": 12,
-        "months": [1, 2],
-        "monthDays": [1, 12, 24],
-        "weekDays": [1, 4, 7]
+        "months": [
+          1,
+          2
+        ],
+        "monthDays": [
+          1,
+          12,
+          24
+        ],
+        "weekDays": [
+          1,
+          4,
+          7
+        ]
       },
       "dataType": "steps",
       "aggregated": true,
@@ -119,7 +140,11 @@
         "occurrences": 20,
         "months": [],
         "monthDays": [],
-        "weekDays": [1, 3, 5]
+        "weekDays": [
+          1,
+          3,
+          5
+        ]
       }
     },
     {
@@ -133,7 +158,11 @@
         "months": [],
         "monthDays": [],
         "weekDays": [],
-        "hours": [8, 12, 18]
+        "hours": [
+          8,
+          12,
+          18
+        ]
       }
     },
     {
@@ -176,6 +205,16 @@
     {
       "id": 8,
       "type": "environmet",
+      "scheduling": {
+        "startEvent": "consent",
+        "intervalType": "d",
+        "interval": 1,
+        "occurrences": 20
+      }
+    },
+    {
+      "id": 9,
+      "type": "fingerTapping",
       "scheduling": {
         "startEvent": "consent",
         "intervalType": "d",
@@ -249,6 +288,13 @@
           "sv": "Jag godkänner att ange min plats."
         },
         "taskId": 8
+      },
+      {
+        "description": {
+          "en": "I agree to perform a finger tapping test.",
+          "sv": "Jag godkänner att utföra ett fingeravtryckstest."
+        },
+        "taskId": 9
       }
     ],
     "extraItems": [

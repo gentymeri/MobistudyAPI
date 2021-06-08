@@ -274,6 +274,8 @@ export default async function () {
             await DAO.deletePO60DataByStudy(teamStudies[i]._key)
             await DAO.deletePeakFlowDataByStudy(teamStudies[i]._key)
             await DAO.deletePositionsByStudy(teamStudies[i]._key)
+            await DAO.deleteFingerTappingsByStudy(teamStudies[i]._key)
+
             // Delete the study
             await DAO.deleteStudy(teamStudies[i]._key)
           }

@@ -19,6 +19,7 @@ import getMiband3DataDAO from './miband3DataDAO.mjs'
 import getPO60DataDAO from './po60DataDAO.mjs'
 import getPeakFlowDataDAO from './peakflowDataDAO.mjs'
 import getPositionsDAO from './positionsDAO.mjs'
+import getFingerTappingDAO from './fingerTappingDAO.mjs'
 
 import getConfig from '../services/config.mjs'
 
@@ -69,8 +70,9 @@ export async function initializeDAO () {
   DAO = Object.assign(po60Data, DAO)
   const peakflowData = await getPeakFlowDataDAO(db)
   DAO = Object.assign(peakflowData, DAO)
-  const env = await getPositionsDAO(db)
-  DAO = Object.assign(env, DAO)
-
+  const pos = await getPositionsDAO(db)
+  DAO = Object.assign(pos, DAO)
+  const ft = await getFingerTappingDAO(db)
+  DAO = Object.assign(ft, DAO)
   // add new collections here
 }
