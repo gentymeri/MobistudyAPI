@@ -1,0 +1,14 @@
+{
+  "userKey":"asdasd",
+  "studyKey":"asdasd",
+  "taskId":7,
+  "createdTS": "new Date()",
+  "tappingCount": 0,
+  "tappingData": [
+    {
+      "tapTimeStamp": 0,
+      "TappedButtonId": "TappedButtonLeft",
+      "TapCoordinate": "{86.5, 438.5}"
+    }
+  ]
+}
