@@ -8,43 +8,43 @@ import utils from './utils.mjs'
 import { applogger } from '../services/logger.mjs'
 
 export default async function (db) {
-  let collection = await utils.getCollection(db, 'peakflowData')
+  const collection = await utils.getCollection(db, 'peakFlows')
 
   return {
     async getAllPeakFlows () {
-      let filter = ''
-      let query = 'FOR data IN peakflowData ' + filter + ' RETURN data'
+      const filter = ''
+      const query = 'FOR data IN peakFlows ' + filter + ' RETURN data'
       applogger.trace('Querying "' + query + '"')
-      let cursor = await db.query(query)
+      const cursor = await db.query(query)
       return cursor.all()
     },
 
     async getPeakFlowsByUser (userKey) {
-      var query = 'FOR data IN peakflowData FILTER data.userKey == @userKey RETURN data'
-      let bindings = { userKey: userKey }
+      const query = 'FOR data IN peakFlows FILTER data.userKey == @userKey RETURN data'
+      const bindings = { userKey: userKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
-      let cursor = await db.query(query, bindings)
+      const cursor = await db.query(query, bindings)
       return cursor.all()
     },
 
     async getPeakFlowsByUserAndStudy (userKey, studyKey) {
-      var query = 'FOR data IN peakflowData FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
-      let bindings = { userKey: userKey, studyKey: studyKey }
+      const query = 'FOR data IN peakFlows FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
+      const bindings = { userKey: userKey, studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
-      let cursor = await db.query(query, bindings)
+      const cursor = await db.query(query, bindings)
       return cursor.all()
     },
 
     async getPeakFlowsByStudy (studyKey) {
-      var query = 'FOR data IN peakflowData FILTER data.studyKey == @studyKey RETURN data'
-      let bindings = { studyKey: studyKey }
+      const query = 'FOR data IN peakFlows FILTER data.studyKey == @studyKey RETURN data'
+      const bindings = { studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
-      let cursor = await db.query(query, bindings)
+      const cursor = await db.query(query, bindings)
       return cursor.all()
     },
 
     async createPeakFlow (newPeakFlowData) {
-      let meta = await collection.save(newPeakFlowData)
+      const meta = await collection.save(newPeakFlowData)
       newPeakFlowData._key = meta._key
       return newPeakFlowData
     },
@@ -62,7 +62,7 @@ export default async function (db) {
 
     // deletes all data based on study
     async deletePeakFlowDataByStudy (studyKey) {
-      let peakflowData = await this.getPeakFlowsByStudy(studyKey)
+      const peakflowData = await this.getPeakFlowsByStudy(studyKey)
       for (let i = 0; i < peakflowData.length; i++) {
         await this.deletePeakFlowData(peakflowData[i]._key)
       }
@@ -70,7 +70,7 @@ export default async function (db) {
 
     // deletes all data based on user
     async deletePeakFlowDataByUser (userKey) {
-      let peakflowData = await this.getPeakFlowsByUser(userKey)
+      const peakflowData = await this.getPeakFlowsByUser(userKey)
       for (let i = 0; i < peakflowData.length; i++) {
         await this.deletePeakFlowData(peakflowData[i]._key)
       }
