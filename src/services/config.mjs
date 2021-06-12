@@ -5,8 +5,9 @@
 */
 
 import fs from 'fs'
+import util from 'util'
 
-var config
+let config
 
 /**
 * Retrieves Docker secrets from /run/secrets
@@ -15,8 +16,7 @@ function getSwarmSecret (secret) {
   try {
     // Swarm secret are accessible within tmpfs /run/secrets dir
     return fs.readFileSync(util.format('/run/secrets/%s', secret), 'utf8').trim()
-  }
-  catch (e) {
+  } catch (e) {
     return false
   }
 }
@@ -32,7 +32,7 @@ export default function () {
     }
     if (config.web === undefined) config.web = {}
     if (config.web.port === undefined) config.web.port = (process.env.WEB_PORT || 8080)
-    if (config.web.cluster === undefined) config.web.cluster = (process.env.WEB_CLUSTER || true)
+    if (config.web.cluster === undefined) config.web.cluster = (process.env.WEB_CLUSTER === 'true' || true)
 
     if (config.logs === undefined) config.logs = {}
     if (config.logs.folder === undefined) config.logs.folder = (process.env.LOGS_FOLDER || 'logs')
@@ -57,6 +57,10 @@ export default function () {
     if (config.outlook.email === undefined) config.outlook.email = process.env.OUTLOOK_EMAIL
     if (config.outlook.user === undefined) config.outlook.user = (getSwarmSecret('OUTLOOK_USER') || process.env.OUTLOOK_USER)
     if (config.outlook.password === undefined) config.outlook.password = (getSwarmSecret('OUTLOOK_PASSWORD') || process.env.OUTLOOK_PASSWORD)
+
+    if (config.environmentAPIs === undefined) config.environmentAPIs = {}
+    if (config.environmentAPIs.OpenWeatherMap === undefined) config.environmentAPIs.OpenWeatherMap = (getSwarmSecret('OWP_API_KEY') || process.env.OWP_API_KEY)
+    if (config.environmentAPIs.Ambee === undefined) config.environmentAPIs.Ambee = (getSwarmSecret('AMBEE_API_KEY') || process.env.AMBEE_API_KEY)
   }
   return config
 }

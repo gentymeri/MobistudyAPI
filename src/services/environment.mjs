@@ -6,8 +6,8 @@ import getConfig from './config.mjs'
 
 const config = getConfig()
 
-const OWMapiKey = config.environment.OpenWeatherMap
-const AMBEEKey = config.environment.Ambee
+const OWMapiKey = config.environmentAPIs.OpenWeatherMap
+const AMBEEKey = config.environmentAPIs.Ambee
 
 // lat: latitude
 // long: longitude

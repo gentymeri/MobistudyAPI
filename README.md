@@ -112,6 +112,8 @@ also consider using environmental variables. This is the full list of variables:
 | OUTLOOK_USER       | string  | NA          | YES    |
 | OUTLOOK_PASSWORD   | string  | NA          | YES    |
 | OUTLOOK_EMAIL      | string  | NA          | NO     |
+| OWP_API_KEY        | string  | NA          | YES    |
+| AMBEE_API_KEY      | string  | NA          | YES    |
 
 AUTH_ADMIN_EMAIL and AUTH_ADMIN_PASSWORD are used at the first start, to generate
 an admin user that can be used to access the website the first time.
