@@ -6,7 +6,7 @@
 import utils from './utils.mjs'
 import { applogger } from '../services/logger.mjs'
 
-const CollectionName = 'fingerTapping'
+const CollectionName = 'fingerTappings'
 
 export default async function (db) {
   const collection = await utils.getCollection(db, CollectionName)

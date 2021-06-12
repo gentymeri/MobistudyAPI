@@ -2,7 +2,8 @@
 .gitignore
 node_modules
 npm-debug.log
-logs
+logs/app*
+logs/http*
 config.json
 README.md
 Dockerfile
