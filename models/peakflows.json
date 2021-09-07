@@ -1,7 +1,12 @@
 {
-  "userKey": "userinfo.user._key",
-  "studyKey": "studyKey",
-  "taskId": "taskId",
-  "createdTS": "new Date()",
-  "pef": 300
+  "userKey": "90935",
+  "studyKey": "1978",
+  "taskId": 8,
+  "createdTS": "2021-09-07T20:31:46.982Z",
+  "PEFs": [
+    463,
+    405,
+    509
+  ],
+  "pefMax": 509
 }

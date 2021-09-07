@@ -1,0 +1,15 @@
+{
+  "userKey": "90935",
+  "studyKey": "1978",
+  "taskId": 6,
+  "createdTS": "2021-09-07T20:37:10.982Z",
+  "po60Data": {
+    "startTimestamp": "2021-09-07T20:37:09.374Z",
+    "endTimestamp": null,
+    "hrMax": 144,
+    "hrMin": 50,
+    "hrAvg": 101,
+    "SPO2Max": 90,
+    "SPO2Min": 61,
+    "SPO2Avg": 50
+  }

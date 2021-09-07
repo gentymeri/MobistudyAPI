@@ -1,0 +1,39 @@
+{
+  "userKey": "12123",
+  "studyKey": "4324234",
+  "taskId": 3,
+  "createdTS": "2021-09-07T11:11:59.418Z",
+  "device": {
+    "id": "00:11:22:33:FF:EE",
+    "serialNumber": "180a-555-333",
+    "battery": {
+      "chargeLevel": 80,
+      "currentlyCharging": 0,
+      "lastChargedDate": "2021-09-07T11:11:41.983Z",
+      "numOfCharges": 4,
+      "amountCharged": 50
+    },
+    "charging": false,
+    "swVersion": "11",
+    "hwVersion": "3",
+    "serialNumebr": "asdasd"
+  },
+  "miband3Data": [
+    {
+      "date": "2021-09-06T11:12:41.982Z",
+      "activityType": 98,
+      "intensity": 6,
+      "steps": 5,
+      "hr": 19,
+      "buffer": {}
+    },
+    {
+      "date": "2021-09-06T11:13:41.982Z",
+      "activityType": 98,
+      "intensity": 4,
+      "steps": 19,
+      "hr": 92,
+      "buffer": {}
+    }
+  }
+}

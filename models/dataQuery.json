@@ -1,15 +1,15 @@
 {
-	"userKey": "asdasd",
-	"studyKey": "asdasd",
-	"taskId": 3,
-	"dataType": "steps",
-	"createdTS": "timestamp on the server",
-	"healthData": [
-		{
-			"startDate": "2019-02-27T12:46:07.294Z",
-			"endDate": "2019-02-27T12:46:07.294Z",
-			"unit": "count",
-			"value": 150
-		}
-	]
+  "userKey": "121212",
+  "studyKey": "3333",
+  "taskId": 3,
+  "dataType": "steps",
+  "createdTS": "2021-09-07T20:40:18.358Z",
+  "healthData": [
+    {
+      "startDate": "2019-02-27T12:46:07.294Z",
+      "endDate": "2019-02-27T12:46:07.294Z",
+      "unit": "count",
+      "value": 150
+    }
+  ]
 }

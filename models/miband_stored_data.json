@@ -1,8 +1,0 @@
-{
-    "userKey": "userinfo.user._key",
-    "studyKey": "studyKey",
-    "taskId": "taskId",
-    "createdTS": "new Date()",
-    "device": "this.deviceInfo",
-    "miband3Data": "storedData"
-}

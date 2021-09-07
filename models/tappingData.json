@@ -1,14 +1,18 @@
 {
-  "userKey":"asdasd",
-  "studyKey":"asdasd",
-  "taskId":7,
-  "createdTS": "new Date()",
-  "tappingCount": 0,
+  "userKey": "asdasd",
+  "studyKey": "asdasd",
+  "taskId": 7,
+  "createdTS": "2021-09-07T20:32:39.365Z",
+  "startedTS": "2021-09-07T20:32:19.365Z",
+  "completionTS": "2021-09-07T20:32:39.365Z",
   "tappingData": [
     {
-      "tapTimeStamp": 0,
-      "TappedButtonId": "TappedButtonLeft",
-      "TapCoordinate": "{86.5, 438.5}"
+      "msFromStart": 1247,
+      "side": "left"
+    },
+    {
+      "msFromStart": 1616,
+      "side": "right"
     }
   ]
 }
