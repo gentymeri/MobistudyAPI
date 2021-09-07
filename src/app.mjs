@@ -7,9 +7,7 @@
 
 import express from 'express'
 import helmet from 'helmet'
-import bodyParser from 'body-parser'
 import passport from 'passport'
-import path from 'path'
 
 import { applogger, httplogger } from './services/logger.mjs'
 import authConfig from './services/authSetup.mjs'
@@ -44,9 +42,9 @@ export default async function () {
   // setup body parser
   // default limit is 100kb, so we need to extend the limit
   // see http://stackoverflow.com/questions/19917401/node-js-express-request-entity-too-large
-  app.use(bodyParser.urlencoded({ limit: '20mb', extended: false }))
-  app.use(bodyParser.json({ limit: '20mb' }))
-  app.use(bodyParser.text({ limit: '20mb' }))
+  app.use(express.urlencoded({ limit: '20mb', extended: false }))
+  app.use(express.json({ limit: '20mb' }))
+  app.use(express.text({ limit: '20mb' }))
 
   // this needs to be called by apps, allow CORS for everybody
   app.use(function (req, res, next) {
