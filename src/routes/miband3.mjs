@@ -13,7 +13,6 @@ import auditLogger from '../services/auditLogger.mjs'
 const router = express.Router()
 
 export default async function () {
-
   // Get all miband data
   // query params: studyKey to filter by study
   router.get('/miband3Data', passport.authenticate('jwt', { session: false }), async function (req, res) {
@@ -21,23 +20,23 @@ export default async function () {
       if (req.user.role === 'researcher') {
         // extra check about the teams
         if (req.query.teamKey) {
-          let team = await DAO.getOneTeam(req.query.teamKey)
+          const team = await DAO.getOneTeam(req.query.teamKey)
           if (!team.researchersKeys.includes(req.user._key)) return res.sendStatus(403)
           else {
-            let miband3Data = await DAO.getAllMiband3Data()
+            const miband3Data = await DAO.getAllMiband3Data()
             res.send(miband3Data)
           }
         }
         if (req.query.studyKey) {
-          let team = await DAO.getAllTeams(req.user._key, req.query.studyKey)
+          const team = await DAO.getAllTeams(req.user._key, req.query.studyKey)
           if (team.length === 0) return res.sendStatus(403)
           else {
-            let miband3Data = await DAO.getMiband3DataByStudy(req.query.studyKey)
+            const miband3Data = await DAO.getMiband3DataByStudy(req.query.studyKey)
             res.send(miband3Data)
           }
         }
       } else if (req.user.role === 'participant') {
-        let miband3Data = await DAO.getMiband3DataByUser(req.user._key)
+        const miband3Data = await DAO.getMiband3DataByUser(req.user._key)
         res.send(miband3Data)
       }
     } catch (err) {
@@ -49,7 +48,7 @@ export default async function () {
   // Get miband3 data for a user
   router.get('/miband3Data/:userKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
-      let miband3Data = await DAO.getMiband3DataByUser(req.params.userKey)
+      const miband3Data = await DAO.getMiband3DataByUser(req.params.userKey)
       res.send(miband3Data)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve Miband3Data data')
@@ -60,7 +59,7 @@ export default async function () {
   // Get miband3 data for a study for a user
   router.get('/miband3Data/:userKey/:studyKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
-      let miband3Data = await DAO.getMiband3DataByUserAndStudy(req.params.userKey, req.params.studyKey)
+      const miband3Data = await DAO.getMiband3DataByUserAndStudy(req.params.userKey, req.params.studyKey)
       res.send(miband3Data)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve Miband3Data Data ')
@@ -76,14 +75,14 @@ export default async function () {
     try {
       newMiband3Data = await DAO.createMiband3Data(newMiband3Data)
       // also update task status
-      let participant = await DAO.getParticipantByUserKey(req.user._key)
+      const participant = await DAO.getParticipantByUserKey(req.user._key)
       if (!participant) return res.status(404)
 
-      let study = participant.studies.find((s) => {
+      const study = participant.studies.find((s) => {
         return s.studyKey === newMiband3Data.studyKey
       })
       if (!study) return res.status(400)
-      let taskItem = study.taskItemsConsent.find(ti => ti.taskId === newMiband3Data.taskId)
+      const taskItem = study.taskItemsConsent.find(ti => ti.taskId === newMiband3Data.taskId)
       if (!taskItem) return res.status(400)
       taskItem.lastExecuted = newMiband3Data.createdTS
       // update the participant

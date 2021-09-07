@@ -2,8 +2,9 @@
 .gitignore
 node_modules
 npm-debug.log
-logs
-config.json
+logs/app*
+logs/http*
+config/config.json
 README.md
 Dockerfile
 .DS_Store

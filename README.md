@@ -6,17 +6,19 @@ This is the back-end REST API of MobiStudy.
 
 You need to install the following on your system:
 
-- nodejs (v 10 or bigger)
+- nodejs (v 14 or higher)
 - arango DB (v 3)
+
+In order to guarantee that the same version of node is used across developers, it is recommendable to use [nvm](https://github.com/nvm-sh/nvm) and run `nvm install && nvm use` to switch to the node version used in this project.
 
 Install all other dependencies with `npm install`.
 
 On Arango, you must have created a dedicated database for Mobistudy, and, possibly,
 also a dedicated user with its password.
 
-To start Arango, you can either [install it](https://www.arangodb.com/), or use Docker. For development, use:
-
+To start Arango, you can either [install it](https://www.arangodb.com/), or use Docker. For development, you can use:
 `docker run -e ARANGO_NO_AUTH=1 -p 127.0.0.1:8529:8529 --name mobiArango arangodb`
+to start a Docker container with Arango. You can then access the web interface on http://localhost:8529
 
 ## Run
 
@@ -33,7 +35,7 @@ See section about Docker for details about environmental variables.
 
 ## Test
 
-Run `npm run test:unit`. If you want to have the tests run continuously (as you
+Run `npm run test`. If you want to have the tests run continuously (as you
 change the code), run `npm run test:watch`.
 
 ## Develop
@@ -53,9 +55,7 @@ project
 │   └───routes              // API endpoints
 │   └───services            // application logic
 └───test                    // automatic tests and experiments
-    └───jest                // unit tests
-        └───__tests__       // unit test specs
-        └───__integrated__  // integrated test specs (require docker)
+    └───jest                // unit tests specs
 ```
 
 ## Contribute
@@ -112,6 +112,8 @@ also consider using environmental variables. This is the full list of variables:
 | OUTLOOK_USER       | string  | NA          | YES    |
 | OUTLOOK_PASSWORD   | string  | NA          | YES    |
 | OUTLOOK_EMAIL      | string  | NA          | NO     |
+| OWP_API_KEY        | string  | NA          | YES    |
+| AMBEE_API_KEY      | string  | NA          | YES    |
 
 AUTH_ADMIN_EMAIL and AUTH_ADMIN_PASSWORD are used at the first start, to generate
 an admin user that can be used to access the website the first time.

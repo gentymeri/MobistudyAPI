@@ -1,8 +1,8 @@
-FROM node:14.16.1-alpine3.10  as build
+FROM node:14.17   as build
 
-RUN apk --no-cache add --virtual native-deps \
-  g++ gcc libgcc libstdc++ linux-headers autoconf automake make nasm python git && \
-  npm install --quiet node-gyp -g
+# RUN apk --no-cache add --virtual native-deps \
+#   g++ gcc libgcc libstdc++ linux-headers autoconf automake make nasm python git && \
+#   npm install --quiet node-gyp -g
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
@@ -13,7 +13,7 @@ RUN npm install --production
 
 COPY . /usr/src/app
 
-FROM node:15-alpine3.10
+FROM node:14.17-alpine3.12
 
 COPY --from=build /usr/src/app /usr/src/app
 

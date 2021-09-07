@@ -10,8 +10,13 @@ describe('when composing an email', () => {
     expect(email.title).toBe('Mobistudy password recovery')
     expect(email.content).toBe(`<p>You have requested to reset your password on Mobistudy.</p>
     <p>Please go to <a href=link>this webpage</a> to set another password.</p>
-    <p>Or use the following code if required: token</p>
+    <p>Or copy/paste the following code in the app: token</p>
     <p>This code will expire after 24 hours.</p>`)
+  })
+
+  test('the email password recovery in Spanish is correct', async () => {
+    let email = await passwordRecoveryCompose('link', 'token', 'es')
+    expect(email.title).toBe('Recuperación de contraseña de Mobistudy')
   })
 
   test('the email for a completed study is correct', async () => {
@@ -74,11 +79,17 @@ describe('when composing an email', () => {
       },
       consent: {
         taskItems: [{
-          description: 'task1',
+          description: {
+            en: 'task1',
+            it: 'attivita 1'
+          },
           taskId: 1
         }],
         extraItems: [{
-          description: 'extra1'
+          description: {
+            en: 'extra1',
+            it: 'addizionale 1'
+          }
         }]
       }
     })

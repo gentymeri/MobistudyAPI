@@ -33,10 +33,8 @@ export default async function (db) {
     },
 
     async getParticipantByUserKey (userKey) {
-      let filter = ''
-      let bindings = { 'userkey': userKey }
-      if (userKey) {
-        filter = ' FILTER participant.userKey == @userkey '
+      if (!userKey) {
+        throw new Error('user key must be specified')
       }
       var query = 'FOR participant IN participants ' +
         filter + ' RETURN participant'

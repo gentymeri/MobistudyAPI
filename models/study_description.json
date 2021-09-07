@@ -145,26 +145,25 @@
           3,
           5
         ]
-      },
-      "dataType": "distance"
+      }
     },
     {
       "id": 4,
       "type": "qcst",
       "scheduling": {
         "startEvent": "consent",
-        "intervalType": "w",
+        "intervalType": "d",
         "interval": 1,
         "occurrences": 20,
         "months": [],
         "monthDays": [],
-        "weekDays": [
-          1,
-          3,
-          5
+        "weekDays": [],
+        "hours": [
+          8,
+          12,
+          18
         ]
-      },
-      "dataType": "steps"
+      }
     },
     {
       "id": 5,
@@ -191,6 +190,36 @@
         "months": [],
         "monthDays": [],
         "weekDays": []
+      }
+    },
+    {
+      "id": 7,
+      "type": "peakflow",
+      "scheduling": {
+        "startEvent": "consent",
+        "intervalType": "h",
+        "interval": 12,
+        "occurrences": 40
+      }
+    },
+    {
+      "id": 8,
+      "type": "environmet",
+      "scheduling": {
+        "startEvent": "consent",
+        "intervalType": "d",
+        "interval": 1,
+        "occurrences": 20
+      }
+    },
+    {
+      "id": 9,
+      "type": "fingerTapping",
+      "scheduling": {
+        "startEvent": "consent",
+        "intervalType": "d",
+        "interval": 1,
+        "occurrences": 20
       }
     }
   ],
@@ -238,6 +267,34 @@
           "sv": "Jag accepterar att skicka min samlade data från MiBand3 träningsspåraren."
         },
         "taskId": 5
+      },
+      {
+        "description": {
+          "en": "I agree to provide my data collected from the PO60.",
+          "sv": "Jag accepterar att skicka min samlade data från PO60."
+        },
+        "taskId": 6
+      },
+      {
+        "description": {
+          "en": "I agree to provide my data collected from the Smart Peak Flow Meter.",
+          "sv": "Jag accepterar att skicka min samlade data från Smart Peak Flow Meter."
+        },
+        "taskId": 7
+      },
+      {
+        "description": {
+          "en": "I agree to provide my location.",
+          "sv": "Jag godkänner att ange min plats."
+        },
+        "taskId": 8
+      },
+      {
+        "description": {
+          "en": "I agree to perform a finger tapping test.",
+          "sv": "Jag godkänner att utföra ett fingeravtryckstest."
+        },
+        "taskId": 9
       }
     ],
     "extraItems": [

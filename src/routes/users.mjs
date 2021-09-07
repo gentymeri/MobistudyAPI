@@ -14,7 +14,8 @@ import getConfig from '../services/config.mjs'
 import { applogger } from '../services/logger.mjs'
 import auditLogger from '../services/auditLogger.mjs'
 import { sendEmail } from '../services/mailSender.mjs'
-import { userRegistrationCompose, passwordRecoveryCompose } from '../services/emailComposer.mjs'
+import { userRegistrationCompose, passwordRecoveryCompose, newPasswordCompose } from '../services/emailComposer.mjs'
+import { getLanguageFromAcceptedList } from '../i18n/i18n.mjs'
 
 owasp.config({
   allowPassphrases: true,
@@ -29,13 +30,13 @@ const router = express.Router()
 const config = getConfig()
 
 const pwdCheck = function (email, password) {
-  let userName = email.substring(0, email.indexOf('@'))
+  const userName = email.substring(0, email.indexOf('@'))
   if ((password.toUpperCase().includes(userName.toUpperCase()))) return false
 
-  let strengthCheck = zxcvbn(password)
+  const strengthCheck = zxcvbn(password)
   if (strengthCheck.score < 2) return false
 
-  let result = owasp.test(password)
+  const result = owasp.test(password)
   if (!result.strong) {
     return false
   }
@@ -43,7 +44,6 @@ const pwdCheck = function (email, password) {
 }
 
 export default async function () {
-
   router.post('/login', passport.authenticate('local', { session: false }), function (req, res, next) {
     res.send(req.user)
     auditLogger.log('login', req.user._key, undefined, undefined, 'User ' + req.user.email + ' has logged in', 'users', req.user._key, undefined)
@@ -51,25 +51,25 @@ export default async function () {
 
   router.post('/sendResetPasswordEmail', async function (req, res) {
     if (req.body.email) {
-      let email = req.body.email
-      let existing = await DAO.findUser(email)
+      const email = req.body.email
+      const existing = await DAO.findUser(email)
       if (!existing) return res.sendStatus(200)
 
-      let daysecs = 24 * 60 * 60
+      const daysecs = 24 * 60 * 60
       const token = jwt.sign({
         email: email
       }, config.auth.secret, {
         expiresIn: daysecs
       })
-      let serverlink = req.protocol + '://' + req.headers.host + '/#/resetPassword?email=' + email + '&token=' + token
+      const serverlink = 'https://app.mobistudy.org/#/resetPassword?email=' + email + '&token=' + token
       let language = 'en'
       if (existing.role === 'participant') {
         // find language of the participant
-        let part = await DAO.getParticipantByUserKey(existing._key)
+        const part = await DAO.getParticipantByUserKey(existing._key)
         language = part.language
       }
-      let { title, content } = passwordRecoveryCompose(serverlink, token, language)
-      sendEmail(email, title, content)
+      const msg = passwordRecoveryCompose(serverlink, token, language)
+      sendEmail(email, msg.title, msg.content)
       res.sendStatus(200)
       applogger.info({ email: req.body.email }, 'Reset password email sent')
       auditLogger.log('resetPasswordEmail', existing._key, undefined, undefined, 'User ' + email + ' has requested a reset password email', 'users', existing._key, undefined)
@@ -88,18 +88,28 @@ export default async function () {
         applogger.info('Resetting password, token has expired')
         res.sendStatus(400)
       } else {
-        let email = decoded.email
-        let newPasssword = req.body.password
+        const email = decoded.email
+        const newPasssword = req.body.password
         if (!pwdCheck(email, newPasssword)) return res.status(400).send('Password too weak')
-        let hashedPassword = bcrypt.hashSync(newPasssword, 8)
-        let existing = await DAO.findUser(email)
+        const hashedPassword = bcrypt.hashSync(newPasssword, 8)
+        const existing = await DAO.findUser(email)
         if (!existing) {
           applogger.info('Resetting password, email ' + email + ' not registered')
           return res.status(409).send('This email is not registered')
         }
+        let language = 'en'
+        if (existing.role === 'participant') {
+          // find language of the participant
+          const part = await DAO.getParticipantByUserKey(existing._key)
+          language = part.language
+        }
+        const msg = newPasswordCompose(language)
+        await sendEmail(email, msg.title, msg.content)
+
         await DAO.updateUser(existing._key, {
           hashedPassword: hashedPassword
         })
+
         res.sendStatus(200)
         applogger.info({ email: email }, 'User has changed the password')
         auditLogger.log('resetPassword', existing._key, undefined, undefined, 'User ' + email + ' has changed the password', 'users', existing._key, undefined)
@@ -108,29 +118,35 @@ export default async function () {
   })
 
   router.post('/users', async (req, res) => {
-    let user = req.body
-    let password = user.password
+    const user = req.body
+    const password = user.password
     if (!pwdCheck(user.email, password)) return res.status(400).send('Password too weak')
-    let hashedPassword = bcrypt.hashSync(password, 8)
+
+    // get the language from the browser, at this stage the user preferences are unknown
+    const language = getLanguageFromAcceptedList(req.acceptsLanguages())
+    try {
+      const msg = userRegistrationCompose(language)
+      await sendEmail(user.email, msg.title, msg.content)
+    } catch (err) {
+      res.status(400).send('Cannot send confirmation email')
+      applogger.warn({ error: err }, 'Cannot send new user confirmation email')
+      return
+    }
+
+    const hashedPassword = bcrypt.hashSync(password, 8)
     delete user.password
     user.hashedPassword = hashedPassword
     try {
-      let existing = await DAO.findUser(user.email)
+      const existing = await DAO.findUser(user.email)
       if (existing) return res.status(409).send('This email is already registered')
       if (user.role === 'admin') return res.sendStatus(403)
-      let newuser = await DAO.createUser(user)
+      const newuser = await DAO.createUser(user)
       res.sendStatus(200)
       applogger.info({ email: newuser.email }, 'New user created')
       auditLogger.log('userCreated', newuser._key, undefined, undefined, 'New user created with email ' + newuser.email, 'users', newuser._key, undefined)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new user')
       res.sendStatus(500)
-    }
-    try {
-      let { title, content } = userRegistrationCompose(language)
-      sendEmail(newuser.email, title, content)
-    } catch {
-      applogger.error({ error: err }, 'Cannot send  new user')
     }
   })
 
@@ -162,11 +178,11 @@ export default async function () {
   // NEW GET USER FUNCTION
   router.get('/getUsers', passport.authenticate('jwt', { session: false }), async function (req, res) {
     if (req.user.role !== 'admin') {
-      console.log(`not an admin`)
+      console.log('not an admin')
       res.sendStatus(403)
     } else {
       try {
-        let result = await DAO.getUsers(false,
+        const result = await DAO.getUsers(false,
           req.query.roleType,
           req.query.userEmail,
           req.query.sortDirection,
@@ -185,11 +201,11 @@ export default async function () {
   // NEW GET USER COUNT FUNCTION
   router.get('/getUsers/count', passport.authenticate('jwt', { session: false }), async function (req, res) {
     if (req.user.role !== 'admin') {
-      console.log(`not an admin`)
+      console.log('not an admin')
       res.sendStatus(403)
     } else {
       try {
-        let result = await DAO.getUsers(true,
+        const result = await DAO.getUsers(true,
           req.query.roleType,
           req.query.userEmail,
           req.query.sortDirection,
@@ -238,25 +254,26 @@ export default async function () {
   })
 
   // Remove Specified User (currently only removes researchers)
+  // TODO: remove participants as well
   router.delete('/users/:user_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
-      let userKey = req.params.user_key
-      // Only admin can remove a user
+      const userKey = req.params.user_key
+      // Only admin can remove a team
       if (req.user.role === 'admin') {
         // Remove user from all teams
-        let teamsOfUser = await DAO.getAllTeams(userKey)
+        const teamsOfUser = await DAO.getAllTeams(userKey)
         // For each team, find the user key in the researcher keys and remove
         for (let i = 0; i < teamsOfUser.length; i++) {
-          let teamKeyOfUser = teamsOfUser[i]._key
-          let selTeam = await DAO.getOneTeam(teamKeyOfUser)
-          let index = selTeam.researchersKeys.indexOf(userKey)
+          const teamKeyOfUser = teamsOfUser[i]._key
+          const selTeam = await DAO.getOneTeam(teamKeyOfUser)
+          const index = selTeam.researchersKeys.indexOf(userKey)
           if (index !== null) {
             selTeam.researchersKeys.splice(index, 1)
           }
           await DAO.replaceTeam(teamKeyOfUser, selTeam)
         }
         // Then, FINALLY, remove user from DAO
-        let user = await DAO.getOneUser(userKey)
+        const user = await DAO.getOneUser(userKey)
         await DAO.removeUser(userKey)
         res.sendStatus(200)
 

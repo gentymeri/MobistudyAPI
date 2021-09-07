@@ -8,9 +8,8 @@ import i18n from '../i18n/i18n.mjs'
 
 // creates the email when a user registers
 // returns { title: '...', content: '...'}
-export async function userRegistrationCompose (serverlink, token, language) {
+export function userRegistrationCompose (language) {
   i18n.locale = language
-
   let title = i18n.t('account.registrationTitle')
   let content = i18n.t('account.registrationContent')
   return { title: title, content: content }
@@ -18,11 +17,21 @@ export async function userRegistrationCompose (serverlink, token, language) {
 
 // creates the email when a user requests password recovery
 // returns { title: '...', content: '...'}
-export async function passwordRecoveryCompose (serverlink, token, language) {
+export function passwordRecoveryCompose (serverlink, token, language) {
   i18n.locale = language
 
   let title = i18n.t('account.passwordRecoveryTitle')
   let content = i18n.t('account.passwordRecoveryContent', { serverlink: serverlink, token: token })
+  return { title: title, content: content }
+}
+
+// creates the email when a user sets a new password
+// returns { title: '...', content: '...'}
+export function newPasswordCompose (language) {
+  i18n.locale = language
+
+  let title = i18n.t('account.newPasswordTitle')
+  let content = i18n.t('account.newPasswordContent')
   return { title: title, content: content }
 }
 
@@ -51,12 +60,12 @@ export async function studyStatusUpdateCompose (studyKey, participant) {
       for (let i = 0; i < partStudy.taskItemsConsent.length; i++) {
         let taskID = partStudy.taskItemsConsent[i].taskId
         // get description of task from study description using ID
-        let descr = '\u2022 ' + study.consent.taskItems.find(t => t.taskId == taskID).description + '\n'
+        let descr = '\u2022 ' + study.consent.taskItems.find(t => t.taskId == taskID).description[participant.language] + '\n'
         if (partStudy.taskItemsConsent[i].consented === true) taskConDesc += descr
         else taskNotConDesc += descr
       }
       for (let i = 0; i < partStudy.extraItemsConsent.length; i++) {
-        let descr = '\u2022 ' + study.consent.extraItems[i].description + '\n'
+        let descr = '\u2022 ' + study.consent.extraItems[i].description[participant.language] + '\n'
         if (partStudy.extraItemsConsent[i].consented) taskConDesc += descr
         else taskNotConDesc += descr
       }

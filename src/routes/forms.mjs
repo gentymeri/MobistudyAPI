@@ -13,7 +13,6 @@ import auditLogger from '../services/auditLogger.mjs'
 const router = express.Router()
 
 export default async function () {
-
   // query params:"
   // "list" if set only provides a list
   router.get('/forms', passport.authenticate('jwt', { session: false }), async function (req, res) {
@@ -35,7 +34,7 @@ export default async function () {
   router.get('/forms/:form_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
-      let form = await DAO.getOneForm(req.params.form_key)
+      const form = await DAO.getOneForm(req.params.form_key)
       res.send(form)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve form with _key ' + req.params.form_key)
