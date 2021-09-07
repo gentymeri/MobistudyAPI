@@ -11,39 +11,59 @@ export default async function (db) {
   const collection = await utils.getCollection(db, 'positions')
 
   return {
-    async getAllPositions () {
+    async getAllPositions (dataCallback) {
       const filter = ''
       const query = 'FOR data IN positions ' + filter + ' RETURN data'
       applogger.trace('Querying "' + query + '"')
       const cursor = await db.query(query)
-      return cursor.all()
+      if (dataCallback) {
+        while (cursor.hasNext()) {
+          const a = await cursor.next()
+          dataCallback(a)
+        }
+      } else return cursor.all()
     },
 
-    async getPositionsByUser (userKey) {
+    async getPositionsByUser (userKey, dataCallback) {
       const query =
         'FOR data IN positions FILTER data.userKey == @userKey RETURN data'
       const bindings = { userKey: userKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
-      return cursor.all()
+      if (dataCallback) {
+        while (cursor.hasNext()) {
+          const a = await cursor.next()
+          dataCallback(a)
+        }
+      } else return cursor.all()
     },
 
-    async getPositionsByUserAndStudy (userKey, studyKey) {
+    async getPositionsByUserAndStudy (userKey, studyKey, dataCallback) {
       const query =
         'FOR data IN positions FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
       const bindings = { userKey: userKey, studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
-      return cursor.all()
+      if (dataCallback) {
+        while (cursor.hasNext()) {
+          const a = await cursor.next()
+          dataCallback(a)
+        }
+      } else return cursor.all()
     },
 
-    async getPositionsByStudy (studyKey) {
+    async getPositionsByStudy (studyKey, dataCallback) {
       const query =
         'FOR data IN positions FILTER data.studyKey == @studyKey RETURN data'
       const bindings = { studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
-      return cursor.all()
+      if (dataCallback) {
+        while (cursor.hasNext()) {
+          const a = await cursor.next()
+          dataCallback(a)
+        }
+      } else return cursor.all()
     },
 
     async createPosition (position) {

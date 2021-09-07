@@ -1,11 +1,10 @@
 {
-	"userKey": "asdasd",
-	"studyKey": "QCST",
-	"taskId": 1,
-	"dataType": "steps",
-	"createdTS": "timestamp on the server",
-	"steps": "66",
-	"heartRate": 120,
-	"borgScale": 7,
-	"time": "00:00"
+  "userKey": "asdasd",
+  "studyKey": "QCST",
+  "taskId": 1,
+  "createdTS": "timestamp on the server",
+  "steps": "66",
+  "heartRate": 120,
+  "borgScale": 7,
+  "time": "03:00"
 }

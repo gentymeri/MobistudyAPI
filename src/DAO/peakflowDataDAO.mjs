@@ -11,36 +11,56 @@ export default async function (db) {
   const collection = await utils.getCollection(db, 'peakFlows')
 
   return {
-    async getAllPeakFlows () {
+    async getAllPeakFlows (dataCallback) {
       const filter = ''
       const query = 'FOR data IN peakFlows ' + filter + ' RETURN data'
       applogger.trace('Querying "' + query + '"')
       const cursor = await db.query(query)
-      return cursor.all()
+      if (dataCallback) {
+        while (cursor.hasNext()) {
+          const a = await cursor.next()
+          dataCallback(a)
+        }
+      } else return cursor.all()
     },
 
-    async getPeakFlowsByUser (userKey) {
+    async getPeakFlowsByUser (userKey, dataCallback) {
       const query = 'FOR data IN peakFlows FILTER data.userKey == @userKey RETURN data'
       const bindings = { userKey: userKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
-      return cursor.all()
+      if (dataCallback) {
+        while (cursor.hasNext()) {
+          const a = await cursor.next()
+          dataCallback(a)
+        }
+      } else return cursor.all()
     },
 
-    async getPeakFlowsByUserAndStudy (userKey, studyKey) {
+    async getPeakFlowsByUserAndStudy (userKey, studyKey, dataCallback) {
       const query = 'FOR data IN peakFlows FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
       const bindings = { userKey: userKey, studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
-      return cursor.all()
+      if (dataCallback) {
+        while (cursor.hasNext()) {
+          const a = await cursor.next()
+          dataCallback(a)
+        }
+      } else return cursor.all()
     },
 
-    async getPeakFlowsByStudy (studyKey) {
+    async getPeakFlowsByStudy (studyKey, dataCallback) {
       const query = 'FOR data IN peakFlows FILTER data.studyKey == @studyKey RETURN data'
       const bindings = { studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
-      return cursor.all()
+      if (dataCallback) {
+        while (cursor.hasNext()) {
+          const a = await cursor.next()
+          dataCallback(a)
+        }
+      } else return cursor.all()
     },
 
     async createPeakFlow (newPeakFlowData) {

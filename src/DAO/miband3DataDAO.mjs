@@ -8,43 +8,48 @@ import utils from './utils.mjs'
 import { applogger } from '../services/logger.mjs'
 
 export default async function (db) {
-  let collection = await utils.getCollection(db, 'miband3Data')
+  const collection = await utils.getCollection(db, 'miband3Data')
 
   return {
     async getAllMiband3Data () {
-      let filter = ''
-      let query = 'FOR data IN miband3Data ' + filter + ' RETURN data'
+      const filter = ''
+      const query = 'FOR data IN miband3Data ' + filter + ' RETURN data'
       applogger.trace('Querying "' + query + '"')
-      let cursor = await db.query(query)
+      const cursor = await db.query(query)
       return cursor.all()
     },
 
     async getMiband3DataByUser (userKey) {
-      var query = 'FOR data IN miband3Data FILTER data.userKey == @userKey RETURN data'
-      let bindings = { userKey: userKey }
+      const query = 'FOR data IN miband3Data FILTER data.userKey == @userKey RETURN data'
+      const bindings = { userKey: userKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
-      let cursor = await db.query(query, bindings)
+      const cursor = await db.query(query, bindings)
       return cursor.all()
     },
 
     async getMiband3DataByUserAndStudy (userKey, studyKey) {
-      var query = 'FOR data IN miband3Data FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
-      let bindings = { userKey: userKey, studyKey: studyKey }
+      const query = 'FOR data IN miband3Data FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
+      const bindings = { userKey: userKey, studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
-      let cursor = await db.query(query, bindings)
+      const cursor = await db.query(query, bindings)
       return cursor.all()
     },
 
-    async getMiband3DataByStudy (studyKey) {
-      var query = 'FOR data IN miband3Data FILTER data.studyKey == @studyKey RETURN data'
-      let bindings = { studyKey: studyKey }
+    async getMiband3DataByStudy (studyKey, dataCallback) {
+      const query = 'FOR data IN miband3Data FILTER data.studyKey == @studyKey RETURN data'
+      const bindings = { studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
-      let cursor = await db.query(query, bindings)
-      return cursor.all()
+      const cursor = await db.query(query, bindings)
+      if (dataCallback) {
+        while (cursor.hasNext()) {
+          const a = await cursor.next()
+          dataCallback(a)
+        }
+      } else return cursor.all()
     },
 
     async createMiband3Data (newMiband3Data) {
-      let meta = await collection.save(newMiband3Data)
+      const meta = await collection.save(newMiband3Data)
       newMiband3Data._key = meta._key
       return newMiband3Data
     },
@@ -62,7 +67,7 @@ export default async function (db) {
 
     // deletes all data based on study
     async deleteMiband3DataByStudy (studyKey) {
-      let miband3Data = await this.getMiband3DataByStudy(studyKey)
+      const miband3Data = await this.getMiband3DataByStudy(studyKey)
       for (let i = 0; i < miband3Data.length; i++) {
         await this.deleteMiband3Data(miband3Data[i]._key)
       }
@@ -70,7 +75,7 @@ export default async function (db) {
 
     // deletes all data based on user
     async deleteMiband3DataByUser (userKey) {
-      let miband3Data = await this.getMiband3DataByUser(userKey)
+      const miband3Data = await this.getMiband3DataByUser(userKey)
       for (let i = 0; i < miband3Data.length; i++) {
         await this.deleteMiband3Data(miband3Data[i]._key)
       }

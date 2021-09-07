@@ -7,7 +7,7 @@ jest.mock('../../src/DAO/DAO')
 describe('when a participant and some answers are stored', () => {
 
   beforeAll(() => {
-    let participants = [{
+    const participants = [{
       _key: '0000',
       userKey: '111111',
       createdTS: "2019-02-27T12:46:07.294Z",
@@ -30,10 +30,15 @@ describe('when a participant and some answers are stored', () => {
           taskId: 1,
           consented: true,
           lastExecuted: "2019-02-27T12:46:07.294Z"
+        },
+        {
+          taskId: 2,
+          consented: true,
+          lastExecuted: "2019-02-27T12:46:07.294Z"
         }]
       }]
     }]
-    let answers = [{
+    const answers = [{
       _key: '9999',
       userKey: "111111",
       studyKey: "123456",
@@ -54,7 +59,95 @@ describe('when a participant and some answers are stored', () => {
         timeStamp: "2019-02-27T12:46:07.294Z"
       }]
     }]
-    DAO.__setReturnedValueSequence([participants, answers])
+    const healthstores = [{
+      _key: '44444',
+      userKey: "111111",
+      studyKey: "123456",
+      taskId: 2,
+      createdTS: "2019-02-27T12:46:07.294Z",
+      healthData: [{
+        startDate: "2019-02-27T12:46:07.294Z",
+        endDate: "2019-02-27T12:46:07.294Z",
+        unit: 'count',
+        value: 150
+      }]
+    }]
+    const mibands = [{
+      _key: '3333',
+      userKey: "111111",
+      studyKey: "123456",
+      taskId: 2,
+      createdTS: "2019-02-27T12:46:07.294Z",
+      miband3Data: []
+    }]
+    const po60s = [{
+      _key: '121212',
+      userKey: "111111",
+      studyKey: "123456",
+      taskId: 2,
+      createdTS: "2019-02-27T12:46:07.294Z",
+      po60Data: []
+    }]
+    const qcst = [{
+      _key: '878787',
+      userKey: "111111",
+      studyKey: "123456",
+      taskId: 2,
+      createdTS: "2019-02-27T12:46:07.294Z",
+      steps: 66,
+      heartRate: 120,
+      borgScale: 7,
+      time: "03:00"
+    }]
+    const swmts = [{
+      _key: '323232',
+      userKey: "111111",
+      studyKey: "123456",
+      taskId: 2,
+      createdTS: "2019-02-27T12:46:07.294Z",
+      distance: 600,
+      steps: 433,
+	    borgScale: 5,
+    }]
+    const peakflows = [{
+      _key: '723723',
+      userKey: "111111",
+      studyKey: "123456",
+      taskId: 2,
+      createdTS: "2019-02-27T12:46:07.294Z",
+      PEF: 323
+    }]
+    const positions = [{
+      _key: '22222',
+      userKey: "111111",
+      studyKey: "123456",
+      taskId: 2,
+      createdTS: "2019-02-27T12:46:07.294Z",
+      "position": {
+        "timestamp": 1622323689069,
+        "coords": {
+          "longitude": 13.019884999999999,
+          "latitude": 55.6028994,
+          "accuracy": 21,
+          "altitude": 33,
+          "altitudeAccuracy": 10
+        }
+      }
+    }]
+    const fingerTappings = [{
+      _key: '22222',
+      userKey: "111111",
+      studyKey: "123456",
+      taskId: 2,
+      createdTS: "2019-02-27T12:46:07.294Z",
+      tappingCount: 0,
+      tappingData: [{
+        tapTimeStamp: 0,
+        tappedButtonId: "TappedButtonLeft",
+        tapCoordinates: [86.5, 438.5]
+      }]
+    }]
+    DAO.__setReturnedValueSequence([participants, answers, healthstores, mibands, po60s, qcst, swmts, peakflows, positions, fingerTappings])
   })
 
   test('a zip file can be created', async () => {

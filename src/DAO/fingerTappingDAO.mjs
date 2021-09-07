@@ -12,36 +12,56 @@ export default async function (db) {
   const collection = await utils.getCollection(db, CollectionName)
 
   return {
-    async getAllFingerTappings () {
+    async getAllFingerTappings (dataCallback) {
       const filter = ''
       const query = 'FOR data IN ' + CollectionName + ' ' + filter + ' RETURN data'
       applogger.trace('Querying "' + query + '"')
       const cursor = await db.query(query)
-      return cursor.all()
+      if (dataCallback) {
+        while (cursor.hasNext()) {
+          const a = await cursor.next()
+          dataCallback(a)
+        }
+      } else return cursor.all()
     },
 
-    async getFingerTappingsByUser (userKey) {
+    async getFingerTappingsByUser (userKey, dataCallback) {
       const query = 'FOR data IN ' + CollectionName + ' FILTER data.userKey == @userKey RETURN data'
       const bindings = { userKey: userKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
-      return cursor.all()
+      if (dataCallback) {
+        while (cursor.hasNext()) {
+          const a = await cursor.next()
+          dataCallback(a)
+        }
+      } else return cursor.all()
     },
 
-    async getFingerTappingsByUserAndStudy (userKey, studyKey) {
+    async getFingerTappingsByUserAndStudy (userKey, studyKey, dataCallback) {
       const query = 'FOR data IN ' + CollectionName + ' FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
       const bindings = { userKey: userKey, studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
-      return cursor.all()
+      if (dataCallback) {
+        while (cursor.hasNext()) {
+          const a = await cursor.next()
+          dataCallback(a)
+        }
+      } else return cursor.all()
     },
 
-    async getFingerTappingsByStudy (studyKey) {
+    async getFingerTappingsByStudy (studyKey, dataCallback) {
       const query = 'FOR data IN ' + CollectionName + ' FILTER data.studyKey == @studyKey RETURN data'
       const bindings = { studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
-      return cursor.all()
+      if (dataCallback) {
+        while (cursor.hasNext()) {
+          const a = await cursor.next()
+          dataCallback(a)
+        }
+      } else return cursor.all()
     },
 
     async createFingerTapping (newtappingData) {

@@ -8,43 +8,53 @@ import utils from './utils.mjs'
 import { applogger } from '../services/logger.mjs'
 
 export default async function (db, logger) {
-  let collection = await utils.getCollection(db, 'QCSTData')
+  const collection = await utils.getCollection(db, 'QCSTData')
 
   return {
     async getAllQCSTData () {
-      let filter = ''
-      let query = 'FOR data IN QCSTData ' + filter + ' RETURN data'
+      const filter = ''
+      const query = 'FOR data IN QCSTData ' + filter + ' RETURN data'
       applogger.trace('Querying "' + query + '"')
-      let cursor = await db.query(query)
+      const cursor = await db.query(query)
       return cursor.all()
     },
 
     async getQCSTDataByUser (userKey) {
-      var query = 'FOR data IN QCSTData FILTER data.userKey == @userKey RETURN data'
-      let bindings = { userKey: userKey }
+      const query = 'FOR data IN QCSTData FILTER data.userKey == @userKey RETURN data'
+      const bindings = { userKey: userKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
-      let cursor = await db.query(query, bindings)
+      const cursor = await db.query(query, bindings)
       return cursor.all()
     },
 
-    async getQCSTDataByUserAndStudy (userKey, studyKey) {
-      var query = 'FOR data IN QCSTData FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
-      let bindings = { userKey: userKey, studyKey: studyKey }
+    async getQCSTDataByUserAndStudy (userKey, studyKey, dataCallback) {
+      const query = 'FOR data IN QCSTData FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
+      const bindings = { userKey: userKey, studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
-      let cursor = await db.query(query, bindings)
-      return cursor.all()
+      const cursor = await db.query(query, bindings)
+      if (dataCallback) {
+        while (cursor.hasNext()) {
+          const a = await cursor.next()
+          dataCallback(a)
+        }
+      } else return cursor.all()
     },
 
-    async getQCSTDataByStudy (studyKey) {
-      var query = 'FOR data IN QCSTData FILTER data.studyKey == @studyKey RETURN data'
-      let bindings = { studyKey: studyKey }
+    async getQCSTDataByStudy (studyKey, dataCallback) {
+      const query = 'FOR data IN QCSTData FILTER data.studyKey == @studyKey RETURN data'
+      const bindings = { studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
-      let cursor = await db.query(query, bindings)
-      return cursor.all()
+      const cursor = await db.query(query, bindings)
+      if (dataCallback) {
+        while (cursor.hasNext()) {
+          const a = await cursor.next()
+          dataCallback(a)
+        }
+      } else return cursor.all()
     },
 
     async createQCSTData (newQCSTData) {
-      let meta = await collection.save(newQCSTData)
+      const meta = await collection.save(newQCSTData)
       newQCSTData._key = meta._key
       return newQCSTData
     },
@@ -62,7 +72,7 @@ export default async function (db, logger) {
 
     // deletes all data based on study
     async deleteQCSTDataByStudy (studyKey) {
-      let QCSTData = await this.getQCSTDataByStudy(studyKey)
+      const QCSTData = await this.getQCSTDataByStudy(studyKey)
       for (let i = 0; i < QCSTData.length; i++) {
         await this.deleteQCSTData(QCSTData[i]._key)
       }
@@ -70,7 +80,7 @@ export default async function (db, logger) {
 
     // deletes all data based on user key
     async deleteQCSTDataByUser (userKey) {
-      let QCSTData = await this.getQCSTDataByUser(userKey)
+      const QCSTData = await this.getQCSTDataByUser(userKey)
       for (let i = 0; i < QCSTData.length; i++) {
         await this.deleteQCSTData(QCSTData[i]._key)
       }

@@ -11,7 +11,7 @@
       "accuracy": 21,
       "altitude": 33,
       "altitudeAccuracy": 10
-    },
+    }
   },
   "environment": {
     "weather": {
