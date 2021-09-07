@@ -10,13 +10,14 @@ import { DAO } from '../DAO/DAO.mjs'
 
 export default {
 
-  tempFolderPath: 'tmp/',
+  tempFolderPath: './tmp/',
 
   /**
    * Purges old zip files
    * @param timeoutSecs files older than this value, in secs, are purged
    */
   async purgeOldFiles (timeoutSecs) {
+    applogger.debug('Purging zip files older than ' + timeoutSecs + ' s')
     const filenames = await fs.promises.readdir(this.tempFolderPath)
     const timeAgo = new Date(new Date().getTime() - (timeoutSecs * 60 * 60 * 24 * 7))
 
@@ -38,6 +39,7 @@ export default {
   async zipStudyData (studyKey) {
     return new Promise((resolve, reject) => {
       let finished = false
+      // the filename is composed of a 6 digits random number  + the study key
       const filename = (Math.floor((Math.random() * 999999)) + '').padStart(6, '0') + '_' + studyKey + '.zip'
       applogger.info('Creating zip file for study ' + studyKey + ', filename: ' + filename)
 
@@ -75,47 +77,47 @@ export default {
         archive.append(JSON.stringify(p), { name: 'participants/' + p._key + '.json' })
       }).then(() => {
         // answers
-        DAO.getAnswersByStudy(studyKey, (a) => {
+        return DAO.getAnswersByStudy(studyKey, (a) => {
           archive.append(JSON.stringify(a), { name: 'answers/' + a._key + '.json' })
         })
       }).then(() => {
         // healthstore
-        DAO.getHealthStoreDataByStudy(studyKey, (a) => {
+        return DAO.getHealthStoreDataByStudy(studyKey, (a) => {
           archive.append(JSON.stringify(a), { name: 'healthstore/' + a._key + '.json' })
         })
       }).then(() => {
         // miband
-        DAO.getMiband3DataByStudy(studyKey, (a) => {
+        return DAO.getMiband3DataByStudy(studyKey, (a) => {
           archive.append(JSON.stringify(a), { name: 'miband3/' + a._key + '.json' })
         })
       }).then(() => {
         // po60
-        DAO.getPO60DataByStudy(studyKey, (a) => {
+        return DAO.getPO60DataByStudy(studyKey, (a) => {
           archive.append(JSON.stringify(a), { name: 'po60/' + a._key + '.json' })
         })
       }).then(() => {
         // qcst
-        DAO.getQCSTDataByStudy(studyKey, (a) => {
+        return DAO.getQCSTDataByStudy(studyKey, (a) => {
           archive.append(JSON.stringify(a), { name: 'qcst/' + a._key + '.json' })
         })
       }).then(() => {
         // smwt
-        DAO.getSMWTDataByStudy(studyKey, (a) => {
+        return DAO.getSMWTDataByStudy(studyKey, (a) => {
           archive.append(JSON.stringify(a), { name: 'smwt/' + a._key + '.json' })
         })
       }).then(() => {
         // peakflow
-        DAO.getPeakFlowsByStudy(studyKey, (a) => {
+        return DAO.getPeakFlowsByStudy(studyKey, (a) => {
           archive.append(JSON.stringify(a), { name: 'peakflow/' + a._key + '.json' })
         })
       }).then(() => {
         // position
-        DAO.getPositionsByStudy(studyKey, (a) => {
+        return DAO.getPositionsByStudy(studyKey, (a) => {
           archive.append(JSON.stringify(a), { name: 'position/' + a._key + '.json' })
         })
       }).then(() => {
         // fingerTapping
-        DAO.getFingerTappingsByStudy(studyKey, (a) => {
+        return DAO.getFingerTappingsByStudy(studyKey, (a) => {
           archive.append(JSON.stringify(a), { name: 'fingerTapping/' + a._key + '.json' })
         })
       }).then(() => {

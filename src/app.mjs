@@ -9,6 +9,7 @@ import express from 'express'
 import helmet from 'helmet'
 import bodyParser from 'body-parser'
 import passport from 'passport'
+import path from 'path'
 
 import { applogger, httplogger } from './services/logger.mjs'
 import authConfig from './services/authSetup.mjs'
@@ -68,6 +69,7 @@ export default async function () {
 
   app.use(apiPrefix, await indexRouter())
   app.use(apiPrefix, await studiesRouter())
+  app.use(apiPrefix, dataDownload(app))
   app.use(apiPrefix, await formsRouter())
   app.use(apiPrefix, await usersRouter())
   app.use(apiPrefix, await participantsRouter())

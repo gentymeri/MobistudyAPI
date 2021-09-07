@@ -18,7 +18,7 @@ export default async function (db) {
       applogger.trace('Querying "' + query + '"')
       const cursor = await db.query(query)
       if (dataCallback) {
-        while (cursor.hasNext()) {
+        while (cursor.hasNext) {
           const a = await cursor.next()
           dataCallback(a)
         }
@@ -31,7 +31,7 @@ export default async function (db) {
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
       if (dataCallback) {
-        while (cursor.hasNext()) {
+        while (cursor.hasNext) {
           const a = await cursor.next()
           dataCallback(a)
         }
@@ -44,7 +44,7 @@ export default async function (db) {
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
       if (dataCallback) {
-        while (cursor.hasNext()) {
+        while (cursor.hasNext) {
           const a = await cursor.next()
           dataCallback(a)
         }
@@ -57,7 +57,7 @@ export default async function (db) {
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
       if (dataCallback) {
-        while (cursor.hasNext()) {
+        while (cursor.hasNext) {
           const a = await cursor.next()
           dataCallback(a)
         }

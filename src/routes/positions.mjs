@@ -22,53 +22,47 @@ export default async function () {
       const long = req.query.long
       if (!lat || !long) return res.sendStatus(400)
       const env = { }
-      await Promise.all([
-        async () => {
-          try {
-            env.weather = await getWeather(lat, long)
-          } catch (err) {
-            // send at least the structure
-            env.weather = {
-              wind: { }
-            }
-            applogger.error({ error: err }, 'Cannot retrieve weather')
-          }
-        },
-        async () => {
-          try {
-            env.pollution = await getPollution(lat, long)
-          } catch (err) {
-            // send at least the structure
-            env.pollution = {
-              components: { }
-            }
-            applogger.error({ error: err }, 'Cannot retrieve pollution')
-          }
-        },
-        async () => {
-          try {
-            env.postcode = await getPostcode(lat, long)
-          } catch (err) {
-            // send at least the structure
-            env.postcode = {}
-            applogger.error({ error: err }, 'Cannot retrieve postcode')
-          }
-        },
-        async () => {
-          try {
-            env.allergens = await getAllergenes(lat, long)
-          } catch (err) {
-            // send at least the structure
-            env.allergens = {
-              pollen: {
-                Count: { },
-                Risk: { }
-              }
-            }
-            applogger.error({ error: err }, 'Cannot retrieve allergenes')
+
+      try {
+        env.weather = await getWeather(lat, long)
+      } catch (err) {
+        // send at least the structure
+        env.weather = {
+          wind: { }
+        }
+        applogger.error({ error: err }, 'Cannot retrieve weather')
+      }
+
+      try {
+        env.pollution = await getPollution(lat, long)
+      } catch (err) {
+        // send at least the structure
+        env.pollution = {
+          components: { }
+        }
+        applogger.error({ error: err }, 'Cannot retrieve pollution')
+      }
+
+      try {
+        env.postcode = await getPostcode(lat, long)
+      } catch (err) {
+        // send at least the structure
+        env.postcode = {}
+        applogger.error({ error: err }, 'Cannot retrieve postcode')
+      }
+
+      try {
+        env.allergens = await getAllergenes(lat, long)
+      } catch (err) {
+        // send at least the structure
+        env.allergens = {
+          pollen: {
+            Count: { },
+            Risk: { }
           }
         }
-      ])
+        applogger.error({ error: err }, 'Cannot retrieve allergenes')
+      }
       res.send(env)
     }
   )
