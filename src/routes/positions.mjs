@@ -18,26 +18,58 @@ export default async function () {
     '/positions/environment',
     passport.authenticate('jwt', { session: false }),
     async function (req, res) {
-      try {
-        const lat = req.query.lat
-        const long = req.query.long
-        if (!lat || !long) return res.sendStatus(400)
-        const env = { }
-        const result = await Promise.all([
-          getWeather(lat, long),
-          getPollution(lat, long),
-          getPostcode(lat, long),
-          getAllergenes(lat, long)
-        ])
-        env.weather = result[0]
-        env.pollution = result[1]
-        env.postcode = result[2]
-        env.allergens = result[3]
-        res.send(env)
-      } catch (err) {
-        applogger.error({ error: err }, 'Cannot retrieve environment')
-        res.sendStatus(500)
-      }
+      const lat = req.query.lat
+      const long = req.query.long
+      if (!lat || !long) return res.sendStatus(400)
+      const env = { }
+      await Promise.all([
+        async () => {
+          try {
+            env.weather = await getWeather(lat, long)
+          } catch (err) {
+            // send at least the structure
+            env.weather = {
+              wind: { }
+            }
+            applogger.error({ error: err }, 'Cannot retrieve weather')
+          }
+        },
+        async () => {
+          try {
+            env.pollution = await getPollution(lat, long)
+          } catch (err) {
+            // send at least the structure
+            env.pollution = {
+              components: { }
+            }
+            applogger.error({ error: err }, 'Cannot retrieve pollution')
+          }
+        },
+        async () => {
+          try {
+            env.postcode = await getPostcode(lat, long)
+          } catch (err) {
+            // send at least the structure
+            env.postcode = {}
+            applogger.error({ error: err }, 'Cannot retrieve postcode')
+          }
+        },
+        async () => {
+          try {
+            env.allergens = await getAllergenes(lat, long)
+          } catch (err) {
+            // send at least the structure
+            env.allergens = {
+              pollen: {
+                Count: { },
+                Risk: { }
+              }
+            }
+            applogger.error({ error: err }, 'Cannot retrieve allergenes')
+          }
+        }
+      ])
+      res.send(env)
     }
   )
 
