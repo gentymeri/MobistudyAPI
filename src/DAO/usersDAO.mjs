@@ -14,27 +14,27 @@ import utils from './utils.mjs'
 import { applogger } from '../services/logger.mjs'
 
 export default async function (db) {
-  let usersCollection = await utils.getCollection(db, 'users')
+  const usersCollection = await utils.getCollection(db, 'users')
 
   return {
     async findUser (email) {
       // Email string is set to lowercase
-      var query = 'FOR user in users FILTER LOWER(user.email) == \'' + email + '\' RETURN user'
+      const query = 'FOR user in users FILTER LOWER(user.email) == \'' + email + '\' RETURN user'
       applogger.trace('Querying "' + query + '"')
-      let cursor = await db.query(query)
-      let users = await cursor.all()
+      const cursor = await db.query(query)
+      const users = await cursor.all()
       if (users.length) return users[0]
       else return undefined
     },
 
     async createUser (newuser) {
-      let meta = await usersCollection.save(newuser)
+      const meta = await usersCollection.save(newuser)
       newuser._key = meta._key
       return newuser
     },
 
     async getOneUser (userkey) {
-      let user = await usersCollection.document(userkey)
+      const user = await usersCollection.document(userkey)
       applogger.trace('Searching for user "' + user._key)
       return user
     },
@@ -43,34 +43,34 @@ export default async function (db) {
       let queryString = ''
 
       if (countOnly) {
-        queryString = `RETURN COUNT ( `
+        queryString = 'RETURN COUNT ( '
       }
-      let bindings = {}
-      queryString += `FOR user IN users `
+      const bindings = {}
+      queryString += 'FOR user IN users '
 
       if (roleType) {
-        queryString += `FILTER user.role == @roleType `
+        queryString += 'FILTER user.role == @roleType '
         bindings.roleType = roleType
       }
       if (userEmail) {
-        queryString += `FILTER LIKE(user.email, CONCAT('%', @userEmail, '%'), true) `
+        queryString += 'FILTER LIKE(user.email, CONCAT(\'%\', @userEmail, \'%\'), true) '
         bindings.userEmail = userEmail
       }
       if (!countOnly) {
         if (!sortDirection) {
           sortDirection = 'DESC'
         }
-        queryString += `SORT user.email @sortDirection `
+        queryString += 'SORT user.email @sortDirection '
         bindings.sortDirection = sortDirection
         if (!!offset && !!rowsPerPage) {
-          queryString += `LIMIT @offset, @rowsPerPage `
+          queryString += 'LIMIT @offset, @rowsPerPage '
           bindings.offset = parseInt(offset)
           bindings.rowsPerPage = parseInt(rowsPerPage)
         }
       }
 
       if (countOnly) {
-        queryString += ` RETURN 1 )`
+        queryString += ' RETURN 1 )'
       } else {
         queryString += ` RETURN {
           userkey: user._key,
@@ -79,59 +79,72 @@ export default async function (db) {
         }`
       }
       applogger.trace(bindings, 'Querying "' + queryString + '"')
-      let cursor = await db.query(queryString, bindings)
+      const cursor = await db.query(queryString, bindings)
       if (countOnly) {
-        let counts = await cursor.all()
+        const counts = await cursor.all()
         if (counts.length) return '' + counts[0]
         else return undefined
       } else return cursor.all()
     },
-    async getAllUsersByCriteria (role, studyKey, studyKeys) {
+
+    // get all users given a role and a list of studies
+    async getAllUsersByCriteria (role, studyKeys, dataCallback) {
       let join = ''
       let filter = ''
-      let bindings = {}
-      if (studyKey) {
-        join = ' FOR study in studies '
-        filter = ' FILTER studies._key == @studyKey '
-        bindings.studyKey = studyKey
-      }
-      if (studyKeys) {
-        join = ' FOR study in studies '
-        filter = ' FILTER studies._key IN @studyKey '
-        bindings.studyKeys = studyKeys
-      }
-      if (role) {
-        if (studyKey) filter += ' AND user.role == @role'
-        else filter = ' FILTER user.role == @role'
-        bindings.role = role
+      const bindings = {}
+      if (role === 'participant') {
+        filter = ' FILTER user.role == "participant" '
+
+        if (studyKeys) {
+          join = ' FOR participant in participants '
+          filter += ' FILTER participant.userKey == user._key AND LENGTH( INTERSECTION (participant.studies[*].studyKey, @studyKeys) ) > 0   '
+          bindings.studyKeys = studyKeys
+        }
+      } else if (role === 'researcher') {
+        filter = ' FILTER user.role == "researcher" '
+
+        if (studyKeys) {
+          join = ' FOR team in teams FOR study in studies '
+          filter += ' FILTER user._key IN team.researchersKeys AND  study.teamKey == team._key AND study._key IN ["4590699"]  '
+          bindings.studyKeys = studyKeys
+        }
+      } else if (role === 'admin') {
+        filter = ' FILTER user.role == "admin" '
+      } else {
+        throw new Error('Role must be specified')
       }
 
-      var query = 'FOR user in users ' + join + filter + ' RETURN user'
+      const query = 'FOR user in users ' + join + filter + ' RETURN { _key: user._key, email: user.email, role: user.role }'
       applogger.trace(bindings, 'Querying "' + query + '"')
-      let cursor = await db.query(query, bindings)
-      return cursor.all()
+      const cursor = await db.query(query, bindings)
+      if (dataCallback) {
+        while (cursor.hasNext) {
+          const p = await cursor.next()
+          dataCallback(p)
+        }
+      } else return cursor.all()
     },
 
     // Get all users in DB
     async getAllUsersInDb () {
-      var query = 'FOR user in users RETURN user'
+      const query = 'FOR user in users RETURN user'
       applogger.trace('Querying "' + query + '"')
-      let cursor = await db.query(query)
+      const cursor = await db.query(query)
       return cursor.all()
     },
 
     // udpates a user, we assume the _key is the correct one
     async updateUser (_key, newuser) {
-      let newval = await usersCollection.update(_key, newuser, { keepNull: false, mergeObjects: true, returnNew: true })
+      const newval = await usersCollection.update(_key, newuser, { keepNull: false, mergeObjects: true, returnNew: true })
       return newval
     },
 
-    //remove a user (Assumption: userKey is the correct one)
+    // remove a user (Assumption: userKey is the correct one)
     async removeUser (userKey) {
-      let bindings = { 'usrKey': userKey }
-      let query = 'REMOVE { _key:@usrKey } IN users'
+      const bindings = { usrKey: userKey }
+      const query = 'REMOVE { _key:@usrKey } IN users'
       applogger.trace(bindings, 'Querying "' + query + '"')
-      let cursor = await db.query(query, bindings)
+      const cursor = await db.query(query, bindings)
       return cursor.all()
     }
   }

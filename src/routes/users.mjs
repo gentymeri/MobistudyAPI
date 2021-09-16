@@ -156,14 +156,14 @@ export default async function () {
     try {
       let val
       if (req.user.role === 'admin') {
-        val = await DAO.getAllUsersByCriteria(null, req.query.studyKey)
+        val = await DAO.getAllUsersByCriteria(null, [req.query.studyKey])
       } else if (req.user.role === 'researcher') {
         // TODO: make sure the study Key is among the ones the researcher is allowed
-        if (req.query.studyKey) val = await DAO.getAllUsersByCriteria('participant', req.query.studyKey)
+        if (req.query.studyKey) val = await DAO.getAllUsersByCriteria('participant', [req.query.studyKey])
         else {
           // TODO: retrieve studies where this participant is involved in
           let studyKeys
-          val = await DAO.getAllUsersByCriteria('participant', undefined, studyKeys)
+          val = await DAO.getAllUsersByCriteria('participant', [studyKeys])
         }
       } else { // a participant
         val = await DAO.getOneUser(req.user._key)
