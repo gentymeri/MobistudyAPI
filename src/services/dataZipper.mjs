@@ -72,9 +72,14 @@ export default {
         reject(err)
       })
 
-      // participants
-      DAO.getParticipantsByStudy(studyKey, null, (p) => {
-        archive.append(JSON.stringify(p), { name: 'participants/' + p._key + '.json' })
+      // users
+      DAO.getAllUsersByCriteria('participant', [studyKey], (u) => {
+        archive.append(JSON.stringify(u), { name: 'users/' + u._key + '.json' })
+      }).then(() => {
+        // participants
+        return DAO.getParticipantsByStudy(studyKey, null, (p) => {
+          archive.append(JSON.stringify(p), { name: 'participants/' + p._key + '.json' })
+        })
       }).then(() => {
         // answers
         return DAO.getAnswersByStudy(studyKey, (a) => {
