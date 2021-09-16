@@ -37,7 +37,7 @@ export default function () {
     if (config.logs === undefined) config.logs = {}
     if (config.logs.folder === undefined) config.logs.folder = (process.env.LOGS_FOLDER || 'logs')
     if (config.logs.rotationsize === undefined) config.logs.rotationsize = (process.env.LOGS_ROTATIONSIZE || '1M')
-    if (config.logs.console === undefined) config.logs.console = (process.env.LOGS_CONSOLE || false)
+    if (config.logs.console === undefined) config.logs.console = !!(process.env.LOGS_CONSOLE || false)
     if (config.logs.level === undefined) config.logs.level = parseInt(process.env.LOGS_LEVEL || '30')
 
     if (config.auth === undefined) config.auth = {}
