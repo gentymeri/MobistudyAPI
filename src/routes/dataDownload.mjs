@@ -23,8 +23,8 @@ export default function (app) {
   // schedule automatic purging of old files every 24h
   setInterval(async () => {
     // purge files older than a week
-    const oneweek = 7 * 24 * 60 * 60
-    await dataZipper.purgeOldFiles(oneweek)
+    const oneday = 24 * 60 * 60
+    await dataZipper.purgeOldFiles(oneday)
   }, 24 * 60 * 60 * 1000)
 
   // more secure version, but needs cookies instead of jwt tokens to work
@@ -65,8 +65,8 @@ export default function (app) {
       applogger.debug({ user: req.user._key }, 'User requested data download for study ' + req.params.studyKey)
 
       // purge files older than a week
-      const oneweek = 7 * 24 * 60 * 60
-      await dataZipper.purgeOldFiles(oneweek)
+      const oneday = 24 * 60 * 60
+      await dataZipper.purgeOldFiles(oneday)
       const filename = await dataZipper.zipStudyData(req.params.studyKey)
       res.send(filename)
     }

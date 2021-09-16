@@ -19,7 +19,7 @@ export default {
   async purgeOldFiles (timeoutSecs) {
     applogger.debug('Purging zip files older than ' + timeoutSecs + ' s')
     const filenames = await fs.promises.readdir(this.tempFolderPath)
-    const timeAgo = new Date(new Date().getTime() - (timeoutSecs * 60 * 60 * 24 * 7))
+    const timeAgo = new Date(new Date().getTime() - (timeoutSecs * 1000))
 
     for (const filename of filenames) {
       if (filename.endsWith('.zip')) {
