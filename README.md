@@ -20,6 +20,20 @@ To start Arango, you can either [install it](https://www.arangodb.com/), or use 
 `docker run -e ARANGO_NO_AUTH=1 -p 127.0.0.1:8529:8529 --name mobiArango arangodb`
 to start a Docker container with Arango. You can then access the web interface on http://localhost:8529
 
+### Configuration
+
+For development, it is easier to create a configuration file, which must be named config.json and placed under the config folder.
+See config.template.json under the same folder as an example.
+You can remove the "cert" part if you don't have an https certificate and you can leave random data inside "outlook" and "environmentAPIs" if you don't have an account on those services (Microsoft Outlook, OpenWeatherMap and Ambee).
+The part under "auth" configures the admin user of the server, you can specify the email address and password that you like.
+The "logs" part is for setting up the logging system. Inside "folder" you can user "logs", which is also included in this repository.
+
+The part under "db" is important and is linked to how you configure Arango.
+Your Arango instance should have a user and a database dedicated to Mobsitudy.
+Once Arango is started, open the interface at http://localhost:8529, then login using the root user. If you used used ARANGO_NO_AUTH, no password should be needed.
+
+Once inside, create a new user (you can call it “mobistudy”) and a new database (you can also call it “mobistudy”) and associate the new database to the new user. These details (database name, user name and the user password) are the same that you need to specify in the config file under “db”.
+
 ## Run
 
 The code is written using ES6 module, so you need a recent version of NodeJS.
@@ -52,11 +66,14 @@ project
 │   └───i18n                // internationalised text
 │   │   └───en              // English text
 │   │   └───sv              // Swedish text
+│   │   └───es              // Spanish text
 │   └───routes              // API endpoints
 │   └───services            // application logic
 └───test                    // automatic tests and experiments
     └───jest                // unit tests specs
 ```
+
+Run `npm run dev` to start a self-restarting server. This needs `nodemon` package to be installed globally, do that with `npm i -g nodemon`.
 
 ## Contribute
 
