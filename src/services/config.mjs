@@ -61,6 +61,8 @@ export default function () {
     if (config.environmentAPIs === undefined) config.environmentAPIs = {}
     if (config.environmentAPIs.OpenWeatherMap === undefined) config.environmentAPIs.OpenWeatherMap = (getSwarmSecret('OWP_API_KEY') || process.env.OWP_API_KEY)
     if (config.environmentAPIs.Ambee === undefined) config.environmentAPIs.Ambee = (getSwarmSecret('AMBEE_API_KEY') || process.env.AMBEE_API_KEY)
+
+    if (config.mSafety.webhookAuthKey === undefined) config.mSafety.webhookAuthKey = (getSwarmSecret('MSAFETY_WEBHOOKAUTHKEY') || process.env.MSAFETY_WEBHOOKAUTHKEY)
   }
   return config
 }

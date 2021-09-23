@@ -24,7 +24,7 @@ to start a Docker container with Arango. You can then access the web interface o
 
 For development, it is easier to create a configuration file, which must be named config.json and placed under the config folder.
 See config.template.json under the same folder as an example.
-You can remove the "cert" part if you don't have an https certificate and you can leave random data inside "outlook" and "environmentAPIs" if you don't have an account on those services (Microsoft Outlook, OpenWeatherMap and Ambee).
+You can remove the "cert" part if you don't have an https certificate and you can leave random data inside "outlook", "environmentAPIs" and "mSafety" if you don't have an account on those services.
 The part under "auth" configures the admin user of the server, you can specify the email address and password that you like.
 The "logs" part is for setting up the logging system. Inside "folder" you can user "logs", which is also included in this repository.
 
