@@ -46,19 +46,23 @@ export default async function () {
 
     // parse the data and check the auth code
     if (req.headers.authkey === config.mSafety.webhookAuthKey) {
-      for (const pubdata of req.body.pubDataItems) {
-        if (pubdata.type === 'device' && pubdata.event === 'sensors') {
-          const deviceId = pubdata.deviceId
-          const filename = '/sensor_' + deviceId + '_' + ts + '.txt'
-          try {
-            filehandle = await fsOpen(dir + filename, 'w')
-            const text = JSON.stringify(pubdata.jsonData)
-            await filehandle.writeFile(text)
-          } catch (err) {
-            console.error(err)
-            applogger.error(err, 'cannot save sensors data mSafety file' + filename)
-          } finally {
-            if (filehandle) await filehandle.close()
+      if (req.body.pubDataItems) {
+        for (const pubdata of req.body.pubDataItems) {
+          if (pubdata.type === 'device' && pubdata.event === 'sensors') {
+            const deviceId = pubdata.deviceId
+            if (deviceId) {
+              const filename = '/sensor_' + deviceId + '_' + ts + '.txt'
+              try {
+                filehandle = await fsOpen(dir + filename, 'w')
+                const text = JSON.stringify(pubdata.jsonData)
+                await filehandle.writeFile(text)
+              } catch (err) {
+                console.error(err)
+                applogger.error(err, 'cannot save sensors data mSafety file' + filename)
+              } finally {
+                if (filehandle) await filehandle.close()
+              }
+            }
           }
         }
       }
