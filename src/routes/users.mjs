@@ -78,8 +78,9 @@ export default async function () {
 
   router.post('/resetPassword', async function (req, res) {
     if (req.body.token && req.body.password) {
+      let decoded
       try {
-        var decoded = jwt.verify(req.body.token, config.auth.secret)
+        decoded = jwt.verify(req.body.token, config.auth.secret)
       } catch (err) {
         applogger.error(err, 'Resetting password, cannot parse token')
         return res.sendStatus(500)
