@@ -7,6 +7,7 @@ import express from 'express'
 import { open } from 'fs/promises'
 
 const router = express.Router()
+const UPLOADSDIR = 'tasksuploads'
 
 export default async function () {
   // webhook for mSafety data
@@ -15,7 +16,7 @@ export default async function () {
     const ts = new Date().getTime()
     let filehandle
     try {
-      filehandle = await open('request_' + ts + '.txt', 'w')
+      filehandle = await open(UPLOADSDIR + '/request_' + ts + '.txt', 'w')
       const text = JSON.stringify({
         headers: req.headers,
         body: req.body

@@ -1,6 +1,5 @@
 /node_modules
 /logs
 /tmp
-/tasksfiles
 config.json
 .DS_Store
