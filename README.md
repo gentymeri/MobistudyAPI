@@ -152,6 +152,9 @@ Development:
 - [Felix Morau](https://github.com/femosc2)
 - [Milo Bengtsson](https://github.com/palladog)
 - [Daniel Abella](https://github.com/assimilate)
+- [Kevin Tsang](https://github.com/kevinchtsang)
+- [Gent Ymeri](https://github.com/gentymeri)
+
 
 ## License
 
