@@ -27,7 +27,7 @@ export default function () {
       const configfile = fs.readFileSync('./config/config.json', 'utf8')
       config = JSON.parse(configfile)
     } catch (err) {
-      console.log('No config file was specified, using secrets or defaults')
+      console.log('No config file was specified, using env variable or secrets')
       config = {}
     }
     if (config.web === undefined) config.web = {}
@@ -64,6 +64,8 @@ export default function () {
 
     if (config.mSafety === undefined) config.mSafety = {}
     if (config.mSafety.webhookAuthKey === undefined) config.mSafety.webhookAuthKey = (getSwarmSecret('MSAFETY_WEBHOOKAUTHKEY') || process.env.MSAFETY_WEBHOOKAUTHKEY)
+    if (config.mSafety.publicKey === undefined) config.mSafety.publicKey = (getSwarmSecret('MSAFETY_PUBLICKEY') || process.env.MSAFETY_PUBLICKEY)
+    if (config.mSafety.privateKey === undefined) config.mSafety.privateKey = (getSwarmSecret('MSAFETY_PRIVATEKEY') || process.env.MSAFETY_PRIVATEKEY)
   }
   return config
 }
