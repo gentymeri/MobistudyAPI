@@ -28,6 +28,7 @@
     "passport-local": "^1.0.0",
     "pino": "^5.17.0",
     "rotating-file-stream": "^1.4.6",
+    "tweetnacl": "^1.0.3",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
