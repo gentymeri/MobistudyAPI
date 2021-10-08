@@ -164,11 +164,11 @@ export default async function () {
       ) {
         return res.sendStatus(403)
       }
-      if (req.user.role === 'researcher') return res.status(403)
+      if (req.user.role === 'researcher') return res.sendStatus(403)
       try {
         const userKey = req.params.userKey
         const participant = await DAO.getParticipantByUserKey(userKey)
-        if (!participant) return res.status(404)
+        if (!participant) return res.sendStatus(404)
 
         // Remove Answers
         await DAO.deleteAnswersByUser(userKey)
@@ -350,12 +350,12 @@ export default async function () {
       ) {
         return res.sendStatus(403)
       }
-      if (req.user.role === 'researcher') return res.status(403)
+      if (req.user.role === 'researcher') return res.sendStatus(403)
       try {
         const participant = await DAO.getParticipantByUserKey(
           req.params.userKey
         )
-        if (!participant) return res.status(404)
+        if (!participant) return res.sendStatus(404)
         newparticipant = await DAO.updateParticipant(
           participant._key,
           newparticipant
@@ -421,7 +421,7 @@ export default async function () {
         }
         if (!userKey || !studyKey) return res.sendStatus(400)
         const participant = await DAO.getParticipantByUserKey(userKey)
-        if (!participant) return res.status(404)
+        if (!participant) return res.sendStatus(404)
 
         // Updated Time Stamp
         participant.updatedTS = new Date()
