@@ -1,0 +1,13 @@
+{
+  "userKey": "asdasd",
+  "studyKey": "SUAGT",
+  "taskId": 8,
+  "dataType": "distance",
+  "createdTS": "timestamp on the server",
+  "positions": [],
+  "distance": 600,
+  "steps": 433,
+  "borgScale": 5,
+  "angle": 180,
+  "time": "00:00"
+}

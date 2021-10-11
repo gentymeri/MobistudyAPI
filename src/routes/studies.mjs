@@ -283,6 +283,8 @@ export default async function () {
           await DAO.deletePeakFlowDataByStudy(studykey)
           await DAO.deletePositionsByStudy(studykey)
           await DAO.deleteFingerTappingsByStudy(studykey)
+          await DAO.deleteSUAGTDataByStudy(studykey)
+
 
           // Deleting the study
           await DAO.deleteStudy(studykey)
