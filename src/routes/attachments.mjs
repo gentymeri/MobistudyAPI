@@ -5,13 +5,10 @@
 
 import express from 'express'
 import passport from 'passport'
-import { open as fsOpen, stat as fsStat, mkdir as fsMkdir } from 'fs/promises'
-import { applogger } from '../services/logger.mjs'
-import auditLogger from '../services/auditLogger.mjs'
+import { saveAttachment } from '../services/attachments.mjs'
 import { DAO } from '../DAO/DAO.mjs'
 
 const router = express.Router()
-const UPLOADSDIR = 'tasksuploads'
 
 export default async function () {
   // webhook for mSafety data
@@ -31,51 +28,19 @@ export default async function () {
     const taskItem = study.taskItemsConsent.find(ti => ti.taskId === taskId)
     if (!taskItem) return res.sendStatus(400)
 
-    // create the study folder
-    const studyDir = UPLOADSDIR + '/' + studyKey
-    try {
-      await fsStat(studyDir)
-    } catch (err) {
-      await fsMkdir(studyDir, { recursive: true })
-    }
-
-    // create the task folder
-    const taskDir = studyDir + '/' + taskId
-    try {
-      await fsStat(taskDir)
-    } catch (err) {
-      await fsMkdir(taskDir, { recursive: true })
-    }
-
-    // make up a file name
+    // as file id let's use a timestamp
     const ts = new Date().getTime()
-    const filename = 'attach_' + userKey + '_' + ts + '.json' // we assume it's always a json here
+    // let's create a writer from the request
+    const writer = await saveAttachment(userKey, studyKey, taskId, ts + '.json')
 
-    // create the file
-    let filehandle
-    try {
-      const filePath = taskDir + '/' + filename
-      filehandle = await fsOpen(filePath, 'w')
-      if (req.body && Object.keys(req.body).length !== 0) {
-        // if the body has already been parsed, save it
-        await filehandle.writeFile(req.body)
-      } else {
-        // else dump it raw
-        req.on('data', async (chunk) => {
-          await filehandle.writeFile(chunk)
-        })
-        req.on('end', async () => {
-          applogger.debug('Attachment file saved for user ' + userKey + ' study ' + studyKey + ' task ' + taskId + ' at ' + filePath)
-          res.sendStatus(200)
-          if (filehandle) await filehandle.close()
-        })
-      }
-    } catch (err) {
-      console.error(err)
-      applogger.error(err, 'Cannot save attachment')
-      res.sendStatus(500)
-      if (filehandle) await filehandle.close()
-    }
+    // else dump it raw
+    req.on('data', async (chunk) => {
+      await writer.writeChunk(chunk)
+    })
+    req.on('end', async () => {
+      await writer.end()
+      res.sendStatus(200)
+    })
   })
 
   return router
