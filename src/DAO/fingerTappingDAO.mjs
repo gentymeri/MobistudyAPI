@@ -12,6 +12,10 @@ export default async function (db) {
   const collection = await utils.getCollection(db, CollectionName)
 
   return {
+    fingerTappingTransaction () {
+      return CollectionName
+    },
+
     async getAllFingerTappings (dataCallback) {
       const filter = ''
       const query = 'FOR data IN ' + CollectionName + ' ' + filter + ' RETURN data'
@@ -64,15 +68,32 @@ export default async function (db) {
       } else return cursor.all()
     },
 
-    async createFingerTapping (newtappingData) {
-      const meta = await collection.save(newtappingData)
+    // creates new finger tapping data
+    // trx: optional, for transactions
+    async createFingerTapping (newtappingData, trx) {
+      let meta
+      if (trx) {
+        meta = await trx.step(() => collection.save(newtappingData))
+      } else {
+        meta = await collection.save(newtappingData)
+      }
+      applogger.trace(newtappingData, 'Creating finger tapping "' + meta._key + '"')
+
       newtappingData._key = meta._key
       return newtappingData
     },
 
     // udpates a study, we assume the _key is the correct one
-    async replaceFingerTapping (_key, newtappingData) {
-      const meta = await collection.replace(_key, newtappingData)
+    // trx: optional, for transactions
+    async replaceFingerTapping (_key, newtappingData, trx) {
+      let meta
+      if (trx) {
+        meta = await trx.step(() => collection.replace(_key, newtappingData))
+      } else {
+        meta = await collection.replace(_key, newtappingData)
+      }
+      applogger.trace(newtappingData, 'Replacing finger tapping "' + _key + '"')
+
       newtappingData._key = meta._key
       return newtappingData
     },
@@ -83,24 +104,35 @@ export default async function (db) {
     },
 
     // deletes tappingData
-    async deleteFingerTapping (_key) {
-      await collection.remove(_key)
+    async deleteFingerTapping (_key, trx) {
+      if (trx) {
+        await trx.step(() => collection.remove(_key))
+      } else {
+        await collection.remove(_key)
+      }
+      applogger.trace('Deleting finger tapping "' + _key + '"')
       return true
     },
 
     // deletes all data based on study
     async deleteFingerTappingsByStudy (studyKey) {
+      applogger.trace('Deleting all finger tapping by study "' + studyKey + '"')
       const tappingData = await this.getFingerTappingsByStudy(studyKey)
       for (let i = 0; i < tappingData.length; i++) {
-        await this.deleteFingerTapping(tappingData[i]._key)
+        const ftKey = tappingData[i]._key
+        applogger.trace('Deleting finger tapping "' + ftKey + '"')
+        await this.deleteFingerTapping(ftKey)
       }
     },
 
     // deletes all data based on user
     async deleteFingerTappingsByUser (userKey) {
+      applogger.trace('Deleting all finger tapping by user "' + userKey + '"')
       const tappingData = await this.getFingerTappingsByUser(userKey)
       for (let i = 0; i < tappingData.length; i++) {
-        await this.deleteFingerTapping(tappingData[i]._key)
+        const ftKey = tappingData[i]._key
+        applogger.trace('Deleting finger tapping "' + ftKey + '"')
+        await this.deleteFingerTapping(ftKey)
       }
     }
   }
