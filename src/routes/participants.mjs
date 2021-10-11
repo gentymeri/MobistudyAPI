@@ -11,6 +11,7 @@ import { applogger } from '../services/logger.mjs'
 import auditLogger from '../services/auditLogger.mjs'
 import { studyStatusUpdateCompose } from '../services/emailComposer.mjs'
 import { sendEmail } from '../services/mailSender.mjs'
+import { deleteAttachmentsByUser } from '../services/attachments.mjs'
 
 const router = express.Router()
 
@@ -196,6 +197,9 @@ export default async function () {
 
         // Remove tapping Data
         await DAO.deleteFingerTappingsByUser(userKey)
+
+        // Remove attachments
+        await deleteAttachmentsByUser(userKey)
 
         // Remove Audit logs
         await DAO.deleteLogsByUser(userKey)

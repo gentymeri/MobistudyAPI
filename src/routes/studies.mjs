@@ -9,6 +9,7 @@ import passport from 'passport'
 import { DAO } from '../DAO/DAO.mjs'
 import { applogger } from '../services/logger.mjs'
 import auditLogger from '../services/auditLogger.mjs'
+import { deleteAttachmentsByStudy } from '../services/attachments.mjs'
 
 const router = express.Router()
 
@@ -283,6 +284,7 @@ export default async function () {
           await DAO.deletePeakFlowDataByStudy(studykey)
           await DAO.deletePositionsByStudy(studykey)
           await DAO.deleteFingerTappingsByStudy(studykey)
+          await deleteAttachmentsByStudy(studykey)
 
           // Deleting the study
           await DAO.deleteStudy(studykey)
