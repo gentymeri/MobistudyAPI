@@ -18,6 +18,9 @@ const DAO = {
       return nextValues.shift()
     }
   },
+  async getAllUsersByCriteria (role, studyKeys, dataCallback) {
+    return this.getNextData(dataCallback)
+  },
   async getParticipantsByStudy (studykey, currentStatus, dataCallback) {
     return this.getNextData(dataCallback)
   },
