@@ -9,58 +9,30 @@ import passport from 'passport'
 import { DAO } from '../DAO/DAO.mjs'
 import { applogger } from '../services/logger.mjs'
 import auditLogger from '../services/auditLogger.mjs'
+import { saveAttachment } from '../services/attachments.mjs'
 
 const router = express.Router()
 
 export default async function () {
   // Get all tapping data
-  // query params: studyKey to filter by study
+  // optional query param for researcher: studyKey to filter by study
   router.get('/fingerTapping', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       if (req.user.role === 'researcher') {
-        // extra check about the teams
-        if (req.query.teamKey) {
-          const team = await DAO.getOneTeam(req.query.teamKey)
-          if (!team.researchersKeys.includes(req.user._key)) return res.sendStatus(403)
-          else {
-            const tappingData = await DAO.getAllFingerTappings()
-            res.send(tappingData)
-          }
-        }
-        if (req.query.studyKey) {
-          const team = await DAO.getAllTeams(req.user._key, req.query.studyKey)
-          if (team.length === 0) return res.sendStatus(403)
-          else {
-            const tappingData = await DAO.getFingerTappingsByStudy(req.query.studyKey)
-            res.send(tappingData)
-          }
+        const team = await DAO.getAllTeams(req.user._key, req.query.studyKey)
+        if (team.length === 0) return res.sendStatus(403)
+        else {
+          const tappingData = await DAO.getFingerTappingsByStudy(req.query.studyKey)
+          res.send(tappingData)
         }
       } else if (req.user.role === 'participant') {
         const tappingData = await DAO.getFingerTappingsByUser(req.user._key)
         res.send(tappingData)
+      } else {
+        // admin
+        const tappingData = await DAO.getAllFingerTappings()
+        res.send(tappingData)
       }
-    } catch (err) {
-      applogger.error({ error: err }, 'Cannot retrieve tappingData')
-      res.sendStatus(500)
-    }
-  })
-
-  // Get tappingfor a user
-  router.get('/fingerTapping/:userKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    try {
-      const tappingData = await DAO.getFingerTappingsByUser(req.params.userKey)
-      res.send(tappingData)
-    } catch (err) {
-      applogger.error({ error: err }, 'Cannot retrieve tappingData')
-      res.sendStatus(500)
-    }
-  })
-
-  // Get tapping for a study for a user
-  router.get('/fingerTapping/:userKey/:studyKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    try {
-      const tappingData = await DAO.getFingerTappingsByUserAndStudy(req.params.userKey, req.params.studyKey)
-      res.send(tappingData)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve tappingData')
       res.sendStatus(500)
@@ -73,9 +45,24 @@ export default async function () {
     newtappingData.userKey = req.user._key
     if (!newtappingData.createdTS) newtappingData.createdTS = new Date()
     try {
-      newtappingData = await DAO.createFingerTapping(newtappingData)
-      // also update task status
+      // separate tappingData from the object stored on the database
+      const tappingData = newtappingData.tappingData
+      delete newtappingData.tappingData
 
+      // store the database data
+      newtappingData = await DAO.createFingerTapping(newtappingData)
+
+      // save the attachment
+      const filename = newtappingData._key + '.json'
+      const writer = await saveAttachment(newtappingData.userKey, newtappingData.studyKey, newtappingData.taskId, filename)
+      writer.writeChunk(JSON.stringify(tappingData))
+      writer.end()
+
+      // save the filename
+      newtappingData.attachments = [filename]
+      newtappingData = await DAO.replaceFingerTapping(newtappingData._key, newtappingData)
+
+      // also update task status
       const participant = await DAO.getParticipantByUserKey(req.user._key)
       if (!participant) return res.sendStatus(404)
       const study = participant.studies.find((s) => {

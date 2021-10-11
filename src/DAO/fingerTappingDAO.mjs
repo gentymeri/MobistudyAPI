@@ -70,6 +70,13 @@ export default async function (db) {
       return newtappingData
     },
 
+    // udpates a study, we assume the _key is the correct one
+    async replaceFingerTapping (_key, newtappingData) {
+      const meta = await collection.replace(_key, newtappingData)
+      newtappingData._key = meta._key
+      return newtappingData
+    },
+
     async getOneFingerTapping (_key) {
       const tappingData = await collection.document(_key)
       return tappingData
