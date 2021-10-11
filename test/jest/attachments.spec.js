@@ -73,7 +73,6 @@ describe('when saving an attachment', () => {
     } catch (err) {
       // OK!
     }
-
     try {
       stat = await fsStat('tasksuploads/678/123/')
       fail('it should not reach here')
