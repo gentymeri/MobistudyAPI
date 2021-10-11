@@ -44,6 +44,20 @@ export async function initializeDAO () {
   db.useDatabase(config.db.name)
   db.useBasicAuth(config.db.user, config.db.password)
 
+  DAO.startTransaction = async (names) => {
+    return db.beginTransaction({
+      write: names
+    })
+  }
+
+  DAO.endTransaction = async (transaction) => {
+    return transaction.commit()
+  }
+
+  DAO.abortTransation = async (transaction) => {
+    if (transaction) return transaction.abort()
+  }
+
   const studies = await getStudiesDAO(db)
   DAO = Object.assign(studies, DAO)
   const forms = await getFormsDAO(db)
