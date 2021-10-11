@@ -9,13 +9,13 @@
     "start": "node ./src/www.mjs",
     "dev": "nodemon ",
     "test": "jest --updateSnapshot -i --env=node",
-    "test:watch": "jest --watch -i --env=node",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch -i --env=node",
     "test:watchAll": "jest --watchAll -i --env=node"
   },
   "dependencies": {
     "arangojs": "^7.5.0",
     "archiver": "^5.3.0",
-    "axios": "^0.21.2",
+    "axios": "^0.21.4",
     "bcrypt": "^5.0.1",
     "express": "^4.17.1",
     "express-pino-logger": "^4.0.0",
@@ -28,17 +28,18 @@
     "passport-local": "^1.0.0",
     "pino": "^5.17.0",
     "rotating-file-stream": "^1.4.6",
+    "tweetnacl": "^1.0.3",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
-    "eslint": "^7.27.0",
+    "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.23.3",
+    "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
-    "jest": "^24.9.0",
+    "jest": "^25.5.4",
     "jest-esnext": "0.0.4",
     "node-docker-api": "^1.1.22",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.13"
   }
 }

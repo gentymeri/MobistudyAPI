@@ -30,6 +30,11 @@
     "user": "actual user",
     "password": "actual user password"
   },
+  "mSafety": {
+    "webhookAuthKey": "zxzxzxzxzx",
+    "publicKey": "asasa=",
+    "privateKey": "erwerwrwe="
+  },
   "environmentAPIs": {
     "OpenWeatherMap": "KEY",
     "Ambee": "KEY"

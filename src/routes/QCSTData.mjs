@@ -76,14 +76,14 @@ export default async function () {
       newQCSTData = await DAO.createQCSTData(newQCSTData)
       // also update task status
       const participant = await DAO.getParticipantByUserKey(req.user._key)
-      if (!participant) return res.status(404)
+      if (!participant) return res.sendStatus(404)
 
       const study = participant.studies.find((s) => {
         return s.studyKey === newQCSTData.studyKey
       })
-      if (!study) return res.status(400)
+      if (!study) return res.sendStatus(400)
       const taskItem = study.taskItemsConsent.find(ti => ti.taskId === newQCSTData.taskId)
-      if (!taskItem) return res.status(400)
+      if (!taskItem) return res.sendStatus(400)
       taskItem.lastExecuted = newQCSTData.createdTS
       // update the participant
       await DAO.replaceParticipant(participant._key, participant)

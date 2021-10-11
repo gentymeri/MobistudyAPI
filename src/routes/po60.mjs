@@ -78,14 +78,14 @@ export default async function () {
 
       const participant = await DAO.getParticipantByUserKey(req.user._key)
       applogger.info({ userKey: req.user._key, taskId: newPO60Data.taskId, studyKey: newPO60Data.studyKey }, 'Finding participant')
-      if (!participant) return res.status(404)
+      if (!participant) return res.sendStatus(404)
       applogger.info({ userKey: req.user._key, taskId: newPO60Data.taskId, studyKey: newPO60Data.studyKey }, 'Found participant')
       const study = participant.studies.find((s) => {
         return s.studyKey === newPO60Data.studyKey
       })
-      if (!study) return res.status(400)
+      if (!study) return res.sendStatus(400)
       const taskItem = study.taskItemsConsent.find(ti => ti.taskId === newPO60Data.taskId)
-      if (!taskItem) return res.status(400)
+      if (!taskItem) return res.sendStatus(400)
       taskItem.lastExecuted = newPO60Data.createdTS
       // update the participant
       await DAO.replaceParticipant(participant._key, participant)

@@ -7,6 +7,7 @@ import fs from 'fs'
 import archiver from 'archiver'
 import { applogger } from './logger.mjs'
 import { DAO } from '../DAO/DAO.mjs'
+import { getAttachments } from '../../src/services/attachments.mjs'
 
 export default {
 
@@ -124,6 +125,12 @@ export default {
         // fingerTapping
         return DAO.getFingerTappingsByStudy(studyKey, (a) => {
           archive.append(JSON.stringify(a), { name: 'fingerTapping/' + a._key + '.json' })
+        })
+      }).then(() => {
+        // attachments
+
+        return getAttachments(studyKey, (res) => {
+          archive.append(res.content, { name: 'attachments/' + res.task + '/' + res.user + '/' + res.file })
         })
       }).then(() => {
         return archive.finalize()

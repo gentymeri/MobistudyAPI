@@ -33,7 +33,6 @@ import PO60Router from './routes/po60.mjs'
 import PeakFlowRouter from './routes/peakflow.mjs'
 import PositionsRouter from './routes/positions.mjs'
 import fingerTappingRouter from './routes/fingerTapping.mjs'
-import SUAGTRouter from './routes/SUAGTData.mjs'
 
 export default async function () {
   const app = express()
@@ -85,7 +84,6 @@ export default async function () {
   app.use(apiPrefix, await PeakFlowRouter())
   app.use(apiPrefix, await PositionsRouter())
   app.use(apiPrefix, await fingerTappingRouter())
-  app.use(apiPrefix, await SUAGTRouter())
 
   // error handler
   app.use(function (err, req, res, next) {
