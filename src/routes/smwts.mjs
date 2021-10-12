@@ -44,53 +44,60 @@ export default async function () {
     }
   })
 
-  // Get SMWT data for a user
-  router.get('/SMWTData/:userKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    try {
-      const storeData = await DAO.getSmwtsByUser(req.params.userKey)
-      res.send(storeData)
-    } catch (err) {
-      applogger.error({ error: err }, 'Cannot retrieve SMWT data')
-      res.sendStatus(500)
-    }
-  })
-
-  // Get SMWT data for a study for a user
-  router.get('/SMWTData/:userKey/:studyKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    try {
-      const storeData = await DAO.getSmwtsByUserAndStudy(req.params.userKey, req.params.studyKey)
-      res.send(storeData)
-    } catch (err) {
-      applogger.error({ error: err }, 'Cannot retrieve SMWT Data ')
-      res.sendStatus(500)
-    }
-  })
-
   router.post('/SMWTData', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    let newSMWTData = req.body
+    let newSmwt = req.body
     if (req.user.role !== 'participant') return res.sendStatus(403)
-    newSMWTData.userKey = req.user._key
-    if (!newSMWTData.createdTS) newSMWTData.createdTS = new Date()
+    newSmwt.userKey = req.user._key
+    if (!newSmwt.createdTS) newSmwt.createdTS = new Date()
+    let trans
     try {
-      newSMWTData = await DAO.createSmwt(newSMWTData)
-      // also update task status
       const participant = await DAO.getParticipantByUserKey(req.user._key)
       if (!participant) return res.sendStatus(404)
-
       const study = participant.studies.find((s) => {
-        return s.studyKey === newSMWTData.studyKey
+        return s.studyKey === newSmwt.studyKey
       })
       if (!study) return res.sendStatus(400)
-      const taskItem = study.taskItemsConsent.find(ti => ti.taskId === newSMWTData.taskId)
+      const taskItem = study.taskItemsConsent.find(ti => ti.taskId === newSmwt.taskId)
       if (!taskItem) return res.sendStatus(400)
-      taskItem.lastExecuted = newSMWTData.createdTS
+
+      trans = await DAO.startTransaction([DAO.smwtTransaction(), DAO.participantsTransaction()])
+
+      // separate raw data from the object stored on the database
+      const positions = newSmwt.positions
+      delete newSmwt.positions
+      const steps = newSmwt.steps
+      delete newSmwt.steps
+
+      // store the data on the database
+      newSmwt = await DAO.createSmwt(newSmwt, trans)
+
+      // save the attachments
+      const positionsFilename = 'positions_' + newSmwt._key + '.json'
+      let writer = await saveAttachment(newSmwt.userKey, newSmwt.studyKey, newSmwt.taskId, positionsFilename)
+      await writer.writeChunk(JSON.stringify(positions))
+      await writer.end()
+      const stepsFilename = 'steps_' + newSmwt._key + '.json'
+      writer = await saveAttachment(newSmwt.userKey, newSmwt.studyKey, newSmwt.taskId, stepsFilename)
+      await writer.writeChunk(JSON.stringify(steps))
+      await writer.end()
+
+      // save the filename
+      newSmwt.attachments = [positionsFilename, stepsFilename]
+      newSmwt = await DAO.replaceSmwt(newSmwt._key, newSmwt, trans)
+
+      // also update task status
+      taskItem.lastExecuted = newSmwt.createdTS
       // update the participant
-      await DAO.replaceParticipant(participant._key, participant)
+      await DAO.replaceParticipant(participant._key, participant, trans)
+
+      // all done now
+      DAO.endTransaction(trans)
+
       res.sendStatus(200)
-      applogger.info({ userKey: req.user._key, taskId: newSMWTData.taskId, studyKey: newSMWTData.studyKey }, 'Participant has sent SMWT data')
-      auditLogger.log('SMWTDataCreated', req.user._key, newSMWTData.studyKey, newSMWTData.taskId, 'SMWT data created by participant with key ' + participant._key + ' for study with key ' + newSMWTData.studyKey, 'SMWTData', newSMWTData._key, newSMWTData)
+      applogger.info({ userKey: req.user._key, taskId: newSmwt.taskId, studyKey: newSmwt.studyKey }, 'Participant has sent a new smwt')
+      auditLogger.log('SMWTDataCreated', req.user._key, newSmwt.studyKey, newSmwt.taskId, 'Smwt data created by participant with key ' + participant._key + ' for study with key ' + newSmwt.studyKey, 'SMWTData', newSmwt._key, newSmwt)
     } catch (err) {
-      applogger.error({ error: err }, 'Cannot store new SMWT Data')
+      applogger.error({ error: err }, 'Cannot store new smwt')
       res.sendStatus(500)
     }
   })
