@@ -278,7 +278,7 @@ export default async function () {
           await DAO.deleteAnswersByStudy(studykey)
           await DAO.deleteHealthStoreByStudy(studykey)
           await DAO.deleteQCSTDataByStudy(studykey)
-          await DAO.deleteSMWTDataByStudy(studykey)
+          await DAO.deleteSmwtByStudy(studykey)
           await DAO.deleteMiband3DataByStudy(studykey)
           await DAO.deletePO60DataByStudy(studykey)
           await DAO.deletePeakFlowDataByStudy(studykey)

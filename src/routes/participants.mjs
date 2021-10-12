@@ -184,7 +184,7 @@ export default async function () {
         await DAO.deleteQCSTDataByUser(userKey)
 
         // Remove SMWT Data
-        await DAO.deleteSMWTDataByUser(userKey)
+        await DAO.deleteSmwtByUser(userKey)
 
         // Remove PO60 Data
         await DAO.deletePO60DataByUser(userKey)
@@ -262,7 +262,7 @@ export default async function () {
         await DAO.deleteQCSTDataByUser(userKey)
 
         // Remove SMWT Data
-        await DAO.deleteSMWTDataByUser(userKey)
+        await DAO.deleteSmwtByUser(userKey)
 
         // Remove PO60 Data
         await DAO.deletePO60DataByUser(userKey)

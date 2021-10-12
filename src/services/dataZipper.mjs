@@ -108,7 +108,7 @@ export default {
         })
       }).then(() => {
         // smwt
-        return DAO.getSMWTDataByStudy(studyKey, (a) => {
+        return DAO.getSmwtsDataByStudy(studyKey, (a) => {
           archive.append(JSON.stringify(a), { name: 'smwt/' + a._key + '.json' })
         })
       }).then(() => {

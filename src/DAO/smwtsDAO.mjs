@@ -7,13 +7,18 @@
 import utils from './utils.mjs'
 import { applogger } from '../services/logger.mjs'
 
+const COLLECTIONNAME = 'smwts'
+
 export default async function (db, logger) {
-  const collection = await utils.getCollection(db, 'SMWTData')
+  const collection = await utils.getCollection(db, COLLECTIONNAME)
 
   return {
-    async getAllSMWTData (dataCallback) {
-      const filter = ''
-      const query = 'FOR data IN SMWTData ' + filter + ' RETURN data'
+    smwtTransaction () {
+      return COLLECTIONNAME
+    },
+
+    async getAllSmwts (dataCallback) {
+      const query = `FOR data IN ${COLLECTIONNAME} RETURN data`
       applogger.trace('Querying "' + query + '"')
       const cursor = await db.query(query)
       if (dataCallback) {
@@ -24,8 +29,8 @@ export default async function (db, logger) {
       } else return cursor.all()
     },
 
-    async getSMWTDataByUser (userKey, dataCallback) {
-      const query = 'FOR data IN SMWTData FILTER data.userKey == @userKey RETURN data'
+    async getSmwtsByUser (userKey, dataCallback) {
+      const query = `FOR data IN ${COLLECTIONNAME} FILTER data.userKey == @userKey RETURN data`
       const bindings = { userKey: userKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
@@ -37,8 +42,8 @@ export default async function (db, logger) {
       } else return cursor.all()
     },
 
-    async getSMWTDataByUserAndStudy (userKey, studyKey, dataCallback) {
-      const query = 'FOR data IN SMWTData FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
+    async getSmwtsByUserAndStudy (userKey, studyKey, dataCallback) {
+      const query = `FOR data IN ${COLLECTIONNAME} FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data`
       const bindings = { userKey: userKey, studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
@@ -50,8 +55,8 @@ export default async function (db, logger) {
       } else return cursor.all()
     },
 
-    async getSMWTDataByStudy (studyKey, dataCallback) {
-      const query = 'FOR data IN SMWTData FILTER data.studyKey == @studyKey RETURN data'
+    async getSmwtsDataByStudy (studyKey, dataCallback) {
+      const query = `FOR data IN ${COLLECTIONNAME} FILTER data.studyKey == @studyKey RETURN data`
       const bindings = { studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
@@ -63,36 +68,36 @@ export default async function (db, logger) {
       } else return cursor.all()
     },
 
-    async createSMWTData (newSMWTData) {
+    async createSmwt (newSMWTData) {
       const meta = await collection.save(newSMWTData)
       newSMWTData._key = meta._key
       return newSMWTData
     },
 
-    async getOneSMWTData (_key) {
+    async getOneSmwt (_key) {
       const SMWTData = await collection.document(_key)
       return SMWTData
     },
 
     // deletes SMWTData
-    async deleteSMWTData (_key) {
+    async deleteSmwt (_key) {
       await collection.remove(_key)
       return true
     },
 
     // deletes all data based on study
-    async deleteSMWTDataByStudy (studyKey) {
-      const SMWTData = await this.getSMWTDataByStudy(studyKey)
+    async deleteSmwtByStudy (studyKey) {
+      const SMWTData = await this.getSmwtsDataByStudy(studyKey)
       for (let i = 0; i < SMWTData.length; i++) {
-        await this.deleteSMWTData(SMWTData[i]._key)
+        await this.deleteSmwt(SMWTData[i]._key)
       }
     },
 
     // deletes all data based on participant
-    async deleteSMWTDataByUser (userKey) {
-      const SMWTData = await this.getSMWTDataByUser(userKey)
+    async deleteSmwtByUser (userKey) {
+      const SMWTData = await this.getSmwtsByUser(userKey)
       for (let i = 0; i < SMWTData.length; i++) {
-        await this.deleteSMWTData(SMWTData[i]._key)
+        await this.deleteSmwt(SMWTData[i]._key)
       }
     }
   }
