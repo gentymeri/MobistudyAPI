@@ -7,10 +7,16 @@
 import utils from './utils.mjs'
 import { applogger } from '../services/logger.mjs'
 
+const COLLECTIONNAME = 'healthStoreData'
+
 export default async function (db) {
-  const collection = await utils.getCollection(db, 'healthStoreData')
+  const collection = await utils.getCollection(db, COLLECTIONNAME)
 
   return {
+    healthStoreDataTransaction () {
+      return COLLECTIONNAME
+    },
+
     async getAllHealthStoreData () {
       const filter = ''
       const query = 'FOR data IN healthStoreData ' + filter + ' RETURN data'
@@ -48,10 +54,43 @@ export default async function (db) {
       } else return cursor.all()
     },
 
-    async createHealthStoreData (newHealthStoreData) {
-      const meta = await collection.save(newHealthStoreData)
+    /**
+     * Creates new healthstore data
+     * @param newHealthStoreData data to be created
+     * @param trx optiona, transaction
+     * @returns a promise with the new data created
+     */
+    async createHealthStoreData (newHealthStoreData, trx) {
+      let meta
+      if (trx) {
+        meta = await trx.step(() => collection.save(newHealthStoreData))
+      } else {
+        meta = await collection.save(newHealthStoreData)
+      }
+      applogger.trace(newHealthStoreData, 'Creating health store data "' + meta._key + '"')
+
       newHealthStoreData._key = meta._key
       return newHealthStoreData
+    },
+
+    /**
+     * Replace the healthstore data with a new one
+     * @param _key the key of the data
+     * @param newData the new data that will replace the old one
+     * @param trx optional, transaction
+     * @returns a promise with the new data
+     */
+    async replaceHealthStoreData (_key, newData, trx) {
+      let meta
+      if (trx) {
+        meta = await trx.step(() => collection.replace(_key, newData))
+      } else {
+        meta = await collection.replace(_key, newData)
+      }
+      applogger.trace(newData, 'Replacing healthstore data "' + _key + '"')
+
+      newData._key = meta._key
+      return newData
     },
 
     async getOneHealthStoreData (_key) {
