@@ -75,7 +75,7 @@ export default async function () {
 
       // also update task status
       taskItem.lastExecuted = newHealthStoreData.createdTS
-      await DAO.replaceParticipant(participant._key, participant)
+      await DAO.replaceParticipant(participant._key, participant, trans)
 
       // all done now
       DAO.endTransaction(trans)

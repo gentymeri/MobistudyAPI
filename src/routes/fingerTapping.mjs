@@ -76,7 +76,6 @@ export default async function () {
 
       // also update task status
       taskItem.lastExecuted = newtappingData.createdTS
-      // update the participant
       await DAO.replaceParticipant(participant._key, participant)
 
       DAO.endTransaction(trans)
