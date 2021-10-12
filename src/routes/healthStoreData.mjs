@@ -55,7 +55,7 @@ export default async function () {
       const taskItem = study.taskItemsConsent.find(ti => ti.taskId === newHealthStoreData.taskId)
       if (!taskItem) return res.sendStatus(400)
 
-      trans = await DAO.startTransaction([DAO.healthStoreDataTransaction()])
+      trans = await DAO.startTransaction([DAO.healthStoreDataTransaction(), DAO.participantsTransaction()])
 
       // separate raw data from the object stored on the database
       const hsData = newHealthStoreData.healthData

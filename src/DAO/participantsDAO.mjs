@@ -7,10 +7,16 @@
 import utils from './utils.mjs'
 import { applogger } from '../services/logger.mjs'
 
+const COLLECTIONNAME = 'participants'
+
 export default async function (db) {
-  const collection = await utils.getCollection(db, 'participants')
+  const collection = await utils.getCollection(db, COLLECTIONNAME)
 
   return {
+    participantsTransaction () {
+      return COLLECTIONNAME
+    },
+
     async getAllParticipants () {
       const filter = ''
       // TODO: use LIMIT @offset, @count in the query for pagination

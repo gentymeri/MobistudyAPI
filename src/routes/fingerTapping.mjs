@@ -55,7 +55,7 @@ export default async function () {
       const taskItem = study.taskItemsConsent.find(ti => ti.taskId === newtappingData.taskId)
       if (!taskItem) return res.sendStatus(400)
 
-      trans = await DAO.startTransaction([DAO.fingerTappingTransaction()])
+      trans = await DAO.startTransaction([DAO.fingerTappingTransaction(), DAO.participantsTransaction()])
 
       // separate tappingData from the object stored on the database
       const tappingData = newtappingData.tappingData
@@ -76,7 +76,7 @@ export default async function () {
 
       // also update task status
       taskItem.lastExecuted = newtappingData.createdTS
-      await DAO.replaceParticipant(participant._key, participant)
+      await DAO.replaceParticipant(participant._key, participant, trans)
 
       DAO.endTransaction(trans)
 
