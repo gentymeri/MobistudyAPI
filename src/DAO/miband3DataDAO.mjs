@@ -7,36 +7,52 @@
 import utils from './utils.mjs'
 import { applogger } from '../services/logger.mjs'
 
+const COLLECTIONNAME = 'miband3Data'
+
 export default async function (db) {
-  const collection = await utils.getCollection(db, 'miband3Data')
+  const collection = await utils.getCollection(db, COLLECTIONNAME)
 
   return {
-    async getAllMiband3Data () {
-      const filter = ''
-      const query = 'FOR data IN miband3Data ' + filter + ' RETURN data'
+    async getAllMiband3Data (dataCallback) {
+      const query = `FOR data IN ${COLLECTIONNAME} RETURN data`
       applogger.trace('Querying "' + query + '"')
       const cursor = await db.query(query)
-      return cursor.all()
+      if (dataCallback) {
+        while (cursor.hasNext) {
+          const a = await cursor.next()
+          dataCallback(a)
+        }
+      } else return cursor.all()
     },
 
-    async getMiband3DataByUser (userKey) {
-      const query = 'FOR data IN miband3Data FILTER data.userKey == @userKey RETURN data'
+    async getMiband3DataByUser (userKey, dataCallback) {
+      const query = `FOR data IN ${COLLECTIONNAME} FILTER data.userKey == @userKey RETURN data`
       const bindings = { userKey: userKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
-      return cursor.all()
+      if (dataCallback) {
+        while (cursor.hasNext) {
+          const a = await cursor.next()
+          dataCallback(a)
+        }
+      } else return cursor.all()
     },
 
-    async getMiband3DataByUserAndStudy (userKey, studyKey) {
-      const query = 'FOR data IN miband3Data FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
+    async getMiband3DataByUserAndStudy (userKey, studyKey, dataCallback) {
+      const query = `FOR data IN ${COLLECTIONNAME} FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data`
       const bindings = { userKey: userKey, studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
-      return cursor.all()
+      if (dataCallback) {
+        while (cursor.hasNext) {
+          const a = await cursor.next()
+          dataCallback(a)
+        }
+      } else return cursor.all()
     },
 
     async getMiband3DataByStudy (studyKey, dataCallback) {
-      const query = 'FOR data IN miband3Data FILTER data.studyKey == @studyKey RETURN data'
+      const query = `FOR data IN ${COLLECTIONNAME} FILTER data.studyKey == @studyKey RETURN data`
       const bindings = { studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       const cursor = await db.query(query, bindings)
@@ -48,10 +64,43 @@ export default async function (db) {
       } else return cursor.all()
     },
 
-    async createMiband3Data (newMiband3Data) {
-      const meta = await collection.save(newMiband3Data)
+    /**
+     * Create a new Mibadn3 data
+     * @param newMiband3Data new data to be created
+     * @param trx used for transactions, optional
+     * @returns a promise wth the newly created data
+     */
+    async createMiband3Data (newMiband3Data, trx) {
+      let meta
+      if (trx) {
+        meta = await trx.step(() => collection.save(newMiband3Data))
+      } else {
+        meta = await collection.save(newMiband3Data)
+      }
+      applogger.trace(newMiband3Data, 'Creating miband3 data with key ' + meta._key + '')
+
       newMiband3Data._key = meta._key
       return newMiband3Data
+    },
+
+    /**
+     * Replace existing miband3 data with new data
+     * @param _key key of the old data
+     * @param newData new data
+     * @param trx optional, used for transactions
+     * @returns a promise with the new data
+     */
+    async replaceMibadn3Data (_key, newData, trx) {
+      let meta
+      if (trx) {
+        meta = await trx.step(() => collection.replace(_key, newData))
+      } else {
+        meta = await collection.replace(_key, newData)
+      }
+      applogger.trace(newData, 'Replacing miband3 data with key ' + _key + '')
+
+      newData._key = meta._key
+      return newData
     },
 
     async getOneMiband3Data (_key) {
