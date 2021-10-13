@@ -178,7 +178,7 @@ async function decrypt (ciphertext, nonce, deviceId) {
 export default async function () {
   // create the msafety subfolder
   try {
-    await fsStat(UPLOADSDIR + '/' + MSAFETYSUBDIR)
+    await fsStat(msafetyDir)
   } catch (err) {
     fsMkdir(msafetyDir, { recursive: true })
   }
@@ -190,13 +190,13 @@ export default async function () {
     let filehandle
     // parse the data and check the auth code
     if (req.headers.authkey === config.mSafety.webhookAuthKey) {
-      if (req.body.pubDataItems) {
+      if (req.body && req.body.pubDataItems) {
         for (const pubdata of req.body.pubDataItems) {
           if (pubdata.type === 'device' && pubdata.event === 'sensors') {
             const deviceId = pubdata.deviceId
 
             // create the device-specific subfolder
-            const deviceDir = msafetyDir + deviceId
+            const deviceDir = msafetyDir + deviceId + '/'
             try {
               await fsStat(deviceDir)
             } catch (err) {
@@ -204,14 +204,13 @@ export default async function () {
             }
 
             if (deviceId) {
-              const filename = '/sensor_' + deviceId + '_' + ts + '.json'
+              const filename = 'sensor_' + ts + '.json'
               try {
                 filehandle = await fsOpen(deviceDir + filename, 'w')
                 const text = JSON.stringify(pubdata.jsonData)
                 await filehandle.writeFile(text)
               } catch (err) {
-                console.error(err)
-                applogger.error(err, 'cannot save sensors data mSafety file' + filename)
+                applogger.error(err, 'cannot save sensors data mSafety file: ' + filename)
               } finally {
                 if (filehandle) await filehandle.close()
               }
@@ -219,7 +218,7 @@ export default async function () {
           }
         }
       } else {
-        const filename = '/request_' + ts + '.txt'
+        const filename = 'request_' + ts + '.txt'
         applogger.debug('mSafety strange packet received, storing it raw on ' + filename)
         try {
           filehandle = await fsOpen(msafetyDir + filename, 'w')
@@ -242,8 +241,11 @@ export default async function () {
   // key exchange protocol
   router.post('/msafety/keyexchange/', async function (req, res) {
     const body = req.body
+    applogger.trace(body, 'msafety key exchange request')
+
     if (!body || !body.data) {
-      res.status(400).send('data was not passed in the post body.')
+      applogger.warn('msafety key exchange request without any body')
+      res.status(400).send('data was not passed in the post body')
       return
     }
     const ciphertext = body.data
@@ -253,7 +255,7 @@ export default async function () {
       const response = keyexchange(ciphertext, deviceId)
       res.send(response)
     } catch (err) {
-      console.error(err)
+      applogger.error(err, 'cannot generate msafety key exchange')
       res.sendStatus(500)
     }
   })
@@ -263,7 +265,7 @@ export default async function () {
     const body = req.body
 
     if (!body || !body.data) {
-      res.status(400).send('data was not passed in the post body.')
+      res.status(400).send('data was not passed in the post body')
       return
     }
 
