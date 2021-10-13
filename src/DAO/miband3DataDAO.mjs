@@ -13,6 +13,10 @@ export default async function (db) {
   const collection = await utils.getCollection(db, COLLECTIONNAME)
 
   return {
+    miband3DataTransaction () {
+      return COLLECTIONNAME
+    },
+
     async getAllMiband3Data (dataCallback) {
       const query = `FOR data IN ${COLLECTIONNAME} RETURN data`
       applogger.trace('Querying "' + query + '"')
@@ -90,7 +94,7 @@ export default async function (db) {
      * @param trx optional, used for transactions
      * @returns a promise with the new data
      */
-    async replaceMibadn3Data (_key, newData, trx) {
+    async replaceMiband3Data (_key, newData, trx) {
       let meta
       if (trx) {
         meta = await trx.step(() => collection.replace(_key, newData))
