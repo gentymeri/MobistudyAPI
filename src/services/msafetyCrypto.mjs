@@ -457,6 +457,8 @@ class HandshakeState {
      * are no more message tokens to process.
      */
   ReadMessage (message) {
+    console.log('ReadMessage MESSAGE', message)
+    
     const messagePatterns = this.messagePatterns.shift()
     let ciphertext = Buffer.concat([Buffer.alloc(0), message])
 

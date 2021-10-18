@@ -87,6 +87,10 @@ async function updateSession (deviceId, session) {
  */
 function keyexchange (ciphertext, deviceId) {
   const [message, rx, tx] = handshake(ciphertext)
+  console.log('handshake message', message)
+  console.log('handshake rx', rx)
+  console.log('handshake tx', tx)
+
   storeSession(deviceId, rx, tx)
 
   return { data: message.toString('base64') }
@@ -101,6 +105,9 @@ function keyexchange (ciphertext, deviceId) {
 function handshake (ciphertext) {
   const handshakeState = new HandshakeState()
   handshakeState.Initialize('NK', false, Buffer.alloc(0), KEYPAIR, null, null, null)
+
+  console.log('handshake HANDSHAKETEST', handshakeState)
+
   handshakeState.ReadMessage(Buffer.from(ciphertext, 'base64'))
   const response = handshakeState.WriteMessage(Buffer.alloc(0))
 
