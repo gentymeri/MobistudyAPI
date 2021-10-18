@@ -261,7 +261,7 @@ export default async function () {
       return
     }
     const ciphertext = body.data
-    const deviceId = body.deviceId
+    const deviceId = req.query.deviceId
 
     console.log('DEVICE ID IS ' + deviceId)
 
