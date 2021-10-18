@@ -86,6 +86,9 @@ async function updateSession (deviceId, session) {
  * @return {object} an object containing the message as base64 encoded string.
  */
 function keyexchange (ciphertext, deviceId) {
+  console.log('CIPHERTEXT', ciphertext)
+  console.log('DEVICEID', deviceId)
+
   const [message, rx, tx] = handshake(ciphertext)
   console.log('handshake message', message)
   console.log('handshake rx', rx)
@@ -257,6 +260,8 @@ export default async function () {
     }
     const ciphertext = body.data
     const deviceId = req.query.deviceId
+
+    console.log('DEVICE ID IS ' + deviceId)
 
     try {
       const response = keyexchange(ciphertext, deviceId)
