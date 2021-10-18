@@ -265,6 +265,8 @@ export default async function () {
 
     console.log('DEVICE ID IS ' + deviceId)
 
+    console.log('DEVICE ID IS ' + deviceId)
+
     try {
       const response = keyexchange(ciphertext, deviceId)
       res.send(response)
