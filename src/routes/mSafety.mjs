@@ -114,7 +114,7 @@ function handshake (ciphertext) {
   handshakeState.ReadMessage(Buffer.from(ciphertext, 'base64'))
   const response = handshakeState.WriteMessage(Buffer.alloc(0))
 
-  console.log('RESPONSE FROM HANDSHAKE', response)
+  console.log('handshake RESPONSE FROM HANDSHAKE', response)
 
   return response
 }
@@ -222,7 +222,7 @@ export default async function () {
                 const text = JSON.stringify(pubdata.jsonData)
                 await filehandle.writeFile(text)
               } catch (err) {
-                applogger.error(err, 'cannot save sensors data mSafety file: ' + filename)
+                applogger.error({ error: err }, 'cannot save sensors data mSafety file: ' + filename)
               } finally {
                 if (filehandle) await filehandle.close()
               }
@@ -242,7 +242,7 @@ export default async function () {
           res.sendStatus(200)
         } catch (err) {
           res.sendStatus(500)
-          applogger.error(err, 'cannot save mSafety file' + filename)
+          applogger.error({ error: err }, 'cannot save mSafety file' + filename)
         } finally {
           if (filehandle) await filehandle.close()
         }
@@ -253,7 +253,7 @@ export default async function () {
   // key exchange protocol
   router.post('/msafety/keyexchange/', async function (req, res) {
     const body = req.body
-    applogger.trace(body, 'msafety key exchange request')
+    applogger.trace({ body: body }, 'msafety key exchange request')
 
     if (!body || !body.data) {
       applogger.warn('msafety key exchange request without any body')
@@ -263,15 +263,17 @@ export default async function () {
     const ciphertext = body.data
     const deviceId = req.query.deviceId
 
-    console.log('DEVICE ID IS ' + deviceId)
-
-    console.log('DEVICE ID IS ' + deviceId)
+    if (!deviceId) {
+      applogger.warn('msafety key exchange request without deviceId in query params')
+      res.status(400).send('deviceId was not passed in query params')
+      return
+    }
 
     try {
       const response = keyexchange(ciphertext, deviceId)
       res.send(response)
     } catch (err) {
-      applogger.error(err, 'cannot generate msafety key exchange')
+      applogger.error({ error: err }, 'cannot generate msafety key exchange')
       res.sendStatus(500)
     }
   })
