@@ -205,6 +205,7 @@ export default async function () {
     // parse the data and check the auth code
     if (req.headers.authkey === config.mSafety.webhookAuthKey) {
       if (req.body && req.body.pubDataItems) {
+        console.log('DATA WITH BODY', req.body)
         for (const pubdata of req.body.pubDataItems) {
           if (pubdata.type === 'device' && pubdata.event === 'sensors') {
             const deviceId = pubdata.deviceId
@@ -224,6 +225,7 @@ export default async function () {
                 const text = JSON.stringify(pubdata.jsonData)
                 await filehandle.writeFile(text)
               } catch (err) {
+                console.error('ERROR WRITING PARSED FILE')
                 applogger.error({ error: err }, 'cannot save sensors data mSafety file: ' + filename)
               } finally {
                 if (filehandle) await filehandle.close()
@@ -232,6 +234,7 @@ export default async function () {
           }
         }
       } else {
+        console.log('DATA WITHOUT BODY', req)
         const filename = 'request_' + ts + '.txt'
         applogger.debug({ headers: req.headers, body: req.body }, 'mSafety strange packet received, storing it raw on ' + filename)
         try {
@@ -240,9 +243,11 @@ export default async function () {
             headers: req.headers,
             body: req.body
           })
+          console.log('WRITING FILE', text)
           await filehandle.writeFile(text)
           res.sendStatus(200)
         } catch (err) {
+          console.error('ERROR WRITING RAW FILE')
           res.sendStatus(500)
           applogger.error({ error: err }, 'cannot save mSafety file' + filename)
         } finally {
@@ -250,6 +255,7 @@ export default async function () {
         }
       }
     } else {
+      console.error('WRONG AUTH IN MSAFETY')
       res.sendStatus(403)
       applogger.warn({ headers: req.headers, body: req.body }, 'mSafety unauthorized call received')
     }
