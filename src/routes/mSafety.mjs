@@ -224,6 +224,9 @@ export default async function () {
                 filehandle = await fsOpen(deviceDir + filename, 'w')
                 const text = JSON.stringify(pubdata.jsonData)
                 await filehandle.writeFile(text)
+                res.sendStatus(200)
+                console.log('PARSED FILE WRITTEN' + deviceDir + filename)
+                applogger.debug({ filename: filename }, 'mSafety file with data saved')
               } catch (err) {
                 console.error('ERROR WRITING PARSED FILE')
                 applogger.error({ error: err }, 'cannot save sensors data mSafety file: ' + filename)
@@ -243,9 +246,10 @@ export default async function () {
             headers: req.headers,
             body: req.body
           })
-          console.log('WRITING FILE', text)
           await filehandle.writeFile(text)
           res.sendStatus(200)
+          console.log('RAW FILE WRITTEN' + msafetyDir + filename)
+          applogger.debug({ filename: filename }, 'mSafety file with raw data saved')
         } catch (err) {
           console.error('ERROR WRITING RAW FILE')
           res.sendStatus(500)
