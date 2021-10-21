@@ -197,16 +197,19 @@ export default async function () {
 
   // webhook for mSafety data
   router.post('/msafety/webhook/', async function (req, res) {
-    console.log('WEBHOOK RECEIVED CALL')
+    console.log('WEBHOOK RECEIVED CALL', req.headers)
 
     // temporary implementation, just writes any message to file
     const ts = new Date().getTime()
     let filehandle
     // parse the data and check the auth code
     if (req.headers.authkey === config.mSafety.webhookAuthKey) {
+      console.log('AUTH KEY OK')
+      console.log('BODY', req.body)
       if (req.body && req.body.pubDataItems) {
         console.log('DATA WITH BODY', req.body)
         for (const pubdata of req.body.pubDataItems) {
+          console.log('DATA EVENT', pubdata)
           if (pubdata.type === 'device' && pubdata.event === 'sensors') {
             const deviceId = pubdata.deviceId
 
@@ -224,7 +227,6 @@ export default async function () {
                 filehandle = await fsOpen(deviceDir + filename, 'w')
                 const text = JSON.stringify(pubdata.jsonData)
                 await filehandle.writeFile(text)
-                res.sendStatus(200)
                 console.log('PARSED FILE WRITTEN' + deviceDir + filename)
                 applogger.debug({ filename: filename }, 'mSafety file with data saved')
               } catch (err) {
@@ -234,8 +236,12 @@ export default async function () {
                 if (filehandle) await filehandle.close()
               }
             }
+          } else {
+            console.log('UNKOWN DATA EVENT', pubdata)
+            applogger.error({ pubdata: pubdata }, 'cannot parse sensors data from mSafety')
           }
         }
+        res.sendStatus(200)
       } else {
         console.log('DATA WITHOUT BODY', req)
         const filename = 'request_' + ts + '.txt'
