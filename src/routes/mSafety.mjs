@@ -29,7 +29,7 @@ const sessionsStore = {}
  * @param {CipherState} rx a CipherState used for incoming messages.
  * @param {CipherState} tx a CipherState used for outgoing messages.
  */
-async function storeSession (deviceId, rx, tx) {
+async function storeSession(deviceId, rx, tx) {
   const key = 'state_' + deviceId
   let session = sessionsStore[key]
 
@@ -63,7 +63,7 @@ async function storeSession (deviceId, rx, tx) {
  * @param {string} deviceId the device id.
  * @returns {Object} if a session exists. null otherwise.
  */
-async function loadSession (deviceId) {
+async function loadSession(deviceId) {
   const key = 'state_' + deviceId
   return sessionsStore[key]
 }
@@ -73,7 +73,7 @@ async function loadSession (deviceId) {
  * @param {string} deviceId the device id.
  * @param {Object} session the session object.
  */
-async function updateSession (deviceId, session) {
+async function updateSession(deviceId, session) {
   const key = 'state_' + deviceId
   sessionsStore[key] = session
 }
@@ -85,7 +85,7 @@ async function updateSession (deviceId, session) {
  * @param {String} deviceId the id of the device.
  * @return {object} an object containing the message as base64 encoded string.
  */
-function keyexchange (ciphertext, deviceId) {
+function keyexchange(ciphertext, deviceId) {
   console.log('CIPHERTEXT', ciphertext)
   console.log('DEVICEID', deviceId)
 
@@ -105,7 +105,7 @@ function keyexchange (ciphertext, deviceId) {
  * @param {String} ciphertext a base64 encoded string from the initiator.
  * @return an array containing a message and the two cipher states.
  */
-function handshake (ciphertext) {
+function handshake(ciphertext) {
   const handshakeState = new HandshakeState()
   handshakeState.Initialize('NK', false, Buffer.alloc(0), KEYPAIR, null, null, null)
 
@@ -127,7 +127,7 @@ function handshake (ciphertext) {
  * @param {String} deviceId the device id.
  * @returns an object containing the plaintext (as a base64 encoded string) and the nonce (as a string) used. If anything fails, null is returned.
  */
-async function encrypt (plaintext, deviceId) {
+async function encrypt(plaintext, deviceId) {
   const session = await loadSession(deviceId)
 
   if (!session) {
@@ -158,7 +158,7 @@ async function encrypt (plaintext, deviceId) {
  * @param {BitInt} nonce the nonce used when encrypting the ciphertext.
  * @param {*} deviceId the device id.
  */
-async function decrypt (ciphertext, nonce, deviceId) {
+async function decrypt(ciphertext, nonce, deviceId) {
   const session = await loadSession(deviceId)
 
   if (!session) {
@@ -197,6 +197,8 @@ export default async function () {
 
   // webhook for mSafety data
   router.post('/msafety/webhook/', async function (req, res) {
+    console.log('WEBHOOK RECEIVED CALL')
+
     // temporary implementation, just writes any message to file
     const ts = new Date().getTime()
     let filehandle
@@ -231,7 +233,7 @@ export default async function () {
         }
       } else {
         const filename = 'request_' + ts + '.txt'
-        applogger.debug('mSafety strange packet received, storing it raw on ' + filename)
+        applogger.debug({ headers: req.headers, body: req.body }, 'mSafety strange packet received, storing it raw on ' + filename)
         try {
           filehandle = await fsOpen(msafetyDir + filename, 'w')
           const text = JSON.stringify({
@@ -247,6 +249,9 @@ export default async function () {
           if (filehandle) await filehandle.close()
         }
       }
+    } else {
+      res.sendStatus(403)
+      applogger.warn({ headers: req.headers, body: req.body }, 'mSafety unauthorized call received')
     }
   })
 
@@ -256,7 +261,7 @@ export default async function () {
     applogger.trace({ body: body }, 'msafety key exchange request')
 
     if (!body || !body.data) {
-      applogger.warn('msafety key exchange request without any body')
+      applogger.warn('mSafety key exchange request without any body')
       res.status(400).send('data was not passed in the post body')
       return
     }
@@ -264,7 +269,7 @@ export default async function () {
     const deviceId = req.query.deviceId
 
     if (!deviceId) {
-      applogger.warn('msafety key exchange request without deviceId in query params')
+      applogger.warn('mSafety key exchange request without deviceId in query params')
       res.status(400).send('deviceId was not passed in query params')
       return
     }
@@ -272,8 +277,9 @@ export default async function () {
     try {
       const response = keyexchange(ciphertext, deviceId)
       res.send(response)
+      applogger.debug('mSafety key exchange completed for device ' + deviceId)
     } catch (err) {
-      applogger.error({ error: err }, 'cannot generate msafety key exchange')
+      applogger.error({ error: err }, 'cannot generate mSafety key exchange')
       res.sendStatus(500)
     }
   })
