@@ -197,17 +197,12 @@ export default async function () {
 
   // webhook for mSafety data
   router.post('/msafety/webhook/', async function (req, res) {
-    console.log('WEBHOOK RECEIVED CALL', req.headers)
-
     // temporary implementation, just writes any message to file
     const ts = new Date().getTime()
     let filehandle
     // parse the data and check the auth code
     if (req.headers.authkey === config.mSafety.webhookAuthKey) {
-      console.log('AUTH KEY OK')
-      console.log('BODY', req.body)
       if (req.body && req.body.pubDataItems) {
-        console.log('DATA WITH BODY', req.body)
         for (const pubdata of req.body.pubDataItems) {
           console.log('DATA EVENT', pubdata)
           if (pubdata.type === 'device' && pubdata.event === 'sensors') {
@@ -227,23 +222,19 @@ export default async function () {
                 filehandle = await fsOpen(deviceDir + filename, 'w')
                 const text = JSON.stringify(pubdata.jsonData)
                 await filehandle.writeFile(text)
-                console.log('PARSED FILE WRITTEN' + deviceDir + filename)
                 applogger.debug({ filename: filename }, 'mSafety file with data saved')
               } catch (err) {
-                console.error('ERROR WRITING PARSED FILE')
                 applogger.error({ error: err }, 'cannot save sensors data mSafety file: ' + filename)
               } finally {
                 if (filehandle) await filehandle.close()
               }
             }
           } else {
-            console.log('UNKOWN DATA EVENT', pubdata)
-            applogger.error({ pubdata: pubdata }, 'cannot parse sensors data from mSafety')
+            applogger.trace({ pubdata: pubdata }, 'discarding non sensors data from mSafety')
           }
         }
         res.sendStatus(200)
       } else {
-        console.log('DATA WITHOUT BODY', req)
         const filename = 'request_' + ts + '.txt'
         applogger.debug({ headers: req.headers, body: req.body }, 'mSafety strange packet received, storing it raw on ' + filename)
         try {
@@ -254,18 +245,14 @@ export default async function () {
           })
           await filehandle.writeFile(text)
           res.sendStatus(200)
-          console.log('RAW FILE WRITTEN' + msafetyDir + filename)
-          applogger.debug({ filename: filename }, 'mSafety file with raw data saved')
         } catch (err) {
-          console.error('ERROR WRITING RAW FILE')
           res.sendStatus(500)
-          applogger.error({ error: err }, 'cannot save mSafety file' + filename)
+          applogger.error({ error: err }, 'cannot save mSafety raw file' + filename)
         } finally {
           if (filehandle) await filehandle.close()
         }
       }
     } else {
-      console.error('WRONG AUTH IN MSAFETY')
       res.sendStatus(403)
       applogger.warn({ headers: req.headers, body: req.body }, 'mSafety unauthorized call received')
     }
