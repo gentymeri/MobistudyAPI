@@ -8,7 +8,7 @@ import axios from 'axios'
 // type: can be substance or disorder
 // lang: en or sv
 // limit: max number of terms
-export async function getTerm (term, type, lang, limit) {
+export async function getTerm(term, type, lang, limit) {
   if (!term) throw new Error('A term must be specified')
   if (!lang) throw new Error('A langauge must be specified')
   if (!type) throw new Error('A type must be specified')
@@ -31,7 +31,12 @@ export async function getTerm (term, type, lang, limit) {
 
   const resp = await axios.get(url,
     {
-      headers: { 'Accept-Language': acceptedLangs },
+      headers: {
+        'Accept-Language': acceptedLangs,
+        accept: 'application/json',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36'
+      },
+      mode: 'cors',
       params: {
         term: term,
         lang: language,
