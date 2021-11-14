@@ -13,7 +13,7 @@ RUN npm install --production
 
 COPY . /usr/src/app
 
-FROM node:14.17-alpine3.12
+FROM node:fermium-alpine3.12
 
 COPY --from=build /usr/src/app /usr/src/app
 
