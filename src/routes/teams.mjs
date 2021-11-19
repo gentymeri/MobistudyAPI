@@ -269,7 +269,7 @@ export default async function () {
             await DAO.deleteAnswersByStudy(teamStudies[i]._key)
             await DAO.deleteHealthStoreByStudy(teamStudies[i]._key)
             await DAO.deleteQCSTDataByStudy(teamStudies[i]._key)
-            await DAO.deleteSMWTDataByStudy(teamStudies[i]._key)
+            await DAO.deleteSmwtByStudy(teamStudies[i]._key)
             await DAO.deleteMiband3DataByStudy(teamStudies[i]._key)
             await DAO.deletePO60DataByStudy(teamStudies[i]._key)
             await DAO.deletePeakFlowDataByStudy(teamStudies[i]._key)

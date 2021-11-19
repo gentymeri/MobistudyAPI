@@ -29,7 +29,7 @@ const sessionsStore = {}
  * @param {CipherState} rx a CipherState used for incoming messages.
  * @param {CipherState} tx a CipherState used for outgoing messages.
  */
-async function storeSession (deviceId, rx, tx) {
+async function storeSession(deviceId, rx, tx) {
   const key = 'state_' + deviceId
   let session = sessionsStore[key]
 
@@ -63,7 +63,7 @@ async function storeSession (deviceId, rx, tx) {
  * @param {string} deviceId the device id.
  * @returns {Object} if a session exists. null otherwise.
  */
-async function loadSession (deviceId) {
+async function loadSession(deviceId) {
   const key = 'state_' + deviceId
   return sessionsStore[key]
 }
@@ -73,7 +73,7 @@ async function loadSession (deviceId) {
  * @param {string} deviceId the device id.
  * @param {Object} session the session object.
  */
-async function updateSession (deviceId, session) {
+async function updateSession(deviceId, session) {
   const key = 'state_' + deviceId
   sessionsStore[key] = session
 }
@@ -85,8 +85,15 @@ async function updateSession (deviceId, session) {
  * @param {String} deviceId the id of the device.
  * @return {object} an object containing the message as base64 encoded string.
  */
-function keyexchange (ciphertext, deviceId) {
+function keyexchange(ciphertext, deviceId) {
+  console.log('CIPHERTEXT', ciphertext)
+  console.log('DEVICEID', deviceId)
+
   const [message, rx, tx] = handshake(ciphertext)
+  console.log('handshake message', message)
+  console.log('handshake rx', rx)
+  console.log('handshake tx', tx)
+
   storeSession(deviceId, rx, tx)
 
   return { data: message.toString('base64') }
@@ -98,11 +105,16 @@ function keyexchange (ciphertext, deviceId) {
  * @param {String} ciphertext a base64 encoded string from the initiator.
  * @return an array containing a message and the two cipher states.
  */
-function handshake (ciphertext) {
+function handshake(ciphertext) {
   const handshakeState = new HandshakeState()
   handshakeState.Initialize('NK', false, Buffer.alloc(0), KEYPAIR, null, null, null)
+
+  console.log('handshake HANDSHAKETEST', handshakeState)
+
   handshakeState.ReadMessage(Buffer.from(ciphertext, 'base64'))
   const response = handshakeState.WriteMessage(Buffer.alloc(0))
+
+  console.log('handshake RESPONSE FROM HANDSHAKE', response)
 
   return response
 }
@@ -115,7 +127,7 @@ function handshake (ciphertext) {
  * @param {String} deviceId the device id.
  * @returns an object containing the plaintext (as a base64 encoded string) and the nonce (as a string) used. If anything fails, null is returned.
  */
-async function encrypt (plaintext, deviceId) {
+async function encrypt(plaintext, deviceId) {
   const session = await loadSession(deviceId)
 
   if (!session) {
@@ -146,7 +158,7 @@ async function encrypt (plaintext, deviceId) {
  * @param {BitInt} nonce the nonce used when encrypting the ciphertext.
  * @param {*} deviceId the device id.
  */
-async function decrypt (ciphertext, nonce, deviceId) {
+async function decrypt(ciphertext, nonce, deviceId) {
   const session = await loadSession(deviceId)
 
   if (!session) {
@@ -178,7 +190,7 @@ async function decrypt (ciphertext, nonce, deviceId) {
 export default async function () {
   // create the msafety subfolder
   try {
-    await fsStat(UPLOADSDIR + '/' + MSAFETYSUBDIR)
+    await fsStat(msafetyDir)
   } catch (err) {
     fsMkdir(msafetyDir, { recursive: true })
   }
@@ -190,13 +202,14 @@ export default async function () {
     let filehandle
     // parse the data and check the auth code
     if (req.headers.authkey === config.mSafety.webhookAuthKey) {
-      if (req.body.pubDataItems) {
+      if (req.body && req.body.pubDataItems) {
         for (const pubdata of req.body.pubDataItems) {
+          console.log('DATA EVENT', pubdata)
           if (pubdata.type === 'device' && pubdata.event === 'sensors') {
             const deviceId = pubdata.deviceId
 
             // create the device-specific subfolder
-            const deviceDir = msafetyDir + deviceId
+            const deviceDir = msafetyDir + deviceId + '/'
             try {
               await fsStat(deviceDir)
             } catch (err) {
@@ -204,23 +217,26 @@ export default async function () {
             }
 
             if (deviceId) {
-              const filename = '/sensor_' + deviceId + '_' + ts + '.json'
+              const filename = 'sensor_' + ts + '.json'
               try {
                 filehandle = await fsOpen(deviceDir + filename, 'w')
                 const text = JSON.stringify(pubdata.jsonData)
                 await filehandle.writeFile(text)
+                applogger.debug({ filename: filename }, 'mSafety file with data saved')
               } catch (err) {
-                console.error(err)
-                applogger.error(err, 'cannot save sensors data mSafety file' + filename)
+                applogger.error({ error: err }, 'cannot save sensors data mSafety file: ' + filename)
               } finally {
                 if (filehandle) await filehandle.close()
               }
             }
+          } else {
+            applogger.trace({ pubdata: pubdata }, 'discarding non sensors data from mSafety')
           }
         }
+        res.sendStatus(200)
       } else {
-        const filename = '/request_' + ts + '.txt'
-        applogger.debug('mSafety strange packet received, storing it raw on ' + filename)
+        const filename = 'request_' + ts + '.txt'
+        applogger.debug({ headers: req.headers, body: req.body }, 'mSafety strange packet received, storing it raw on ' + filename)
         try {
           filehandle = await fsOpen(msafetyDir + filename, 'w')
           const text = JSON.stringify({
@@ -231,29 +247,42 @@ export default async function () {
           res.sendStatus(200)
         } catch (err) {
           res.sendStatus(500)
-          applogger.error(err, 'cannot save mSafety file' + filename)
+          applogger.error({ error: err }, 'cannot save mSafety raw file' + filename)
         } finally {
           if (filehandle) await filehandle.close()
         }
       }
+    } else {
+      res.sendStatus(403)
+      applogger.warn({ headers: req.headers, body: req.body }, 'mSafety unauthorized call received')
     }
   })
 
   // key exchange protocol
   router.post('/msafety/keyexchange/', async function (req, res) {
     const body = req.body
+    applogger.trace({ body: body }, 'msafety key exchange request')
+
     if (!body || !body.data) {
-      res.status(400).send('data was not passed in the post body.')
+      applogger.warn('mSafety key exchange request without any body')
+      res.status(400).send('data was not passed in the post body')
       return
     }
     const ciphertext = body.data
     const deviceId = req.query.deviceId
 
+    if (!deviceId) {
+      applogger.warn('mSafety key exchange request without deviceId in query params')
+      res.status(400).send('deviceId was not passed in query params')
+      return
+    }
+
     try {
       const response = keyexchange(ciphertext, deviceId)
       res.send(response)
+      applogger.debug('mSafety key exchange completed for device ' + deviceId)
     } catch (err) {
-      console.error(err)
+      applogger.error({ error: err }, 'cannot generate mSafety key exchange')
       res.sendStatus(500)
     }
   })
@@ -263,7 +292,7 @@ export default async function () {
     const body = req.body
 
     if (!body || !body.data) {
-      res.status(400).send('data was not passed in the post body.')
+      res.status(400).send('data was not passed in the post body')
       return
     }
 

@@ -1,23 +1,23 @@
 'use strict'
 
 /**
-* This provides the data access for the Study miband3Data.
+* This provides the data access for the Study SMWTData.
 */
 
 import utils from './utils.mjs'
 import { applogger } from '../services/logger.mjs'
 
-const COLLECTIONNAME = 'miband3Data'
+const COLLECTIONNAME = 'smwts'
 
-export default async function (db) {
+export default async function (db, logger) {
   const collection = await utils.getCollection(db, COLLECTIONNAME)
 
   return {
-    miband3DataTransaction () {
+    smwtTransaction () {
       return COLLECTIONNAME
     },
 
-    async getAllMiband3Data (dataCallback) {
+    async getAllSmwts (dataCallback) {
       const query = `FOR data IN ${COLLECTIONNAME} RETURN data`
       applogger.trace('Querying "' + query + '"')
       const cursor = await db.query(query)
@@ -29,7 +29,7 @@ export default async function (db) {
       } else return cursor.all()
     },
 
-    async getMiband3DataByUser (userKey, dataCallback) {
+    async getSmwtsByUser (userKey, dataCallback) {
       const query = `FOR data IN ${COLLECTIONNAME} FILTER data.userKey == @userKey RETURN data`
       const bindings = { userKey: userKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
@@ -42,7 +42,7 @@ export default async function (db) {
       } else return cursor.all()
     },
 
-    async getMiband3DataByUserAndStudy (userKey, studyKey, dataCallback) {
+    async getSmwtsByUserAndStudy (userKey, studyKey, dataCallback) {
       const query = `FOR data IN ${COLLECTIONNAME} FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data`
       const bindings = { userKey: userKey, studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
@@ -55,7 +55,7 @@ export default async function (db) {
       } else return cursor.all()
     },
 
-    async getMiband3DataByStudy (studyKey, dataCallback) {
+    async getSmwtsDataByStudy (studyKey, dataCallback) {
       const query = `FOR data IN ${COLLECTIONNAME} FILTER data.studyKey == @studyKey RETURN data`
       const bindings = { studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
@@ -69,68 +69,68 @@ export default async function (db) {
     },
 
     /**
-     * Create a new Mibadn3 data
-     * @param newMiband3Data new data to be created
-     * @param trx used for transactions, optional
-     * @returns a promise wth the newly created data
+     * Create a new six minute walk test
+     * @param newSmwt new 6mwt
+     * @param trx optional transaction
+     * @returns promise with the new created smwt
      */
-    async createMiband3Data (newMiband3Data, trx) {
+    async createSmwt (newSmwt, trx) {
       let meta
       if (trx) {
-        meta = await trx.step(() => collection.save(newMiband3Data))
+        meta = await trx.step(() => collection.save(newSmwt))
       } else {
-        meta = await collection.save(newMiband3Data)
+        meta = await collection.save(newSmwt)
       }
-      applogger.trace(newMiband3Data, 'Creating miband3 data with key ' + meta._key + '')
+      applogger.trace(newSmwt, 'Creating six minute walk test with key ' + meta._key + '')
 
-      newMiband3Data._key = meta._key
-      return newMiband3Data
+      newSmwt._key = meta._key
+      return newSmwt
     },
 
     /**
-     * Replace existing miband3 data with new data
-     * @param _key key of the old data
-     * @param newData new data
-     * @param trx optional, used for transactions
-     * @returns a promise with the new data
+     * Replaces a 6mwt
+     * @param _key key of the 6mwt to replace
+     * @param newData new 6mwt obejct
+     * @param trx optional transaction
+     * @returns promise with replaced 6mwt
      */
-    async replaceMiband3Data (_key, newData, trx) {
+    async replaceSmwt (_key, newData, trx) {
       let meta
       if (trx) {
         meta = await trx.step(() => collection.replace(_key, newData))
       } else {
         meta = await collection.replace(_key, newData)
       }
-      applogger.trace(newData, 'Replacing miband3 data with key ' + _key + '')
+      applogger.trace(newData, 'Replacing six minute walk test with key ' + _key + '')
 
       newData._key = meta._key
       return newData
     },
 
-    async getOneMiband3Data (_key) {
-      const miband3Data = await collection.document(_key)
-      return miband3Data
+    async getOneSmwt (_key) {
+      const SMWTData = await collection.document(_key)
+      return SMWTData
     },
 
-    // deletes miband3Data
-    async deleteMiband3Data (_key) {
+    // deletes SMWTData
+    async deleteSmwt (_key) {
       await collection.remove(_key)
       return true
     },
 
     // deletes all data based on study
-    async deleteMiband3DataByStudy (studyKey) {
-      const miband3Data = await this.getMiband3DataByStudy(studyKey)
-      for (let i = 0; i < miband3Data.length; i++) {
-        await this.deleteMiband3Data(miband3Data[i]._key)
+    async deleteSmwtByStudy (studyKey) {
+      const SMWTData = await this.getSmwtsDataByStudy(studyKey)
+      for (let i = 0; i < SMWTData.length; i++) {
+        await this.deleteSmwt(SMWTData[i]._key)
       }
     },
 
-    // deletes all data based on user
-    async deleteMiband3DataByUser (userKey) {
-      const miband3Data = await this.getMiband3DataByUser(userKey)
-      for (let i = 0; i < miband3Data.length; i++) {
-        await this.deleteMiband3Data(miband3Data[i]._key)
+    // deletes all data based on participant
+    async deleteSmwtByUser (userKey) {
+      const SMWTData = await this.getSmwtsByUser(userKey)
+      for (let i = 0; i < SMWTData.length; i++) {
+        await this.deleteSmwt(SMWTData[i]._key)
       }
     }
   }

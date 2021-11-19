@@ -7,10 +7,16 @@
 import utils from './utils.mjs'
 import { applogger } from '../services/logger.mjs'
 
+const COLLECTIONNAME = 'participants'
+
 export default async function (db) {
-  const collection = await utils.getCollection(db, 'participants')
+  const collection = await utils.getCollection(db, COLLECTIONNAME)
 
   return {
+    participantsTransaction () {
+      return COLLECTIONNAME
+    },
+
     async getAllParticipants () {
       const filter = ''
       // TODO: use LIMIT @offset, @count in the query for pagination
@@ -128,8 +134,14 @@ export default async function (db) {
     },
 
     // udpates a participant, we assume the _key is the correct one
-    async replaceParticipant (_key, participant) {
-      const meta = await collection.replace(_key, participant)
+    // optional trx: for transactions
+    async replaceParticipant (_key, participant, trx) {
+      let meta
+      if (trx) {
+        meta = await trx.step(() => collection.replace(_key, participant))
+      } else {
+        meta = await collection.replace(_key, participant)
+      }
       applogger.trace(participant, 'Replacing participant "' + _key + '"')
       participant._key = meta._key
       return participant

@@ -44,25 +44,8 @@ export default async function () {
     if (req.user.role !== 'participant') return res.sendStatus(403)
     newtappingData.userKey = req.user._key
     if (!newtappingData.createdTS) newtappingData.createdTS = new Date()
+    let trans
     try {
-      // separate tappingData from the object stored on the database
-      const tappingData = newtappingData.tappingData
-      delete newtappingData.tappingData
-
-      // store the database data
-      newtappingData = await DAO.createFingerTapping(newtappingData)
-
-      // save the attachment
-      const filename = newtappingData._key + '.json'
-      const writer = await saveAttachment(newtappingData.userKey, newtappingData.studyKey, newtappingData.taskId, filename)
-      writer.writeChunk(JSON.stringify(tappingData))
-      writer.end()
-
-      // save the filename
-      newtappingData.attachments = [filename]
-      newtappingData = await DAO.replaceFingerTapping(newtappingData._key, newtappingData)
-
-      // also update task status
       const participant = await DAO.getParticipantByUserKey(req.user._key)
       if (!participant) return res.sendStatus(404)
       const study = participant.studies.find((s) => {
@@ -71,15 +54,39 @@ export default async function () {
       if (!study) return res.sendStatus(400)
       const taskItem = study.taskItemsConsent.find(ti => ti.taskId === newtappingData.taskId)
       if (!taskItem) return res.sendStatus(400)
+
+      trans = await DAO.startTransaction([DAO.fingerTappingTransaction(), DAO.participantsTransaction()])
+
+      // separate tappingData from the object stored on the database
+      const tappingData = newtappingData.tappingData
+      delete newtappingData.tappingData
+
+      // store the database data
+      newtappingData = await DAO.createFingerTapping(newtappingData, trans)
+
+      // save the attachment
+      const filename = newtappingData._key + '.json'
+      const writer = await saveAttachment(newtappingData.userKey, newtappingData.studyKey, newtappingData.taskId, filename)
+      await writer.writeChunk(JSON.stringify(tappingData))
+      await writer.end()
+
+      // save the filename
+      newtappingData.attachments = [filename]
+      newtappingData = await DAO.replaceFingerTapping(newtappingData._key, newtappingData, trans)
+
+      // also update task status
       taskItem.lastExecuted = newtappingData.createdTS
-      // update the participant
-      await DAO.replaceParticipant(participant._key, participant)
+      await DAO.replaceParticipant(participant._key, participant, trans)
+
+      DAO.endTransaction(trans)
+
       res.sendStatus(200)
       applogger.info({ userKey: req.user._key, taskId: newtappingData.taskId, studyKey: newtappingData.studyKey }, 'Participant has sent finger tapping data')
       auditLogger.log('fingerTappingCreated', req.user._key, newtappingData.studyKey, newtappingData.taskId, 'Finger tapping data created by participant with key ' + participant._key + ' for study with key ' + newtappingData.studyKey, 'fingerTapping', newtappingData._key, newtappingData)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new tappingData Data')
       res.sendStatus(500)
+      DAO.abortTransation(trans)
     }
   })
 

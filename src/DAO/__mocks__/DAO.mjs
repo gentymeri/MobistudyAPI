@@ -39,7 +39,7 @@ const DAO = {
   async getQCSTDataByStudy (studyKey, dataCallback) {
     return this.getNextData(dataCallback)
   },
-  async getSMWTDataByStudy (studyKey, dataCallback) {
+  async getSmwtsDataByStudy (studyKey, dataCallback) {
     return this.getNextData(dataCallback)
   },
   async getPeakFlowsByStudy (studyKey, dataCallback) {
