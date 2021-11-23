@@ -224,7 +224,7 @@
     },
     {
       "id": 10,
-      "type": "suagt",
+      "type": "tugt",
       "scheduling": {
         "startEvent": "consent",
         "intervalType": "w",

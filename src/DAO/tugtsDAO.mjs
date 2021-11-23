@@ -1,23 +1,23 @@
 'use strict'
 
 /**
- * This provides the data access for the Study SUAGTData.
+ * This provides the data access for the Study TUGTData.
  */
 
 import utils from './utils.mjs'
 import { applogger } from '../services/logger.mjs'
 
-const COLLECTIONNAME = 'suagts'
+const COLLECTIONNAME = 'tugts'
 
 export default async function (db, logger) {
   const collection = await utils.getCollection(db, COLLECTIONNAME)
 
   return {
-    suagtTransaction () {
+    tugtTransaction () {
       return COLLECTIONNAME
     },
 
-    async getAllSuagts (dataCallback) {
+    async getAllTugts (dataCallback) {
       const query = `FOR data IN ${COLLECTIONNAME} RETURN data`
       applogger.trace('Querying "' + query + '"')
       const cursor = await db.query(query)
@@ -29,7 +29,7 @@ export default async function (db, logger) {
       } else return cursor.all()
     },
 
-    async getSuagtsByUser (userKey, dataCallback) {
+    async getTugtsByUser (userKey, dataCallback) {
       const query = `FOR data IN ${COLLECTIONNAME} FILTER data.userKey == @userKey RETURN data`
       const bindings = { userKey: userKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
@@ -42,7 +42,7 @@ export default async function (db, logger) {
       } else return cursor.all()
     },
 
-    async getSuagtsByUserAndStudy (userKey, studyKey, dataCallback) {
+    async getTugtsByUserAndStudy (userKey, studyKey, dataCallback) {
       const query = `FOR data IN ${COLLECTIONNAME} FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data`
       const bindings = { userKey: userKey, studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
@@ -55,7 +55,7 @@ export default async function (db, logger) {
       } else return cursor.all()
     },
 
-    async getSuagtsDataByStudy (studyKey, dataCallback) {
+    async getTugtsDataByStudy (studyKey, dataCallback) {
       const query = `FOR data IN ${COLLECTIONNAME} FILTER data.studyKey == @studyKey RETURN data`
       const bindings = { studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
@@ -69,68 +69,68 @@ export default async function (db, logger) {
     },
 
     /**
-     * Create a new stand up and go test
-     * @param newSuagt new Suagt
+     * Create a new Timed up & Go Test
+     * @param newTugt new Tugt
      * @param trx optional transaction
-     * @returns promise with the new created Suagt
+     * @returns promise with the new created Tugt
      */
-    async createSuagts (newSuagt, trx) {
+    async createTugts (newTugt, trx) {
       let meta
       if (trx) {
-        meta = await trx.step(() => collection.save(newSuagt))
+        meta = await trx.step(() => collection.save(newTugt))
       } else {
-        meta = await collection.save(newSuagt)
+        meta = await collection.save(newTugt)
       }
-      applogger.trace(newSuagt, 'Creating stand up and go test with key ' + meta._key + '')
+      applogger.trace(newTugt, 'Creating timed up & go test with key ' + meta._key + '')
 
-      newSuagt._key = meta._key
-      return newSuagt
+      newTugt._key = meta._key
+      return newTugt
     },
 
     /**
-     * Replaces a Suagt
-     * @param _key key of the Suagt to replace
-     * @param newData new Suagt object
+     * Replaces a Tugt
+     * @param _key key of the Tugt to replace
+     * @param newData new Tugt object
      * @param trx optional transaction
-     * @returns promise with replaced Suagt
+     * @returns promise with replaced Tugt
      */
-    async replaceSuagt (_key, newData, trx) {
+    async replaceTugt (_key, newData, trx) {
       let meta
       if (trx) {
         meta = await trx.step(() => collection.replace(_key, newData))
       } else {
         meta = await collection.replace(_key, newData)
       }
-      applogger.trace(newData, 'Replacing stand up and go test with key ' + _key + '')
+      applogger.trace(newData, 'Replacing timed up & go test with key ' + _key + '')
 
       newData._key = meta._key
       return newData
     },
 
-    async getOneSuagt (_key) {
-      const SUAGTData = await collection.document(_key)
-      return SUAGTData
+    async getOneTugt (_key) {
+      const TUGTData = await collection.document(_key)
+      return TUGTData
     },
 
-    // deletes SUAGTData
-    async deleteSuagt (_key) {
+    // deletes TUGTData
+    async deleteTugt (_key) {
       await collection.remove(_key)
       return true
     },
 
     // deletes all data based on study
-    async deleteSuagtByStudy (studyKey) {
-      const SUAGTData = await this.getSuagtsDataByStudy(studyKey)
-      for (let i = 0; i < SUAGTData.length; i++) {
-        await this.deleteSuagt(SUAGTData[i]._key)
+    async deleteTugtByStudy (studyKey) {
+      const TUGTData = await this.getTugtsDataByStudy(studyKey)
+      for (let i = 0; i < TUGTData.length; i++) {
+        await this.deleteTugt(TUGTData[i]._key)
       }
     },
 
     // deletes all data based on participant
-    async deleteSuagtByUser (userKey) {
-      const SUAGTData = await this.getSuagtsByUser(userKey)
-      for (let i = 0; i < SUAGTData.length; i++) {
-        await this.deleteSuagt(SUAGTData[i]._key)
+    async deleteTugtByUser (userKey) {
+      const TUGTData = await this.getTugtsByUser(userKey)
+      for (let i = 0; i < TUGTData.length; i++) {
+        await this.deleteTugt(TUGTData[i]._key)
       }
     }
   }
