@@ -35,6 +35,7 @@ import PositionsRouter from './routes/positions.mjs'
 import fingerTappingRouter from './routes/fingerTapping.mjs'
 import mSafetyRouter from './routes/mSafety.mjs'
 import attachmentsRouter from './routes/attachments.mjs'
+import suagtsRouter from './routes/suagts.mjs'
 
 export default async function () {
   const app = express()
@@ -87,6 +88,7 @@ export default async function () {
   app.use(apiPrefix, await PositionsRouter())
   app.use(apiPrefix, await fingerTappingRouter())
   app.use(apiPrefix, await attachmentsRouter())
+  app.use(apiPrefix, await suagtsRouter())
 
   app.use(apiPrefix, await mSafetyRouter())
 

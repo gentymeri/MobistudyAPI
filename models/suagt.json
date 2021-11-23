@@ -1,0 +1,55 @@
+{
+  "userKey": "asdasd",
+  "studyKey": "SUAGT",
+  "taskId": 8,
+  "dataType": "distance",
+  "createdTS": "timestamp on the server",
+  "positions": [{
+    "timestamp": 1616096268755,
+    "coords": {
+      "latitude": 55.6031628,
+      "longitude": 13.0204605,
+      "altitude": 72.52993923146708,
+      "accuracy": 32.112998962402344
+    }
+  },
+    {
+      "timestamp": 1616096269999,
+      "coords": {
+        "latitude": 55.60358,
+        "longitude": 13.0202173,
+        "altitude": 47.59667030700763,
+        "accuracy": 7.504000186920166,
+        "heading": 291,
+        "speed": 0.949999988079071
+      }
+    }
+  ],
+  "steps": [
+    {
+      "startDate": 1616096275662,
+      "endDate": 1616096275668,
+      "numberOfSteps": 1
+    },
+    {
+      "startDate": 1616096275662,
+      "endDate": 1616096285975,
+      "numberOfSteps": 1
+    }
+  ],
+  "angle": [
+  {
+    "startDate": 1616096275662,
+    "endDate": 1616096275668,
+    "angle": 180
+  },
+  {
+    "startDate": 1616096275662,
+    "endDate": 1616096285975,
+    "angle": 180
+  }
+],
+  "distance": 600,
+  "borgScale": 5,
+  "time": "00:00"
+}
