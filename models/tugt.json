@@ -2,27 +2,36 @@
   "userKey": "asdasd",
   "studyKey": "TUGT",
   "taskId": 8,
-  "dataType": "distance",
   "createdTS": "timestamp on the server",
-  "positions": [{
-    "timestamp": 1616096268755,
-    "coords": {
-      "latitude": 55.6031628,
-      "longitude": 13.0204605,
-      "altitude": 72.52993923146708,
-      "accuracy": 32.112998962402344
-    }
-  },
+  "acceleration": [
     {
-      "timestamp": 1616096269999,
-      "coords": {
-        "latitude": 55.60358,
-        "longitude": 13.0202173,
-        "altitude": 47.59667030700763,
-        "accuracy": 7.504000186920166,
-        "heading": 291,
-        "speed": 0.949999988079071
-      }
+      "timestamp": 1616096275662,
+      "acc": {
+        "x": 12.98,
+        "y": 11.0,
+        "z": 98.9
+      },
+      "accG": {
+        "x": 10.1,
+        "y": 1.1,
+        "z": 0.0
+      },
+      "rotRate": {
+        "alpha": 11.9,
+        "beta": 0.0,
+        "gamma": 11.11
+      },
+      "interval": 100
+    }
+  ],
+  "orientation": [
+    {
+      "timestamp": 1616096275662,
+      "abs": 1212.1,
+      "alpha": 122.66,
+      "beta": 2949,
+      "gamma": 2222,
+      "heading": 122
     }
   ],
   "steps": [
@@ -34,22 +43,12 @@
     {
       "startDate": 1616096275662,
       "endDate": 1616096285975,
-      "numberOfSteps": 1
+      "numberOfSteps": 2
     }
   ],
-  "angle": [
-  {
-    "startDate": 1616096275662,
-    "endDate": 1616096275668,
-    "angle": 180
-  },
-  {
-    "startDate": 1616096275662,
-    "endDate": 1616096285975,
-    "angle": 180
+  "summary": {
+    "testDurationMs": 3232,
+    "testStartTS": "2021-11-23...",
+    "testEndTS": "2021-11-23..."
   }
-],
-  "distance": 600,
-  "borgScale": 5,
-  "time": "00:00"
 }
