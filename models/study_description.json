@@ -238,6 +238,23 @@
           5
         ]
       }
+    },
+    {
+      "id": 11,
+      "type": "holdPhone",
+      "scheduling": {
+        "startEvent": "consent",
+        "intervalType": "w",
+        "interval": 1,
+        "occurrences": 20,
+        "months": [],
+        "monthDays": [],
+        "weekDays": [
+          1,
+          3,
+          5
+        ]
+      }
     }
   ],
   "consent": {
@@ -319,6 +336,13 @@
           "sv": "Jag accepterar att utföra Timed up and go test en gång i veckan."
         },
         "taskId": 10
+      },
+      {
+        "description": {
+          "en": "I agree to perform the task of holding the phone once a week.",
+          "sv": "Jag går med på att utföra uppgiften att hålla telefonen en gång i veckan."
+        },
+        "taskId": 11
       }
     ],
     "extraItems": [

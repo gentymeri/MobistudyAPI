@@ -1,0 +1,54 @@
+{
+  "userKey": "asdasd",
+  "studyKey": "holdPhone",
+  "taskId": 9,
+  "createdTS": "timestamp on the server",
+  "acceleration": [
+  {
+    "timestamp": 1616096275662,
+    "acc": {
+      "x": 12.98,
+      "y": 11.0,
+      "z": 98.9
+    },
+    "accG": {
+      "x": 10.1,
+      "y": 1.1,
+      "z": 0.0
+    },
+    "rotRate": {
+      "alpha": 11.9,
+      "beta": 0.0,
+      "gamma": 11.11
+    },
+    "interval": 100
+  }
+],
+  "orientation": [
+  {
+    "timestamp": 1616096275662,
+    "abs": 1212.1,
+    "alpha": 122.66,
+    "beta": 2949,
+    "gamma": 2222,
+    "heading": 122
+  }
+],
+  "steps": [
+  {
+    "startDate": 1616096275662,
+    "endDate": 1616096275668,
+    "numberOfSteps": 1
+  },
+  {
+    "startDate": 1616096275662,
+    "endDate": 1616096285975,
+    "numberOfSteps": 2
+  }
+],
+  "summary": {
+  "testDurationMs": 6000,
+    "testStartTS": "2021-11-23...",
+    "testEndTS": "2021-11-23..."
+}
+}

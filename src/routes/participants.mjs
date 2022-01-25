@@ -198,6 +198,12 @@ export default async function () {
         // Remove tapping Data
         await DAO.deleteFingerTappingsByUser(userKey)
 
+        // Remove TUGT Data
+        await DAO.deleteTugtByUser(userKey)
+
+        // Remove holdPhone Data
+        await DAO.deleteHoldPhoneByUser(userKey)
+
         // Remove attachments
         await deleteAttachmentsByUser(userKey)
 
@@ -274,7 +280,13 @@ export default async function () {
         await DAO.deletePositionsByUser(userKey)
 
         // Remove tapping Data
-        await DAO.deletetappingByParticipant(userKey)
+        await DAO.deleteFingerTappingsByUser(userKey)
+
+        // Remove tapping Data
+        await DAO.deleteTugtByUser(userKey)
+
+        // Remove tapping Data
+        await DAO.deleteHoldPhoneByUser(userKey)
 
         // Remove Audit logs
         await DAO.deleteLogsByUser(userKey)

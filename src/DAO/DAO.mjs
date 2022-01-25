@@ -20,6 +20,8 @@ import getPO60DataDAO from './po60DataDAO.mjs'
 import getPeakFlowDataDAO from './peakflowDataDAO.mjs'
 import getPositionsDAO from './positionsDAO.mjs'
 import getFingerTappingDAO from './fingerTappingDAO.mjs'
+import getTugtsDAO from './tugtsDAO.mjs'
+import getHoldPhoneDAO from './holdPhoneDAO.mjs'
 
 import getConfig from '../services/config.mjs'
 
@@ -88,5 +90,9 @@ export async function initializeDAO () {
   DAO = Object.assign(pos, DAO)
   const ft = await getFingerTappingDAO(db)
   DAO = Object.assign(ft, DAO)
+  const TUGTData = await getTugtsDAO(db)
+  DAO = Object.assign(TUGTData, DAO)
+  const holdPhoneData = await getHoldPhoneDAO(db)
+  DAO = Object.assign(holdPhoneData, DAO)
   // add new collections here
 }
